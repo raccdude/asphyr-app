@@ -6,13 +6,47 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		83653EBB306520710084CB48 /* SpaceGrotesk-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */; };
+		83653EBD306520780084CB48 /* SpaceGrotesk-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */; };
+		83653EBF3065207E0084CB48 /* SpaceGrotesk-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */; };
+		83653EC1306520850084CB48 /* SpaceGrotesk-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */; };
+		83653EC3306521BD0084CB48 /* Inter_24pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC2306521BD0084CB48 /* Inter_24pt-Regular.ttf */; };
+		83653EC5306521E90084CB48 /* Inter_24pt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC4306521E90084CB48 /* Inter_24pt-Medium.ttf */; };
+		83653EC7306521F20084CB48 /* Inter_24pt-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC6306521F20084CB48 /* Inter_24pt-SemiBold.ttf */; };
+		83653EC9306521FD0084CB48 /* Inter_24pt-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC8306521FD0084CB48 /* Inter_24pt-Bold.ttf */; };
+		83653ECB3065225F0084CB48 /* Inter_24pt-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653ECA3065225F0084CB48 /* Inter_24pt-Black.ttf */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Regular.ttf"; sourceTree = "<group>"; };
+		83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-SemiBold.ttf"; sourceTree = "<group>"; };
+		83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Bold.ttf"; sourceTree = "<group>"; };
+		83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Medium.ttf"; sourceTree = "<group>"; };
+		83653EC2306521BD0084CB48 /* Inter_24pt-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter_24pt-Regular.ttf"; sourceTree = "<group>"; };
+		83653EC4306521E90084CB48 /* Inter_24pt-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter_24pt-Medium.ttf"; sourceTree = "<group>"; };
+		83653EC6306521F20084CB48 /* Inter_24pt-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter_24pt-SemiBold.ttf"; sourceTree = "<group>"; };
+		83653EC8306521FD0084CB48 /* Inter_24pt-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter_24pt-Bold.ttf"; sourceTree = "<group>"; };
+		83653ECA3065225F0084CB48 /* Inter_24pt-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter_24pt-Black.ttf"; sourceTree = "<group>"; };
 		83F11B21303D338A006A4B80 /* Asphyr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asphyr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		83653ECD306524290084CB48 /* Exceptions for "Asphyr" folder in "Asphyr" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 83F11B20303D338A006A4B80 /* Asphyr */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		83F11B23303D338A006A4B80 /* Asphyr */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				83653ECD306524290084CB48 /* Exceptions for "Asphyr" folder in "Asphyr" target */,
+			);
 			path = Asphyr;
 			sourceTree = "<group>";
 		};
@@ -29,9 +63,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		83653EAB30651E140084CB48 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */,
+				83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */,
+				83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */,
+				83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */,
+				83653EC2306521BD0084CB48 /* Inter_24pt-Regular.ttf */,
+				83653EC4306521E90084CB48 /* Inter_24pt-Medium.ttf */,
+				83653EC6306521F20084CB48 /* Inter_24pt-SemiBold.ttf */,
+				83653EC8306521FD0084CB48 /* Inter_24pt-Bold.ttf */,
+				83653ECA3065225F0084CB48 /* Inter_24pt-Black.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		83F11B18303D338A006A4B80 = {
 			isa = PBXGroup;
 			children = (
+				83653EAB30651E140084CB48 /* Fonts */,
 				83F11B23303D338A006A4B80 /* Asphyr */,
 				83F11B22303D338A006A4B80 /* Products */,
 			);
@@ -109,6 +160,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83653EBD306520780084CB48 /* SpaceGrotesk-SemiBold.ttf in Resources */,
+				83653EC5306521E90084CB48 /* Inter_24pt-Medium.ttf in Resources */,
+				83653ECB3065225F0084CB48 /* Inter_24pt-Black.ttf in Resources */,
+				83653EC1306520850084CB48 /* SpaceGrotesk-Medium.ttf in Resources */,
+				83653EC3306521BD0084CB48 /* Inter_24pt-Regular.ttf in Resources */,
+				83653EBF3065207E0084CB48 /* SpaceGrotesk-Bold.ttf in Resources */,
+				83653EC7306521F20084CB48 /* Inter_24pt-SemiBold.ttf in Resources */,
+				83653EC9306521FD0084CB48 /* Inter_24pt-Bold.ttf in Resources */,
+				83653EBB306520710084CB48 /* SpaceGrotesk-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,7 +313,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Asphyr/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -285,7 +346,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Asphyr/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
