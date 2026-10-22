@@ -10,9 +10,10 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    
     @State private var isShowingNextScreen: Bool = false
     
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -20,21 +21,11 @@ struct LoginView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 16) {
-                    Text("ASPHYR")
-                        .font(.system(size: 24, weight: .bold)) // change
-                        .foregroundStyle(Color.asphyrAccentPrimary)
-                        .padding(.top, 10)
-                    
-                    VStack(spacing: 16) {
-                        Text("WELCOME BACK")
-                            .font(.system(size: 24, weight: .bold)) // change
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                            .padding(.top, 40)
-                        
-                        Text("CONTINUE YOUR JOURNEY")
-                            .font(.system(size: 16, weight: .medium)) // change
-                            .foregroundStyle(Color.asphyrTextSecondary)
+                    WordMarkView() {
+                        dismiss()
                     }
+                    
+                    AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
                     
                     Spacer()
                     
@@ -57,7 +48,6 @@ struct LoginView: View {
                       
                     Spacer()
                     
-                    // BUTTON
                     PrimaryButton(name: "LOG IN") {
                         if !email.isEmpty && !password.isEmpty {
                             isShowingNextScreen = true
@@ -97,11 +87,14 @@ struct LoginView: View {
                     }
                 }
                 .padding(.horizontal, 20)
+                .padding(.vertical, 12)
             }
+            .navigationBarBackButtonHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: $isShowingNextScreen) {
                 HomeView()
             }
-            .navigationBarBackButtonHidden(true)
+           
         }
     }
 }

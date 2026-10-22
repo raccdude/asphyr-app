@@ -59,6 +59,7 @@ struct ArchetypeSelectionView: View {
                             Text("YOUR CHARACTER")
                                 .font(.system(size: 24, weight: .bold))
                                 .foregroundStyle(Color.asphyrTextPrimary)
+                            
                             Spacer()
 
                             Character()

@@ -69,7 +69,7 @@ struct IdentityCreationView: View {
                             
                             Text("BUILD YOUR IDENTITY") // ADD SPACE GROTESK
                                 .font(.system(size: 24, weight: .bold))
-                                .foregroundStyle(Color.asphyrAccentPrimary)
+                                .foregroundStyle(Color.asphyrTextPrimary)
                             
                             Spacer()
                             
@@ -114,49 +114,51 @@ struct IdentityCreationView: View {
                                 
                                 AsphyrTextField(placeholder: "Enter your name", text: $username)
                                 
-                                // 24 px space
+                            }
                                 
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("WHO DO YOU ASPIRE TO BE?")
-                                        .font(.system(size: 14))
-                                        .fontWeight(.medium)
-                                        .foregroundStyle(.white)
-                                    
-                                    LazyVGrid(columns: columns, spacing: 12) {
-                                        ForEach(aspirations) { item in
-                                            AspirationCard(
-                                                aspiration: item,
-                                                isSelected: selectedAspirationID == item.id
-                                            )
-                                            .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    selectedAspirationID = item.id
-                                                }
+                            // 24 px space
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("WHO DO YOU ASPIRE TO BE?")
+                                    .font(.system(size: 14))
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white)
+                                
+                                LazyVGrid(columns: columns, spacing: 12) {
+                                    ForEach(aspirations) { item in
+                                        AspirationCard(
+                                            aspiration: item,
+                                            isSelected: selectedAspirationID == item.id
+                                        )
+                                        .onTapGesture {
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                selectedAspirationID = item.id
                                             }
                                         }
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .center)
                                 }
                                 
-                                PrimaryButton(name: "CONTINUE") {
-                                    if username != "" && selectedAspirationID != nil {
-                                        isShowingNextScreen = true
-                                    }
-                                }
                             }
                             
+                            PrimaryButton(name: "CONTINUE") {
+                                if username != "" && selectedAspirationID != nil {
+                                    isShowingNextScreen = true
+                                }
+                            }
                         }
-                        .padding(.horizontal, 20)
+                        
                     }
-                    .navigationDestination(isPresented: $isShowingNextScreen) {
-                        ArchetypeSelectionView()
-                    }
+                    .padding(.horizontal, 20)
+                }
+                .navigationDestination(isPresented: $isShowingNextScreen) {
+                    ArchetypeSelectionView()
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
+
         
 #Preview {
     IdentityCreationView()
