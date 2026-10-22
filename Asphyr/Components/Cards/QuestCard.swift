@@ -12,77 +12,78 @@ struct QuestCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            
             // HEADER
-            HStack(spacing: 8) {
-                Image(systemName: "shield.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Color("AsphyrGreen"))
+            HStack(spacing: 12) {
+                Image(systemName: "gamecontroller.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color.asphyrTextSecondary)
 
-                
                 Text("Daily Quest".uppercased()) // questType
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color("PrimaryText"))
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color.asphyrTextSecondary)
             
                 Spacer()
                 
-                Image(systemName: "arrow.right")
-                    
-                    .foregroundStyle(Color("PrimaryText"))
+                Image(systemName: "chevron.forward.dotted.chevron.forward")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.asphyrTextSecondary)
             }
             
             // CONTENT
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Operating Systems")
-                    .font(.system(size: 16))
+            VStack(alignment: .leading, spacing: 8) {
+                Text("BUILD A SMALL MECHANIC")
+                    .font(.system(size: 16, weight: .medium))
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color("PrimaryText"))
+                    .foregroundStyle(Color.asphyrTextPrimary)
                 
-                Text("Study deadlocks for 30 mins.")
+                Text("Turn a simple idea into a working feature.")
                     .font(.system(size: 14))
-                    .foregroundStyle(Color("SecondaryText"))
-        
+                    .foregroundStyle(Color.asphyrTextSecondary)
             }
+            .padding(.bottom, 12)
 
             // METADATA
-            HStack(spacing: 18){
-                Text("EDUCATION") // CATEGORY
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color("PrimaryText"))
+            HStack {
+                Text("DEVELOPMENT") // CATEGORY
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                
+                Spacer()
                 
                 Text("30 MIN") // DURATION
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color("PrimaryText"))
-                
-                Spacer()
-                
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.asphyrTextSecondary)
             }
             
-            Divider()
-            
+            RectangleView(height: 1.5, color: Color.asphyrSurfaceElevated)
+
             // FOOTER
             HStack(spacing: 14) {
-                Text("+ 100 XP")
+                Text("+100 XP")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color("PrimaryText"))
+                    .foregroundStyle(Color.asphyrWarning) // change
                 
-                Text("+5 Knowledge")
+                Text("+5 CREATIVITY")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color("PrimaryText"))
+                    .foregroundStyle(Color.asphyrWarning)
                 
                 Spacer()
                 
-                QuestStatus()
+                QuestStatus(status: .available)
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 40)
-        .frame(maxWidth: .infinity, maxHeight: 200)
-        .background(RoundedRectangle(cornerRadius: 16)
-            .fill(Color("Surface"))
-            .shadow(color: Color("AsphyrGreen"), radius: 2, x: 0, y: 1))
-    }
+        .padding(20)
         
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.asphyrSurface)
+                .overlay(RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.asphyrBorder))
+        )
+        
+            //.shadow(color: Color.asphyrAccentPrimary, radius: 2, x: 0, y: 1))
+    }
 }
 
 #Preview {

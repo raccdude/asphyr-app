@@ -8,21 +8,24 @@
 import SwiftUI
 
 struct AttributeCard: View {
-    let attribute: String
-    let value: String
+    let attribute: UserAttribute
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(attribute)
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 4) {
+            Text(attribute.name)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundStyle(Color.asphyrTextSecondary)
             
-            Text(value)
-                .font(.title3)
+            Text(attribute.value)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.asphyrTextPrimary)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, maxHeight: 70)
-        .background(RoundedRectangle(cornerRadius: 16)
-            .fill(Color(.gray))
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4))
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.asphyrSurface)
+                .stroke(Color.asphyrBorder, lineWidth: 1)
+        )
     }
 }

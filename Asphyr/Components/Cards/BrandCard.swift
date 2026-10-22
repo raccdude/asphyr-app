@@ -39,5 +39,6 @@ struct BrandCard: View {
         .frame(width: 170, height: 50)
         .background(Color.asphyrSurface)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.asphyrBorder, lineWidth: 1))
     }
 }
