@@ -13,18 +13,15 @@ struct WelcomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black
+                Color.asphyrBackground
                     .ignoresSafeArea()
                 
                 VStack(spacing: 32) {
-                    Text("ASPHYR")
-                        .font(.system(size: 24, weight: .bold)) // add app typography
-                        .foregroundStyle(Color.asphyrAccentPrimary)
-                        .tracking(4)
+                    WordMarkView()
                     
                     Spacer()
                     
-                    Character()
+                    Character(size: 140)
      
                     Text("YOUR JOURNEY STARTS \nWITH ONE STEP.")
                         .font(.system(size: 24, weight: .bold))
@@ -55,14 +52,15 @@ struct WelcomeView: View {
                                 .foregroundStyle(Color.asphyrAccentPrimary)
                         }
                     }
+                    .padding(.bottom, 12)
                 }
                 .padding(.horizontal, 20)
             }
+            .navigationDestination(isPresented: $isShowingNextScreen) {
+                CreateAccountView()
+            }
+            .navigationBarBackButtonHidden(true)
         }
-        .navigationDestination(isPresented: $isShowingNextScreen) {
-            CreateAccountView()
-        }
-        .navigationBarBackButtonHidden(true)
     }
 }
 

@@ -8,31 +8,47 @@
 import SwiftUI
 
 struct Character: View {
+    // 1. Add a dimension parameter with a default size for the dashboard layout
+    let size: CGFloat
+    
+    init(size: CGFloat = 100) {
+        self.size = size
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
-                    // 1. The Base or Shadow (Bottom layer)
-                    Capsule() // Using Capsule instead of a squished Circle looks cleaner
-                        .frame(width: 50, height: 12)
-                        .foregroundStyle(Color.asphyrSurfaceElevated).opacity(0.5) // Slightly transparent for a shadow effect
-                        .offset(y: 20)
-                    
-                    // 2. The Body (Middle layer)
-                    Circle()
-                        .frame(width: 80, height: 80)
-                        .foregroundStyle(Color.asphyrSurface)
-                        .offset(y: -1) // Pulls the body slightly up from the base
-                    
-                    // 3. The Head (Top layer)
-                    Circle()
-                        .frame(width: 50, height: 50)
-                        .foregroundStyle(Color.asphyrSurfaceElevated)
-                        .offset(y: -70) // Pulls the head up so it overlaps and sits perfectly on the body
-                }
-                .frame(width: 100, height: 100)
-            }
-    
+            
+            // BASE SHADOW
+            Ellipse()
+                .frame(width: size * 0.6, height: size * 0.12)
+                .foregroundStyle(Color.asphyrSurfaceElevated)
+                .opacity(0.4)
+                .offset(y: size * 0.06)
+            
+            // BODY
+            Circle()
+                .frame(width: size * 0.8, height: size * 0.8)
+                .foregroundStyle(Color.asphyrSurfaceElevated)
+                .mask(
+                    RoundedRectangle(cornerRadius: size * 0.16)
+                        .frame(height: size * 0.55)
+                        .offset(y: -(size * 0.12))
+                )
+            
+            // HEAD
+            Circle()
+                .frame(width: size * 0.46, height: size * 0.46)
+                .foregroundStyle(Color.asphyrSurfaceElevated)
+                .offset(y: -(size * 0.7))
+        }
+        .frame(width: size, height: size)
+    }
 }
 
 #Preview {
-    Character()
+    VStack(spacing: 40) {
+        Character()
+        
+        Character(size: 180)
+    }
 }

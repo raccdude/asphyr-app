@@ -38,7 +38,7 @@ struct SplashView: View {
                         .offset(y: -10)
                     
                         Text("ASPHYR")
-                            .font(.system(size: 32, weight: .bold))
+                            .font(.system(size: 32, weight: .black))
                             .foregroundStyle(Color.asphyrAccentPrimary)
                             .tracking(6)
                             .offset(y: -40)
