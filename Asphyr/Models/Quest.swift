@@ -25,11 +25,11 @@ enum QuestType {
     case mainQuest
 }
 
-/*
- enum QuestStatus {
- case available
- case inProgress
- case completed
+
+ enum QuestStatusType {
+     case available
+     case inProgress
+     case completed
  }
  
- */
+ 
