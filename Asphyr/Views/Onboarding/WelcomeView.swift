@@ -9,61 +9,84 @@ import SwiftUI
 
 struct WelcomeView: View {
     @State private var isShowingNextScreen = false
-    
+
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
-                
-                VStack(spacing: 32) {
-                    WordMarkView()
-                    
-                    Spacer()
-                    
-                    Character(size: 140)
-     
-                    Text("YOUR JOURNEY STARTS \nWITH ONE STEP.")
-                        .font(.system(size: 24, weight: .bold))
+        // No NavigationStack here: Welcome is pushed onto SplashView's stack,
+        // so Create Account and Log In are pushed onto that same stack.
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // WORDMARK
+                Text("ASPHYR")
+                    .font(AppTypography.wordMark)
+                    .tracking(1.44)
+                    .foregroundStyle(Color.asphyrAccentPrimary)
+
+                Spacer(minLength: 24)
+
+                // CHARACTER + MESSAGE + CTA
+                VStack(spacing: 0) {
+                    Image("characterSilhouette")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 134, height: 134)
+                        .accessibilityHidden(true)
+
+                    Text("YOUR JOURNEY STARTS\nWITH ONE STEP.")
+                        .font(AppTypography.screenTitle)
                         .foregroundStyle(Color.asphyrTextPrimary)
                         .multilineTextAlignment(.center)
-                    
-                    Text("You don't have to become that person today. \nJust take one step toward becoming them.")
-                        .font(.system(size: 14, weight: .regular))
+                        .accessibilityAddTraits(.isHeader)
+                        .padding(.top, 44)
+
+                    Text("You don’t have to become that person today.\nJust take one step toward becoming them.")
+                        .font(AppTypography.body)
                         .foregroundStyle(Color.asphyrTextSecondary)
                         .multilineTextAlignment(.center)
-                 
-                    PrimaryButton(name: "BEGIN JOURNEY") {
+                        .lineSpacing(1)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
+                        .padding(.top, 14)
+
+                    PrimaryButtonV2(title: "BEGIN JOURNEY") {
                         isShowingNextScreen = true
                     }
-                   
-                    Spacer()
-                    
-                    VStack(spacing: 8) {
-                        Text("Already have an account?")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                        
-                        NavigationLink {
-                            LoginView()
-                        } label: {
-                            Text("LOG IN")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(Color.asphyrAccentPrimary)
-                        }
-                    }
-                    .padding(.bottom, 12)
+                    .padding(.top, 37)
                 }
-                .padding(.horizontal, 20)
+                // Sits slightly above centre, as in Figma
+                .padding(.bottom, 22)
+
+                Spacer(minLength: 24)
+
+                // LOG IN PROMPT (one line)
+                HStack(spacing: 7.5) {
+                    Text("Already have an account?")
+                        .font(AppTypography.bodySecondary)
+                        .foregroundStyle(Color.asphyrTextSecondary)
+
+                    NavigationLink {
+                        LoginView()
+                    } label: {
+                        Text("LOG IN")
+                            .font(AppTypography.bodySecondarySemiBold)
+                            .foregroundStyle(Color.asphyrAccentPrimary)
+                    }
+                }
+                .padding(.bottom, 10)
             }
-            .navigationDestination(isPresented: $isShowingNextScreen) {
-                CreateAccountView()
-            }
-            .navigationBarBackButtonHidden(true)
+            .padding(.horizontal, 20)
         }
+        .navigationDestination(isPresented: $isShowingNextScreen) {
+            CreateAccountView()
+        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
-    WelcomeView()
+    NavigationStack {
+        WelcomeView()
+    }
 }
