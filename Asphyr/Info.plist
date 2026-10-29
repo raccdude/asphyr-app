@@ -4,7 +4,15 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string></string>
+		<string>SpaceGrotesk-Regular.ttf</string>
+		<string>SpaceGrotesk-Medium.ttf</string>
+		<string>SpaceGrotesk-SemiBold.ttf</string>
+		<string>SpaceGrotesk-Bold.ttf</string>
+		<string>Inter_24pt-Regular.ttf</string>
+		<string>Inter_24pt-Medium.ttf</string>
+		<string>Inter_24pt-SemiBold.ttf</string>
+		<string>Inter_24pt-Bold.ttf</string>
+		<string>Inter_24pt-Black.ttf</string>
 	</array>
 </dict>
 </plist>
