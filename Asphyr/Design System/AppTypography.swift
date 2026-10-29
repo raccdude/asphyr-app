@@ -13,14 +13,21 @@ enum AppTypography {
         size: 32
     )
 
-    static let screenTitle = Font.custom(
-        "SpaceGrotesk-SemiBold",
-        size: 24,
-        relativeTo: .largeTitle
-    ).weight(.black)
+    // Figma "Word Mark" — use with .tracking(1.44)
+    static let wordMark = Font.custom(
+        "SpaceGrotesk-Bold",
+        size: 24
+    )
 
+    // Figma "Screen Title"
+    static let screenTitle = Font.custom(
+        "SpaceGrotesk-Bold",
+        size: 24
+    )
+
+    // Figma "Section"
     static let sectionTitle = Font.custom(
-        "SpaceGrotesk-SemiBold",
+        "SpaceGrotesk-Bold",
         size: 20
     )
 
@@ -41,6 +48,12 @@ enum AppTypography {
 
     static let bodySecondary = Font.custom(
         "Inter24pt-Regular",
+        size: 14
+    )
+
+    // Inline text links, e.g. "LOG IN"
+    static let bodySecondarySemiBold = Font.custom(
+        "Inter24pt-SemiBold",
         size: 14
     )
 
