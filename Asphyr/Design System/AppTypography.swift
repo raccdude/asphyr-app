@@ -30,27 +30,27 @@ enum AppTypography {
     )
     
     static let bodyMedium = Font.custom(
-        "Inter-Medium",
+        "Inter24pt-Medium",
         size: 16
     )
     
     static let body = Font.custom(
-        "Inter-Regular",
+        "Inter24pt-Regular",
         size: 16
     )
 
     static let bodySecondary = Font.custom(
-        "Inter-Regular",
+        "Inter24pt-Regular",
         size: 14
     )
 
     static let captionMedium = Font.custom(
-        "Inter-Medium",
+        "Inter24pt-Medium",
         size: 12
     )
     
     static let captionRegular = Font.custom(
-        "Inter-Regular",
+        "Inter24pt-Regular",
         size: 10
     )
 
