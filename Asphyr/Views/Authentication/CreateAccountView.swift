@@ -25,7 +25,7 @@ struct CreateAccountView: View {
     @FocusState private var focus: Field?
 
     private var isEmailValid: Bool {
-        email.wholeMatch(of: /[^@\s]+@[^@\s]+\.[^@\s]+/) != nil
+        email.isValidEmail
     }
 
     private var doPasswordsMatch: Bool {

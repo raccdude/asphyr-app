@@ -8,77 +8,127 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email: String = ""
-    @State private var password: String = ""
+    private enum Field: Hashable {
+        case email, password
+    }
 
     @Environment(AppRouter.self) private var router
 
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var showsError = false
+
+    @FocusState private var focus: Field?
+
     var body: some View {
         AuthScreen {
-            VStack(spacing: 16) {
-                AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
-                
-                Spacer()
-                
-                VStack(spacing: 22) {
-                    AsphyrTextField(placeholder: "Email", text: $email)
-                    AsphyrSecureField(placeholder: "Password", text: $password)   
-                }
-                
-                HStack {
-                    Spacer()
-                    
-                    Button {
-                        router.push(.recover)
-                    } label: {
-                        Text("Forgot password?")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                    }
-                }
-                  
-                Spacer()
-                
-                PrimaryButton(name: "LOG IN") {
-                    if !email.isEmpty && !password.isEmpty {
-                        router.push(.home)
-                    }
-                }
-                
-                HStack {
-                    RectangleView(height: 1)
-                    
-                    Text("OR")
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                    
-                    RectangleView(height: 1)
-                    
-                }
+            content
+        }
+        .animation(.easeInOut(duration: 0.2), value: showsError)
+        .onChange(of: email) {
+            showsError = false
+        }
+        .onChange(of: password) {
+            showsError = false
+        }
+    }
 
-                HStack(spacing: 12) {
-                    BrandCard(brandLogo: "apple.logo", brandName: "Apple", isSystemSymbol: true)
-                    BrandCard(brandLogo: "googleLogo", brandName: "Google")
-                }
-                
-                Spacer()
-                
-                VStack(spacing: 8) {
-                    Text("Don't have an account?")
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                    
-                    Button {
-                        router.switchTo(.createAccount)
-                    } label: {
-                        Text("CREATE ACCOUNT")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color.asphyrAccentPrimary)
-                    }
-                }
+    private var content: some View {
+        VStack(spacing: 0) {
+            AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
+
+            // FIELDS
+            VStack(spacing: 12) {
+                AsphyrInputField(
+                    placeholder: "Email",
+                    icon: "iconMail",
+                    text: $email,
+                    focus: $focus,
+                    field: .email,
+                    hasError: showsError
+                )
+                .textContentType(.username)
+                .keyboardType(.emailAddress)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.next)
+                .onSubmit { focus = .password }
+
+                AsphyrInputField(
+                    placeholder: "Password",
+                    icon: "iconLock",
+                    text: $password,
+                    focus: $focus,
+                    field: .password,
+                    isSecure: true,
+                    hasError: showsError
+                )
+                .textContentType(.password)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.go)
+                .onSubmit(submit)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 12)
+            .padding(.top, 36)
+
+            if showsError {
+                FieldErrorRow(message: "Incorrect email or password. Try again.")
+                    .padding(.top, 8)
+            }
+
+            forgotPasswordButton
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.top, 12)
+
+            PrimaryButtonV2(title: "LOG IN", action: submit)
+                .padding(.top, 24)
+
+            OrDivider()
+                .padding(.top, 22)
+
+            SocialSignInRow()
+                .padding(.top, 22)
+
+            Spacer(minLength: 24)
+
+            AuthSwitchPrompt(prompt: "Don’t have an account?", actionTitle: "CREATE ACCOUNT") {
+                router.switchTo(.createAccount)
+            }
+            .padding(.bottom, 6)
+        }
+        .padding(.horizontal, 20)
+        // Tapping empty space dismisses the keyboard
+        .contentShape(Rectangle())
+        .onTapGesture {
+            focus = nil
+        }
+    }
+
+    private var forgotPasswordButton: some View {
+        Button {
+            router.push(.recover)
+        } label: {
+            Text("Forgot password?")
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextSecondary)
+                // Grows the tap area to about 44 pt without moving the layout
+                .padding(.vertical, 14)
+                .padding(.horizontal, 8)
+                .contentShape(Rectangle())
+                .padding(.vertical, -14)
+                .padding(.horizontal, -8)
+        }
+    }
+
+    /// Authentication is mocked until a backend exists, so this only checks the
+    /// format. Any well-formed email with a password logs in.
+    private func submit() {
+        focus = nil
+
+        if email.isValidEmail && !password.isEmpty {
+            router.push(.home)
+        } else {
+            showsError = true
         }
     }
 }
