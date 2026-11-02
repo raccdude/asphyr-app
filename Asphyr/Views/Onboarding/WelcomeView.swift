@@ -17,68 +17,99 @@ struct WelcomeView: View {
             Color.asphyrBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // WORDMARK
-                Text("ASPHYR")
-                    .font(AppTypography.wordMark)
-                    .tracking(1.44)
-                    .foregroundStyle(Color.asphyrAccentPrimary)
-
-                Spacer(minLength: 24)
-
-                // CHARACTER + MESSAGE + CTA
-                VStack(spacing: 0) {
-                    Image("characterSilhouette")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 134, height: 134)
-                        .accessibilityHidden(true)
-
-                    Text("YOUR JOURNEY STARTS\nWITH ONE STEP.")
-                        .font(AppTypography.screenTitle)
-                        .foregroundStyle(Color.asphyrTextPrimary)
-                        .multilineTextAlignment(.center)
-                        .accessibilityAddTraits(.isHeader)
-                        .padding(.top, 44)
-
-                    Text("You don’t have to become that person today.\nJust take one step toward becoming them.")
-                        .font(AppTypography.body)
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(1)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.9)
-                        .padding(.top, 14)
-
-                    PrimaryButtonV2(title: "BEGIN JOURNEY") {
-                        router.push(.createAccount)
-                    }
-                    .padding(.top, 37)
+            // Fills the screen at the default text size, and only scrolls
+            // when larger text no longer fits.
+            GeometryReader { proxy in
+                ScrollView {
+                    content
+                        .frame(minHeight: proxy.size.height)
                 }
-                // Sits slightly above centre, as in Figma
-                .padding(.bottom, 22)
-
-                Spacer(minLength: 24)
-
-                // LOG IN PROMPT (one line)
-                HStack(spacing: 7.5) {
-                    Text("Already have an account?")
-                        .font(AppTypography.bodySecondary)
-                        .foregroundStyle(Color.asphyrTextSecondary)
-
-                    Button {
-                        router.push(.login)
-                    } label: {
-                        Text("LOG IN")
-                            .font(AppTypography.bodySecondarySemiBold)
-                            .foregroundStyle(Color.asphyrAccentPrimary)
-                    }
-                }
-                .padding(.bottom, 10)
+                .scrollBounceBehavior(.basedOnSize)
             }
-            .padding(.horizontal, 20)
         }
         .navigationBarBackButtonHidden(true)
+    }
+
+    private var content: some View {
+        VStack(spacing: 0) {
+            // WORDMARK
+            Text("ASPHYR")
+                .font(AppTypography.wordMark)
+                .tracking(1.44)
+                .foregroundStyle(Color.asphyrAccentPrimary)
+
+            Spacer(minLength: 24)
+
+            // CHARACTER + MESSAGE + CTA
+            VStack(spacing: 0) {
+                Image("characterSilhouette")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 134, height: 134)
+                    .accessibilityHidden(true)
+
+                Text("YOUR JOURNEY STARTS\nWITH ONE STEP.")
+                    .font(AppTypography.screenTitle)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.top, 44)
+
+                Text("You don’t have to become that person today.\nJust take one step toward becoming them.")
+                    .font(AppTypography.body)
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(1)
+                    .padding(.top, 14)
+
+                PrimaryButtonV2(title: "BEGIN JOURNEY") {
+                    router.push(.createAccount)
+                }
+                .padding(.top, 37)
+            }
+            // Sits slightly above centre, as in Figma
+            .padding(.bottom, 22)
+
+            Spacer(minLength: 24)
+
+            // LOG IN PROMPT (one line, stacking only when large text needs it)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 7.5) {
+                    logInPrompt
+                    logInButton
+                }
+
+                VStack(spacing: 8) {
+                    logInPrompt
+                    logInButton
+                }
+            }
+            .padding(.bottom, 10)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private var logInPrompt: some View {
+        Text("Already have an account?")
+            .font(AppTypography.bodySecondary)
+            .foregroundStyle(Color.asphyrTextSecondary)
+            .multilineTextAlignment(.center)
+    }
+
+    private var logInButton: some View {
+        Button {
+            router.push(.login)
+        } label: {
+            Text("LOG IN")
+                .font(AppTypography.bodySecondarySemiBold)
+                .foregroundStyle(Color.asphyrAccentPrimary)
+                // Grows the tap area to about 44 pt without moving the layout
+                .padding(.vertical, 14)
+                .padding(.horizontal, 8)
+                .contentShape(Rectangle())
+                .padding(.vertical, -14)
+                .padding(.horizontal, -8)
+        }
     }
 }
 

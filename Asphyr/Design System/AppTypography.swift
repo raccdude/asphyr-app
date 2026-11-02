@@ -37,33 +37,33 @@ enum AppTypography {
     )
     
     static let bodyMedium = Font.custom(
-        "Inter24pt-Medium",
+        "Inter-Medium",
         size: 16
     )
     
     static let body = Font.custom(
-        "Inter24pt-Regular",
+        "Inter-Regular",
         size: 16
     )
 
     static let bodySecondary = Font.custom(
-        "Inter24pt-Regular",
+        "Inter-Regular",
         size: 14
     )
 
     // Inline text links, e.g. "LOG IN"
     static let bodySecondarySemiBold = Font.custom(
-        "Inter24pt-SemiBold",
+        "Inter-SemiBold",
         size: 14
     )
 
     static let captionMedium = Font.custom(
-        "Inter24pt-Medium",
+        "Inter-Medium",
         size: 12
     )
     
     static let captionRegular = Font.custom(
-        "Inter24pt-Regular",
+        "Inter-Regular",
         size: 10
     )
 

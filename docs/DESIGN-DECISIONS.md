@@ -19,6 +19,7 @@ These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should 
 - **Active quest card:** a subtle glow only (y 4, blur 12, 30% green).
 - **Selected archetype/aspiration card:** the original style, Elevated Surface fill + green drop shadow (y 1, blur 2). No solid green border.
 - **Back button:** the iOS 26 **system** back button (round glass chevron). It keeps swipe-back working, so stop hiding it with `.navigationBarBackButtonHidden(true)`.
+  - **Exception:** Welcome keeps it hidden, because going back to Splash gives the user nothing.
 - **Demo data:** the account email is `lou@gmail.com`. The Google sign-in button uses the Google "G" logo.
 
 ## Screens

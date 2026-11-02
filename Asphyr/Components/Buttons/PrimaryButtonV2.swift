@@ -19,13 +19,17 @@ struct PrimaryButtonV2: View {
             Text(title)
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(Self.labelColor)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                // Grows past 56 pt so large text wraps instead of truncating
+                .frame(minHeight: 56)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(
-                            LinearGradient(
-                                colors: [Self.gradientTop, Self.gradientBottom],
+                            .linearGradient(
+                                // Blends in sRGB, like Figma, so the middle isn't paler
+                                Gradient(colors: [Self.gradientTop, Self.gradientBottom]).colorSpace(.device),
                                 startPoint: .top,
                                 endPoint: .bottom
                             )

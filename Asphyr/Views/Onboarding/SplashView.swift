@@ -22,7 +22,7 @@ struct SplashView: View {
             LinearGradient(
                 stops: [
                     .init(color: .white.opacity(0.07), location: 0),
-                    .init(color: .white.opacity(0), location: 0.55)
+                    .init(color: .white.opacity(0), location: 0.5)
                 ],
                 startPoint: UnitPoint(x: -0.23, y: 0.41),
                 endPoint: UnitPoint(x: 1.23, y: 0.59)
@@ -47,7 +47,7 @@ struct SplashView: View {
                     .tracking(1.92)
                     .foregroundStyle(Color.asphyrAccentPrimary)
             }
-            .offset(y: -50)
+            .offset(y: -64)
             .opacity(showLogo ? 1 : 0)
             .scaleEffect(showLogo || reduceMotion ? 1 : 0.96)
 
@@ -58,6 +58,7 @@ struct SplashView: View {
                 Text("TAP ANYWHERE TO BEGIN")
                     .font(AppTypography.captionMedium)
                     .foregroundStyle(Color.asphyrTextSecondary)
+                    .multilineTextAlignment(.center)
                     .opacity(
                         showLogo
                         ? (isPulsing ? 0.45 : 1.0)
