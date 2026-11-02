@@ -39,7 +39,7 @@ struct PrimaryButtonV2: View {
         .buttonStyle(PressableButtonStyle())
     }
 
-    // Deliberately not tokenised (see DESIGN-DECISIONS.md)
+    // Deliberately not tokenised (see docs/DESIGN-DECISIONS.md)
     private static let gradientTop = Color(red: 125 / 255, green: 255 / 255, blue: 155 / 255)   // #7DFF9B
     private static let gradientBottom = Color(red: 0 / 255, green: 230 / 255, blue: 59 / 255)    // #00E63B
     private static let labelColor = Color(red: 3 / 255, green: 20 / 255, blue: 10 / 255)         // #03140A
