@@ -12,6 +12,7 @@ import SwiftUI
 /// when the keyboard or larger text needs more room.
 struct AuthScreen<Content: View>: View {
     var showsBackButton: Bool = true
+    var onboardingStep: Int?
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -28,6 +29,6 @@ struct AuthScreen<Content: View>: View {
                 .scrollDismissesKeyboard(.interactively)
             }
         }
-        .authTopBar(showsBackButton: showsBackButton)
+        .authTopBar(showsBackButton: showsBackButton, onboardingStep: onboardingStep)
     }
 }

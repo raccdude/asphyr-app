@@ -11,6 +11,7 @@ import SwiftUI
 /// their own stack.
 struct RootView: View {
     @State private var router = AppRouter()
+    @State private var profile = OnboardingProfile()
 
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -37,6 +38,7 @@ struct RootView: View {
                 }
         }
         .environment(router)
+        .environment(profile)
     }
 }
 

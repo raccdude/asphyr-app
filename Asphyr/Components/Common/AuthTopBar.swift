@@ -14,18 +14,25 @@ import SwiftUI
 /// but keeps the wordmark in the same position.
 struct AuthTopBar: View {
     var showsBackButton: Bool = true
+    /// Shows onboarding progress in place of the wordmark.
+    var onboardingStep: Int?
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
-            Text("ASPHYR")
-                .font(AppTypography.wordMark)
-                .tracking(1.44)
-                .foregroundStyle(Color.asphyrAccentPrimary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .padding(.horizontal, 52)
+            if let onboardingStep {
+                OnboardingStepIndicator(step: onboardingStep)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            } else {
+                Text("ASPHYR")
+                    .font(AppTypography.wordMark)
+                    .tracking(1.44)
+                    .foregroundStyle(Color.asphyrAccentPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, 52)
+            }
 
             if showsBackButton {
                 Button {
@@ -54,11 +61,35 @@ struct AuthTopBar: View {
     }
 }
 
+/// "STEP 1 OF 2" with its progress bars.
+private struct OnboardingStepIndicator: View {
+    let step: Int
+
+    private let stepCount = 2
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 6) {
+            Text("STEP \(step) OF \(stepCount)")
+                .font(AppTypography.captionMedium)
+                .foregroundStyle(Color.asphyrTextSecondary)
+
+            HStack(spacing: 4) {
+                ForEach(1...stepCount, id: \.self) { index in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(index <= step ? Color.asphyrAccentPrimary : Color.asphyrSurfaceElevated)
+                        .frame(width: 28, height: 4)
+                }
+            }
+            .accessibilityHidden(true)
+        }
+    }
+}
+
 extension View {
     /// Pins `AuthTopBar` above the screen in place of the system bar.
-    func authTopBar(showsBackButton: Bool = true) -> some View {
+    func authTopBar(showsBackButton: Bool = true, onboardingStep: Int? = nil) -> some View {
         safeAreaInset(edge: .top, spacing: 0) {
-            AuthTopBar(showsBackButton: showsBackButton)
+            AuthTopBar(showsBackButton: showsBackButton, onboardingStep: onboardingStep)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)

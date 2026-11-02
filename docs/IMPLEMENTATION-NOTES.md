@@ -13,9 +13,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Splash and Welcome polish | Merged | `fix/splash-welcome-polish` |
 | Create Account | Merged | `feat/create-account-v2` |
 | Login | Merged | `feat/login-v2` |
-| Account Recovery and Recovery Success | In review | `feat/account-recovery-v2` |
-| Build Your Identity | Next | — |
-| Your Character | Not started | — |
+| Account Recovery and Recovery Success | Merged | `feat/account-recovery-v2` |
+| Build Your Identity and Create Aspiration | In review | `feat/identity-v2` |
+| Your Character | Next | — |
 | Tab bar and Home | Not started | — |
 | Quests, Quest Details, Create Quest, Reward | Not started | — |
 | Journey, Character, Settings | Not started | — |
@@ -62,7 +62,32 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Keyboard:** the email field sits low, so Recovery scrolls it into view when focused. `AuthTopBar` has a solid background so scrolling content doesn't show behind the wordmark. Use the same scroll approach on any screen with a low field.
 - **`AsphyrToast`** is reusable, with a Reset Progress toast planned in DESIGN-DECISIONS.md.
 
+## Build Your Identity
+- **Onboarding answers:** `OnboardingProfile` is created in `RootView` and read from the environment. It holds the name, color and aspiration in memory, so they reset on relaunch. Your Character adds the archetype, and Home reads it in its own step.
+- **Character colors:** `characterNovice*` are generated from Figma's green novice by swapping its tunic base, shade (base × 0.678) and tint. Figma has no novice variants for the other five colors. At the developer's request, Snow (`#F5F7FF`) replaced Figma's orange, and Midnight, Oxblood and Plum replaced cyan, red and purple.
+- **Dark colors:** Midnight (`#16264F`, tint `#7FA6FF`), Oxblood (`#4A0F1C`, tint `#FF7A8A`) and Plum (`#2F1650`, tint `#B58CFF`) use a brighter tint, because 50% white would dull the eyes, smile and crest.
+- **Snow crest:** a tint crest disappears on the pale tunic, so Snow's crest is dark (`#12141A`, center `#5A6172`). Its eyes and smile stay pale.
+- **Create Aspiration:** a system sheet. iOS floats it 8pt in from the screen edge, so its 12pt padding lines up with the 20pt screen margin. Saved text replaces "Something else" on the card, and choosing a listed card clears it. Tapping any selected card deselects it; the sheet keeps the last custom text if reopened.
+- **Top bar:** `AuthScreen(onboardingStep:)` shows the step indicator in place of the wordmark.
+
+## Unlockable cloaks (future)
+Midnight, Oxblood and Plum are planned as unlockable cloaks: the starter character's look plus a tinted cloak. The unlock rules aren't decided, and nothing is built yet. Use the same tunic and tint as the starter color, and these cloak values:
+
+| Cloak | Cloak top | Cloak bottom |
+|---|---|---|
+| Midnight | `#22386F` | `#0E1730` |
+| Oxblood | `#5A1A28` | `#2A0A12` |
+| Plum | `#3F2268` | `#1D0F33` |
+
+In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The hand color `#3A3F4C` becomes the cloak top × 1.25.
+
 ## Figma updates for later
+- **Identity frames:** add a ring on the selected color swatch. Figma doesn't mark the selection.
+- **Identity frames:** move the content down 14pt to match the lowered back button, and add the "Enter your name." and "Choose an aspiration." errors.
+- **Create Aspiration:** add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
+- **Identity frames and `13.4 - Colours`:** replace orange (`#FF9F40`) with snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`).
+- **Character:** the five non-green novice characters are generated outside Figma, including Snow's dark crest. Add them to Figma if you want it to stay the source of truth.
+
 Development comes first. Make these only when asked. Add to this list as the code moves ahead of Figma.
 
 - **Back button and wordmark:** move them down 14pt on `4 - Login` and the Account Recovery frames (back button top from 62pt to 76pt), and everything below them with it.

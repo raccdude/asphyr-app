@@ -18,6 +18,7 @@ struct AsphyrInputField<Field: Hashable>: View {
     let field: Field
     var isSecure: Bool = false
     var hasError: Bool = false
+    var fill: Color = .asphyrSurface
 
     @State private var isRevealed = false
 
@@ -64,7 +65,7 @@ struct AsphyrInputField<Field: Hashable>: View {
         // that as a second tap and selects the whole word.
         .background {
             RoundedRectangle(cornerRadius: 14)
-                .fill(Color.asphyrSurface)
+                .fill(fill)
                 .onTapGesture {
                     focus.wrappedValue = field
                 }

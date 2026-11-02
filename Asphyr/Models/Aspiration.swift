@@ -8,8 +8,9 @@
 import Foundation
 
 struct Aspiration: Identifiable {
-    let id = UUID()
     let iconName: String
     let title: String
     let description: String
+
+    var id: String { title }
 }

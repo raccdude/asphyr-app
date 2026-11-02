@@ -8,156 +8,206 @@
 import SwiftUI
 
 struct IdentityCreationView: View {
-    @Environment(\.dismiss) private var dismiss
+    private enum Field: Hashable {
+        case name
+    }
+
+    private static let aspirations = [
+        Aspiration(iconName: "iconLaptop", title: "Game Developer", description: "Build interactive games"),
+        Aspiration(iconName: "iconWrench", title: "Mechanical Engineer", description: "Design & build systems"),
+        Aspiration(iconName: "iconBulb", title: "Psychologist", description: "Understand the mind"),
+        Aspiration(iconName: "iconStethoscope", title: "Doctor", description: "Heal & care for others"),
+        Aspiration(iconName: "iconPen", title: "Writer", description: "Craft stories & ideas")
+    ]
+
+    private let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
+
     @Environment(AppRouter.self) private var router
-    @State private var selectedColor: Color = .red // change
-    @State private var username: String = ""
-    @State private var selectedAspirationID: UUID? = nil
-    
-    let colors: [Color] = [.asphyrAccentPrimary, .blue, .yellow, .orange, .teal, .purple]
-    
-    let aspirations = [
-        Aspiration(iconName: "laptopcomputer.and.iphone", title: "Game Developer", description: "Build interactive games"),
-        Aspiration(iconName: "wrench.and.screwdriver", title: "Mechanical Engineer", description: "Design & build systems"),
-        Aspiration(iconName: "brain.head.profile", title: "Psychologist", description: "Understand the mind"),
-        Aspiration(iconName: "stethoscope", title: "Doctor", description: "Heal & care for others"),
-        Aspiration(iconName: "book.pages.fill", title: "Writer", description: "Craft stories & ideas"),
-        Aspiration(iconName: "sparkles", title: "Something else", description: "Define your own path")
-    ]
-    
-    let columns = [
-        GridItem(.adaptive(minimum: 145, maximum: 165), spacing: 12),
-    ]
-    
+    @Environment(OnboardingProfile.self) private var profile
+
+    @State private var showsNameError = false
+    @State private var showsAspirationError = false
+    @State private var isShowingCreateAspiration = false
+    /// Fills the sheet again if a saved custom aspiration was deselected.
+    @State private var lastCustomAspiration = ""
+
+    @FocusState private var focus: Field?
+
+    /// The saved aspiration, when it isn't one of the listed cards.
+    private var customAspiration: String? {
+        guard let aspiration = profile.aspiration,
+              !Self.aspirations.contains(where: { $0.title == aspiration }) else { return nil }
+        return aspiration
+    }
+
     var body: some View {
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 16) {
-                
-                HStack {
-                    Button {
-                        dismiss() // Executes back navigation
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                            .frame(width: 44, height: 44, alignment: .leading)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("STEP 1 OF 2")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                            .tracking(1)
-                        
-                        HStack(spacing: 4) {
-                            RectangleView(height: 2, width: 45, color: Color.asphyrAccentPrimary)
-                            RectangleView(height: 2, width: 45)
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
+        @Bindable var profile = profile
+
+        AuthScreen(onboardingStep: 1) {
+            VStack(spacing: 0) {
+                Text("BUILD YOUR IDENTITY")
+                    .font(AppTypography.screenTitle)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.top, 22)
+
+                character
+                    .padding(.top, 11)
+
+                colorPicker
+                    .padding(.top, 5)
+
+                sectionLabel("WHAT SHOULD WE CALL YOU?")
+                    .padding(.top, 25)
+
+                AsphyrInputField(
+                    placeholder: "Enter your name",
+                    icon: "iconPerson",
+                    text: $profile.name,
+                    focus: $focus,
+                    field: .name,
+                    hasError: showsNameError
+                )
+                .textContentType(.name)
+                .textInputAutocapitalization(.words)
+                .autocorrectionDisabled()
+                .submitLabel(.done)
+                .onSubmit { focus = nil }
                 .padding(.top, 10)
-                
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 24) {
-                        
-                        Text("BUILD YOUR IDENTITY") // ADD SPACE GROTESK
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                        
-                        Spacer()
-                        
-                        Character()
-                        
-                        VStack(spacing: 8) {
-                            //Text("SHIRT COLOR")
-                            //.font(.system(size: 14, weight: .medium))
-                            //.foregroundStyle(.white)
-                            
-                            HStack {
-                                Spacer()
-                                
-                                HStack(spacing: 16) {
-                                    ForEach(colors, id: \.self) { color in
-                                        ColoredDots(
-                                            color: color,
-                                            isSelected: selectedColor == color)
-                                        .scaleEffect(selectedColor == color ? 1.2 : 1.0)
-                                        .opacity(selectedColor == color ? 1.0 : 0.6)
-                                        .onTapGesture {
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                                                selectedColor = color
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                Spacer()
-                                
-                            }
-                            .frame(height: 44)
-                        }
-                        
-                        // 24 px space
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("WHAT SHOULD WE CALL YOU?")
-                                .font(.system(size: 14))
-                                .fontWeight(.medium)
-                                .foregroundStyle(.white)
-                            
-                            AsphyrTextField(placeholder: "Enter your name", text: $username)
-                            
-                        }
-                            
-                        // 24 px space
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("WHO DO YOU ASPIRE TO BE?")
-                                .font(.system(size: 14))
-                                .fontWeight(.medium)
-                                .foregroundStyle(.white)
-                            
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(aspirations) { item in
-                                    AspirationCard(
-                                        aspiration: item,
-                                        isSelected: selectedAspirationID == item.id
-                                    )
-                                    .onTapGesture {
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            selectedAspirationID = item.id
-                                        }
-                                    }
-                                }
-                            }
-                            
-                        }
-                        
-                        PrimaryButton(name: "CONTINUE") {
-                            if username != "" && selectedAspirationID != nil {
-                                router.push(.archetype)
-                            }
-                        }
-                    }
-                    
+
+                if showsNameError {
+                    FieldErrorRow(message: "Enter your name.")
+                        .padding(.top, 8)
                 }
-                .padding(.horizontal, 20)
+
+                sectionLabel("WHO DO YOU ASPIRE TO BECOME?")
+                    .padding(.top, 26)
+
+                aspirationGrid
+                    .padding(.top, 10)
+
+                if showsAspirationError {
+                    FieldErrorRow(message: "Choose an aspiration.")
+                        .padding(.top, 8)
+                }
+
+                PrimaryButtonV2(title: "CONTINUE", action: submit)
+                    .padding(.top, 24)
+
+                Spacer(minLength: 16)
+            }
+            .padding(.horizontal, 20)
+            // Tapping empty space dismisses the keyboard
+            .contentShape(Rectangle())
+            .onTapGesture {
+                focus = nil
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .animation(.easeInOut(duration: 0.2), value: showsNameError)
+        .animation(.easeInOut(duration: 0.2), value: showsAspirationError)
+        .onChange(of: profile.name) {
+            showsNameError = false
+        }
+        .onChange(of: profile.aspiration) {
+            showsAspirationError = false
+        }
+        .sheet(isPresented: $isShowingCreateAspiration) {
+            CreateAspirationView(initialValue: lastCustomAspiration) { saved in
+                lastCustomAspiration = saved
+                profile.aspiration = saved
+            }
+        }
+    }
+
+    private var character: some View {
+        Image(profile.color.noviceImageName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 126, height: 126)
+            .id(profile.color)
+            .transition(.opacity)
+            .animation(.easeInOut(duration: 0.2), value: profile.color)
+            .accessibilityHidden(true)
+    }
+
+    private var colorPicker: some View {
+        HStack(spacing: 6) {
+            ForEach(CharacterColor.allCases) { color in
+                Button {
+                    profile.color = color
+                } label: {
+                    ColoredDots(color: color.swatch, isSelected: profile.color == color)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(color.rawValue)
+                .accessibilityAddTraits(profile.color == color ? .isSelected : [])
+            }
+        }
+    }
+
+    private var aspirationGrid: some View {
+        LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(Self.aspirations) { item in
+                Button {
+                    // Tapping the selected card deselects it
+                    profile.aspiration = profile.aspiration == item.title ? nil : item.title
+                } label: {
+                    AspirationCard(aspiration: item, isSelected: profile.aspiration == item.title)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(profile.aspiration == item.title ? .isSelected : [])
+            }
+
+            Button {
+                if customAspiration != nil {
+                    profile.aspiration = nil
+                } else {
+                    isShowingCreateAspiration = true
+                }
+            } label: {
+                AspirationCard(
+                    aspiration: Aspiration(
+                        iconName: "iconSparkles",
+                        title: customAspiration ?? "Something else",
+                        description: "Define your own path"
+                    ),
+                    isSelected: customAspiration != nil
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(customAspiration != nil ? .isSelected : [])
+        }
+    }
+
+    private func sectionLabel(_ title: String) -> some View {
+        Text(title)
+            .font(AppTypography.captionMedium)
+            .foregroundStyle(Color.asphyrTextSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func submit() {
+        focus = nil
+        profile.name = profile.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        showsNameError = profile.name.isEmpty
+        showsAspirationError = profile.aspiration == nil
+
+        if !showsNameError && !showsAspirationError {
+            router.push(.archetype)
+        }
     }
 }
-
 
 #Preview {
     NavigationStack {
         IdentityCreationView()
     }
     .environment(AppRouter())
+    .environment(OnboardingProfile())
 }

@@ -12,36 +12,35 @@ struct AspirationCard: View {
     let isSelected: Bool
 
     var body: some View {
-        
-        VStack(spacing: 6) {
-            Image(systemName: aspiration.iconName)
-                .font(.system(size: 20)) // CHANGE SIZE
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(isSelected ? Color.asphyrAccentPrimary: Color.asphyrTextPrimary) // change to Color.primaryAccent
-            
+        VStack(spacing: 0) {
+            Image(aspiration.iconName)
+                .foregroundStyle(isSelected ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
+                .accessibilityHidden(true)
+
             Text(aspiration.title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Color.asphyrTextPrimary) // change to primary text
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextPrimary)
                 .multilineTextAlignment(.center)
+                .padding(.top, 10)
 
             Text(aspiration.description)
-                .font(.system(size: 10, weight: .regular))
+                .font(AppTypography.captionMedium)
                 .foregroundStyle(Color.asphyrTextSecondary)
                 .multilineTextAlignment(.center)
-                .lineLimit(2)
-            
+                .padding(.top, 4)
         }
-        .padding(20)
-        .frame(width: 155, height: 110)
-        .background(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
+        .padding(.horizontal, 12)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, minHeight: 108)
+        .background {
+            // The shadow sits on the shape so it doesn't also glow behind the text
             RoundedRectangle(cornerRadius: 16)
-                .stroke(isSelected ? Color.asphyrAccentPrimary : Color.asphyrBorder, lineWidth: 1)
-        )
-        .shadow(
-            color: isSelected ? Color.asphyrAccentPrimary : .clear,
-            radius: isSelected ? 2 : 0, x: 0, y: 1)
-        
+                .fill(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrSurface)
+                .shadow(color: isSelected ? Color.asphyrAccentPrimary : .clear, radius: 1, x: 0, y: 1)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrBorder, lineWidth: 1)
+        }
     }
 }
