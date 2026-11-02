@@ -10,95 +10,92 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var isShowingNextScreen: Bool = false
-    
+
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                WordMarkView() {
+                    dismiss()
+                }
                 
-                VStack(spacing: 16) {
-                    WordMarkView() {
-                        dismiss()
-                    }
-                    
-                    AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
-                    
+                AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
+                
+                Spacer()
+                
+                VStack(spacing: 22) {
+                    AsphyrTextField(placeholder: "Email", text: $email)
+                    AsphyrSecureField(placeholder: "Password", text: $password)   
+                }
+                
+                HStack {
                     Spacer()
                     
-                    VStack(spacing: 22) {
-                        AsphyrTextField(placeholder: "Email", text: $email)
-                        AsphyrSecureField(placeholder: "Password", text: $password)   
-                    }
-                    
-                    HStack {
-                        Spacer()
-                        
-                        NavigationLink {
-                            RecoverAccountView()
-                        } label: {
-                            Text("Forgot password?")
-                                .font(.system(size: 14, weight: .regular))
-                                .foregroundStyle(Color.asphyrTextPrimary)
-                        }
-                    }
-                      
-                    Spacer()
-                    
-                    PrimaryButton(name: "LOG IN") {
-                        if !email.isEmpty && !password.isEmpty {
-                            isShowingNextScreen = true
-                        }
-                    }
-                    
-                    HStack {
-                        RectangleView(height: 1)
-                        
-                        Text("OR")
+                    Button {
+                        router.push(.recover)
+                    } label: {
+                        Text("Forgot password?")
                             .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                        
-                        RectangleView(height: 1)
-                        
-                    }
-
-                    HStack(spacing: 12) {
-                        BrandCard(brandLogo: "apple.logo", brandName: "Apple", isSystemSymbol: true)
-                        BrandCard(brandLogo: "googleLogo", brandName: "Google")
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 8) {
-                        Text("Don't have an account?")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                        
-                        NavigationLink {
-                            CreateAccountView()
-                        } label: {
-                            Text("CREATE ACCOUNT")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(Color.asphyrAccentPrimary)
-                        }
+                            .foregroundStyle(Color.asphyrTextPrimary)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                  
+                Spacer()
+                
+                PrimaryButton(name: "LOG IN") {
+                    if !email.isEmpty && !password.isEmpty {
+                        router.push(.home)
+                    }
+                }
+                
+                HStack {
+                    RectangleView(height: 1)
+                    
+                    Text("OR")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                    
+                    RectangleView(height: 1)
+                    
+                }
+
+                HStack(spacing: 12) {
+                    BrandCard(brandLogo: "apple.logo", brandName: "Apple", isSystemSymbol: true)
+                    BrandCard(brandLogo: "googleLogo", brandName: "Google")
+                }
+                
+                Spacer()
+                
+                VStack(spacing: 8) {
+                    Text("Don't have an account?")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                    
+                    Button {
+                        router.switchTo(.createAccount)
+                    } label: {
+                        Text("CREATE ACCOUNT")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.asphyrAccentPrimary)
+                    }
+                }
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $isShowingNextScreen) {
-                HomeView()
-            }
-           
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    LoginView()
+    NavigationStack {
+        LoginView()
+    }
+    .environment(AppRouter())
 }

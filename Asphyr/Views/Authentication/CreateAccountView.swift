@@ -11,7 +11,8 @@ struct CreateAccountView: View {
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var passwordConfirmation: String = ""
-    @State private var isShowingNextScreen: Bool = false
+
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
         ZStack {
@@ -35,7 +36,7 @@ struct CreateAccountView: View {
                 
                 PrimaryButton(name: "CREATE ACCOUNT") {
                     if !email.isEmpty && !password.isEmpty && password == passwordConfirmation {
-                        isShowingNextScreen = true
+                        router.push(.identity)
                     }
                 }
                 
@@ -62,8 +63,8 @@ struct CreateAccountView: View {
                         .font(.system(size: 14, weight: .regular))
                         .foregroundStyle(Color.asphyrTextSecondary)
                     
-                    NavigationLink {
-                        LoginView()
+                    Button {
+                        router.switchTo(.login)
                     } label: {
                         Text("LOG IN")
                             .font(.system(size: 16, weight: .semibold))
@@ -76,12 +77,12 @@ struct CreateAccountView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $isShowingNextScreen) {
-            IdentityCreationView()
-        }
     }
 }
 
 #Preview {
-    CreateAccountView()
+    NavigationStack {
+        CreateAccountView()
+    }
+    .environment(AppRouter())
 }

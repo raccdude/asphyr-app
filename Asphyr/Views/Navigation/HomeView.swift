@@ -23,123 +23,123 @@ struct HomeView: View {
     ]
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 20) {
-                        HStack(alignment: .center) {
-                            Text("ASPHYR")
-                                .font(.system(size: 26, weight: .black))
-                                .foregroundStyle(Color.asphyrAccentPrimary)
-                                .tracking(4)
-                            
-                            Spacer()
-                        
-                            Button {
-                                isShowingNextScreen = true
-                            } label: {
-                                Image(systemName: "gearshape.fill")
-                                    .font(.system(size: 22))
-                                    .foregroundStyle(Color.asphyrTextPrimary)
-                            }
-                        }
-                        .padding(.top, 12)
-                        .padding(.bottom, 24)
-                        
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("GOOD MORNING") // PLACEHOLDER; WILL CHANGE BASED ON TIME
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundStyle(Color.asphyrTextPrimary)
-                                    .tracking(1)
-                                
-                                Text("Lou") // PLACEHOLDER
-                                    .font(.system(size: 28, weight: .semibold))
-                                    .foregroundStyle(Color.asphyrTextPrimary)
-                            }
-                            Spacer()
-                        }
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 20) {
+                    HStack(alignment: .center) {
+                        Text("ASPHYR")
+                            .font(.system(size: 26, weight: .black))
+                            .foregroundStyle(Color.asphyrAccentPrimary)
+                            .tracking(4)
                         
                         Spacer()
-    
-                        Character()
-                        
-                        Spacer()
-        
-                        VStack(spacing: 8) {
-                            Text("The Strategist".uppercased())// PLACEHOLDER
+                    
+                        Button {
+                            isShowingNextScreen = true
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 22))
+                                .foregroundStyle(Color.asphyrTextPrimary)
+                        }
+                    }
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
+                    
+                    HStack {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("GOOD MORNING") // PLACEHOLDER; WILL CHANGE BASED ON TIME
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(Color.asphyrTextPrimary)
+                                .tracking(1)
                             
-                            Text("Game Developer") // PLACEHOLDER
-                                .font(.system(size: 16))
-                                .fontWeight(.regular)
+                            Text("Lou") // PLACEHOLDER
+                                .font(.system(size: 28, weight: .semibold))
+                                .foregroundStyle(Color.asphyrTextPrimary)
+                        }
+                        Spacer()
+                    }
+                    
+                    Spacer()
+    
+                    Character()
+                    
+                    Spacer()
+        
+                    VStack(spacing: 8) {
+                        Text("The Strategist".uppercased())// PLACEHOLDER
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                        
+                        Text("Game Developer") // PLACEHOLDER
+                            .font(.system(size: 16))
+                            .fontWeight(.regular)
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                        
+                        Text("LEVEL 1") // PLACEHOLDER
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(.vertical, 2)
+                            .padding(.horizontal, 12)
+                            .background(Color.asphyrAccentPrimary, in: .capsule)
+                    }
+                    
+                    Spacer()
+         
+                    // PROGRESS INDICATOR
+                    VStack(spacing: 4) {
+                        HStack {
+                            Text("0 / 500 XP") // PLACEHOLDER
+                                .font(.system(size: 12))
                                 .foregroundStyle(Color.asphyrTextPrimary)
                             
-                            Text("LEVEL 1") // PLACEHOLDER
-                                .font(.system(size: 14, weight: .semibold))
-                                .padding(.vertical, 2)
-                                .padding(.horizontal, 12)
-                                .background(Color.asphyrAccentPrimary, in: .capsule)
+                            Spacer()
+                            
+                            Text("500 XP TO LEVEL 2") // PLACEHOLDER
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.asphyrTextPrimary)
                         }
                         
-                        Spacer()
-         
-                        // PROGRESS INDICATOR
-                        VStack(spacing: 4) {
-                            HStack {
-                                Text("0 / 500 XP") // PLACEHOLDER
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.asphyrTextPrimary)
-                                
-                                Spacer()
-                                
-                                Text("500 XP TO LEVEL 2") // PLACEHOLDER
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.asphyrTextPrimary)
-                            }
-                            
-                           XPBar()
-                        }
-                        .padding(.horizontal, 40)
-                                        
-                        // SECTIONS
-                        VStack(spacing: 12) {
-                            // QUEST SECTION
-                            SectionDivider(sectionTitle: "TODAY'S QUEST")
-        
-                            // REUSABLE QUEST CARD
-                            QuestCard()
-                            
-                            // ATTRIBUTE SECTION
-                           SectionDivider(sectionTitle: "ATTRIBUTES")
-                            
-                            // ATTRIBUTE LAYOUT
-                            LazyVGrid(columns: columns) {
-                                ForEach(userAttributes, id: \.name) {
-                                    item in AttributeCard(attribute: item)
-                                }
-                            }
-                        }
-                       
+                       XPBar()
                     }
-                    .padding(.horizontal, 20)
-                      
+                    .padding(.horizontal, 40)
+                                    
+                    // SECTIONS
+                    VStack(spacing: 12) {
+                        // QUEST SECTION
+                        SectionDivider(sectionTitle: "TODAY'S QUEST")
+        
+                        // REUSABLE QUEST CARD
+                        QuestCard()
+                        
+                        // ATTRIBUTE SECTION
+                       SectionDivider(sectionTitle: "ATTRIBUTES")
+                        
+                        // ATTRIBUTE LAYOUT
+                        LazyVGrid(columns: columns) {
+                            ForEach(userAttributes, id: \.name) {
+                                item in AttributeCard(attribute: item)
+                            }
+                        }
+                    }
+                   
                 }
-            
+                .padding(.horizontal, 20)
+                  
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $isShowingNextScreen) {
-                SettingsView()
-            }
+        
+        }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $isShowingNextScreen) {
+            SettingsView()
         }
     }
 }
 
 #Preview {
-    HomeView()
+    NavigationStack {
+        HomeView()
+    }
 }

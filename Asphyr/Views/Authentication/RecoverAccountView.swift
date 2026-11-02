@@ -9,65 +9,63 @@ import SwiftUI
 
 struct RecoverAccountView: View {
     @State private var email: String = ""
-    @State private var isShowingNextScreen: Bool = false
-    
+
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                WordMarkView() {
+                    dismiss()
+                }
                 
-                VStack(spacing: 16) {
-                    WordMarkView() {
-                        dismiss()
-                    }
+                AuthHeader(heading: "ACCOUNT RECOVERY", subheading: "RESET YOUR PASSWORD")
+                
+                VStack(spacing: 8) {
+                    Image("asphyrLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
                     
-                    AuthHeader(heading: "ACCOUNT RECOVERY", subheading: "RESET YOUR PASSWORD")
-                    
-                    VStack(spacing: 8) {
-                        Image("asphyrLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                        
-                        Text("We'll help you get\nback on track.")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.bottom, 40)
-                    }
-                    
-                    Text("Enter the email associated\nwith your ASPHYR account.")
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundStyle(Color.asphyrTextPrimary)
+                    Text("We'll help you get\nback on track.")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(Color.asphyrTextSecondary)
                         .multilineTextAlignment(.center)
-                        .padding(.bottom, 20)
-                    
-                    AsphyrTextField(placeholder: "Email", text: $email)
-                    
-                    Spacer()
-                    
-                    PrimaryButton(name: "SEND RESET LINK") {
-                        if !email.isEmpty {
-                            isShowingNextScreen = true
-                        }
+                        .padding(.bottom, 40)
+                }
+                
+                Text("Enter the email associated\nwith your ASPHYR account.")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 20)
+                
+                AsphyrTextField(placeholder: "Email", text: $email)
+                
+                Spacer()
+                
+                PrimaryButton(name: "SEND RESET LINK") {
+                    if !email.isEmpty {
+                        router.push(.recoverySuccess)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $isShowingNextScreen) {
-                RecoverySuccessView()
-            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 
 #Preview {
-    RecoverAccountView()
+    NavigationStack {
+        RecoverAccountView()
+    }
+    .environment(AppRouter())
 }

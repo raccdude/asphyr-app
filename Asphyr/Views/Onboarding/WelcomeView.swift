@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @State private var isShowingNextScreen = false
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
-        // No NavigationStack here: Welcome is pushed onto SplashView's stack,
+        // No NavigationStack here: Welcome is pushed onto RootView's stack,
         // so Create Account and Log In are pushed onto that same stack.
         ZStack {
             Color.asphyrBackground
@@ -51,7 +51,7 @@ struct WelcomeView: View {
                         .padding(.top, 14)
 
                     PrimaryButtonV2(title: "BEGIN JOURNEY") {
-                        isShowingNextScreen = true
+                        router.push(.createAccount)
                     }
                     .padding(.top, 37)
                 }
@@ -66,8 +66,8 @@ struct WelcomeView: View {
                         .font(AppTypography.bodySecondary)
                         .foregroundStyle(Color.asphyrTextSecondary)
 
-                    NavigationLink {
-                        LoginView()
+                    Button {
+                        router.push(.login)
                     } label: {
                         Text("LOG IN")
                             .font(AppTypography.bodySecondarySemiBold)
@@ -78,9 +78,6 @@ struct WelcomeView: View {
             }
             .padding(.horizontal, 20)
         }
-        .navigationDestination(isPresented: $isShowingNextScreen) {
-            CreateAccountView()
-        }
         .navigationBarBackButtonHidden(true)
     }
 }
@@ -89,4 +86,5 @@ struct WelcomeView: View {
     NavigationStack {
         WelcomeView()
     }
+    .environment(AppRouter())
 }

@@ -9,9 +9,9 @@ import SwiftUI
 
 struct IdentityCreationView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @State private var selectedColor: Color = .red // change
     @State private var username: String = ""
-    @State private var isShowingNextScreen: Bool = false
     @State private var selectedAspirationID: UUID? = nil
     
     let colors: [Color] = [.asphyrAccentPrimary, .blue, .yellow, .orange, .teal, .purple]
@@ -30,136 +30,134 @@ struct IdentityCreationView: View {
     ]
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+            
+            VStack(alignment: .leading, spacing: 16) {
                 
-                VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Button {
+                        dismiss() // Executes back navigation
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                            .frame(width: 44, height: 44, alignment: .leading)
+                    }
                     
-                    HStack {
-                        Button {
-                            dismiss() // Executes back navigation
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(Color.asphyrTextPrimary)
-                                .frame(width: 44, height: 44, alignment: .leading)
+                    Spacer()
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("STEP 1 OF 2")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(Color.asphyrTextSecondary)
+                            .tracking(1)
+                        
+                        HStack(spacing: 4) {
+                            RectangleView(height: 2, width: 45, color: Color.asphyrAccentPrimary)
+                            RectangleView(height: 2, width: 45)
                         }
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        
+                        Text("BUILD YOUR IDENTITY") // ADD SPACE GROTESK
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(Color.asphyrTextPrimary)
                         
                         Spacer()
                         
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("STEP 1 OF 2")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(Color.asphyrTextSecondary)
-                                .tracking(1)
+                        Character()
+                        
+                        VStack(spacing: 8) {
+                            //Text("SHIRT COLOR")
+                            //.font(.system(size: 14, weight: .medium))
+                            //.foregroundStyle(.white)
                             
-                            HStack(spacing: 4) {
-                                RectangleView(height: 2, width: 45, color: Color.asphyrAccentPrimary)
-                                RectangleView(height: 2, width: 45)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
-                    
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack(spacing: 24) {
-                            
-                            Text("BUILD YOUR IDENTITY") // ADD SPACE GROTESK
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundStyle(Color.asphyrTextPrimary)
-                            
-                            Spacer()
-                            
-                            Character()
-                            
-                            VStack(spacing: 8) {
-                                //Text("SHIRT COLOR")
-                                //.font(.system(size: 14, weight: .medium))
-                                //.foregroundStyle(.white)
+                            HStack {
+                                Spacer()
                                 
-                                HStack {
-                                    Spacer()
-                                    
-                                    HStack(spacing: 16) {
-                                        ForEach(colors, id: \.self) { color in
-                                            ColoredDots(
-                                                color: color,
-                                                isSelected: selectedColor == color)
-                                            .scaleEffect(selectedColor == color ? 1.2 : 1.0)
-                                            .opacity(selectedColor == color ? 1.0 : 0.6)
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                                                    selectedColor = color
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                }
-                                .frame(height: 44)
-                            }
-                            
-                            // 24 px space
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("WHAT SHOULD WE CALL YOU?")
-                                    .font(.system(size: 14))
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(.white)
-                                
-                                AsphyrTextField(placeholder: "Enter your name", text: $username)
-                                
-                            }
-                                
-                            // 24 px space
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("WHO DO YOU ASPIRE TO BE?")
-                                    .font(.system(size: 14))
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(.white)
-                                
-                                LazyVGrid(columns: columns, spacing: 12) {
-                                    ForEach(aspirations) { item in
-                                        AspirationCard(
-                                            aspiration: item,
-                                            isSelected: selectedAspirationID == item.id
-                                        )
+                                HStack(spacing: 16) {
+                                    ForEach(colors, id: \.self) { color in
+                                        ColoredDots(
+                                            color: color,
+                                            isSelected: selectedColor == color)
+                                        .scaleEffect(selectedColor == color ? 1.2 : 1.0)
+                                        .opacity(selectedColor == color ? 1.0 : 0.6)
                                         .onTapGesture {
-                                            withAnimation(.easeInOut(duration: 0.2)) {
-                                                selectedAspirationID = item.id
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                                selectedColor = color
                                             }
                                         }
                                     }
                                 }
                                 
+                                Spacer()
+                                
                             }
-                            
-                            PrimaryButton(name: "CONTINUE") {
-                                if username != "" && selectedAspirationID != nil {
-                                    isShowingNextScreen = true
-                                }
-                            }
+                            .frame(height: 44)
                         }
                         
+                        // 24 px space
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("WHAT SHOULD WE CALL YOU?")
+                                .font(.system(size: 14))
+                                .fontWeight(.medium)
+                                .foregroundStyle(.white)
+                            
+                            AsphyrTextField(placeholder: "Enter your name", text: $username)
+                            
+                        }
+                            
+                        // 24 px space
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("WHO DO YOU ASPIRE TO BE?")
+                                .font(.system(size: 14))
+                                .fontWeight(.medium)
+                                .foregroundStyle(.white)
+                            
+                            LazyVGrid(columns: columns, spacing: 12) {
+                                ForEach(aspirations) { item in
+                                    AspirationCard(
+                                        aspiration: item,
+                                        isSelected: selectedAspirationID == item.id
+                                    )
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            selectedAspirationID = item.id
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                        
+                        PrimaryButton(name: "CONTINUE") {
+                            if username != "" && selectedAspirationID != nil {
+                                router.push(.archetype)
+                            }
+                        }
                     }
-                    .padding(.horizontal, 20)
+                    
                 }
-                .navigationDestination(isPresented: $isShowingNextScreen) {
-                    ArchetypeSelectionView()
-                }
+                .padding(.horizontal, 20)
             }
         }
         .toolbar(.hidden, for: .navigationBar)
     }
 }
 
-        
+
 #Preview {
-    IdentityCreationView()
+    NavigationStack {
+        IdentityCreationView()
+    }
+    .environment(AppRouter())
 }
