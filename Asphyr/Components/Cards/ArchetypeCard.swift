@@ -12,33 +12,36 @@ struct ArchetypeCard: View {
     let isSelected: Bool
 
     var body: some View {
-        
         HStack(spacing: 16) {
-            Image(systemName: archetype.iconName)
-                .font(.system(size: 20)) // CHANGE SIZE
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(isSelected ? Color.asphyrAccentPrimary : .white)
-                .frame(width: 40, height: 40)
-              
+            Image(archetype.iconName)
+                .foregroundStyle(isSelected ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
+                .accessibilityHidden(true)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(archetype.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
+                    .font(AppTypography.subheading)
+                    .foregroundStyle(Color.asphyrTextPrimary)
 
                 Text(archetype.description)
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(.white)
-
+                    .font(AppTypography.bodySecondary)
+                    .foregroundStyle(Color.asphyrTextSecondary)
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity)
-        .background(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(
-            color: isSelected ? Color.asphyrAccentPrimary : .clear,
-            radius: isSelected ? 2 : 0, x: 0, y: 1)
+        .padding(.leading, 18)
+        // Narrow, so the descriptions stay on one line on smaller iPhones
+        .padding(.trailing, 6)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, minHeight: 75)
+        .background {
+            // The shadow sits on the shape so it doesn't also glow behind the text
+            RoundedRectangle(cornerRadius: 16)
+                .fill(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrSurface)
+                .shadow(color: isSelected ? Color.asphyrAccentPrimary : .clear, radius: 1, x: 0, y: 1)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(isSelected ? Color.asphyrSurfaceElevated : Color.asphyrBorder, lineWidth: 1)
+        }
     }
 }

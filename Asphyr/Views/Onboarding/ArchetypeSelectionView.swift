@@ -8,99 +8,84 @@
 import SwiftUI
 
 struct ArchetypeSelectionView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(AppRouter.self) private var router
-    @State private var selectedArchetypeID: UUID? = nil
-    @State private var selectedArchetype: Archetype?
-    
-    let archetypes = [
-    Archetype(iconName: "chart.line.uptrend.xyaxis", title: "Strategist", description: "Analytical, deliberate, focused on planning."),
-    Archetype(iconName: "graduationcap.fill", title: "Scholar", description: "Curious, disciplined, driven by knowledge."),
-    Archetype(iconName: "hammer.fill", title: "Creator", description: "Imaginative, expressive, driven to build."),
-    Archetype(iconName: "map.fill", title: "Explorer ", description: "Curious, adaptable, willing to discover.")
-    ]
+    @Environment(OnboardingProfile.self) private var profile
+
+    @State private var showsArchetypeError = false
+
+    private var imageName: String {
+        profile.color.noviceImageName(holdingItemOf: profile.archetype)
+    }
 
     var body: some View {
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                            .frame(width: 44, height: 44, alignment: .leading)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("STEP 2 OF 2")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                            .tracking(1)
-                        
-                        HStack(spacing: 4) {
-                            RectangleView(height: 2, width: 45, color: .asphyrAccentPrimary)
-                            RectangleView(height: 2, width: 45, color: .asphyrAccentPrimary)
-                        }
-                    }
-                }
-                .padding(.top, 10)
-                .padding(.bottom, 40)
-                
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 24) {
-                        Text("YOUR CHARACTER")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                        
-                        Spacer()
+        AuthScreen(onboardingStep: 2) {
+            VStack(spacing: 0) {
+                Text("YOUR CHARACTER")
+                    .font(AppTypography.screenTitle)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.top, 22)
 
-                        Character()
-                        
-                        Spacer()
-                        
-                        Text(selectedArchetypeID != nil ? (selectedArchetype?.title.uppercased() ?? "") : "WHO WILL YOU BECOME?")
-                            .font(selectedArchetype != nil ? .system(size: 20, weight: .bold) : .system(size: 16, weight: .medium))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                        
-                        Text("HOW WILL YOU APPROACH YOUR GROWTH?")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-        
-                        VStack(spacing: 12) {
-                            ForEach(archetypes) { item in
-                                ArchetypeCard(
-                                    archetype: item,
-                                    isSelected: selectedArchetypeID == item.id
-                                )
-                                .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        selectedArchetypeID = item.id
-                                        selectedArchetype = item
-                                    }
-                                }
-                            }
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 126, height: 126)
+                    .id(imageName)
+                    .transition(.opacity)
+                    .accessibilityHidden(true)
+                    .padding(.top, 11)
+
+                Text(profile.archetype.map { "THE \($0.title.uppercased())" } ?? "WHO WILL YOU BECOME?")
+                    .font(AppTypography.sectionTitle)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 11)
+
+                Text("HOW WILL YOU APPROACH YOUR GROWTH?")
+                    .font(AppTypography.bodySecondary)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 26)
+
+                VStack(spacing: 10) {
+                    ForEach(Archetype.allCases) { archetype in
+                        Button {
+                            // Tapping the selected card deselects it
+                            profile.archetype = profile.archetype == archetype ? nil : archetype
+                        } label: {
+                            ArchetypeCard(archetype: archetype, isSelected: profile.archetype == archetype)
                         }
-                        
-                        PrimaryButton(name: "BEGIN") {
-                            if selectedArchetypeID != nil {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    router.push(.home)
-                                }
-                            }
-                        }
+                        .buttonStyle(.plain)
+                        .accessibilityAddTraits(profile.archetype == archetype ? .isSelected : [])
                     }
                 }
+                .padding(.top, 14)
+
+                if showsArchetypeError {
+                    FieldErrorRow(message: "Choose an archetype.")
+                        .padding(.top, 8)
+                }
+
+                Spacer(minLength: 24)
+
+                PrimaryButtonV2(title: "BEGIN", action: begin)
             }
             .padding(.horizontal, 20)
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .animation(.easeInOut(duration: 0.2), value: profile.archetype)
+        .animation(.easeInOut(duration: 0.2), value: showsArchetypeError)
+        .onChange(of: profile.archetype) {
+            showsArchetypeError = false
+        }
+    }
+
+    private func begin() {
+        showsArchetypeError = profile.archetype == nil
+
+        if !showsArchetypeError {
+            router.push(.home)
+        }
     }
 }
 
@@ -109,4 +94,5 @@ struct ArchetypeSelectionView: View {
         ArchetypeSelectionView()
     }
     .environment(AppRouter())
+    .environment(OnboardingProfile())
 }

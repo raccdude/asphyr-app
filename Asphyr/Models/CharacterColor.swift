@@ -31,4 +31,9 @@ enum CharacterColor: String, CaseIterable, Identifiable {
     }
 
     var noviceImageName: String { "characterNovice\(rawValue)" }
+
+    /// The novice holding the archetype's item, or empty-handed without one.
+    func noviceImageName(holdingItemOf archetype: Archetype?) -> String {
+        noviceImageName + (archetype?.rawValue ?? "")
+    }
 }

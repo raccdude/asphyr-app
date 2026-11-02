@@ -14,4 +14,5 @@ final class OnboardingProfile {
     var name: String = ""
     var color: CharacterColor = .green
     var aspiration: String?
+    var archetype: Archetype?
 }
