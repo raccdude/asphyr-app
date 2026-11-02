@@ -8,19 +8,11 @@
 import SwiftUI
 
 struct RecoverySuccessView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(AppRouter.self) private var router
     
     var body: some View {
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-            
+        AuthScreen {
             VStack(spacing: 16) {
-                WordMarkView() {
-                    dismiss()
-                }
-                
                 AuthHeader(heading: "RECOVERY SUCCESS", subheading: "CHECK YOUR EMAIL")
                 
                 VStack(spacing: 8) {
@@ -57,8 +49,6 @@ struct RecoverySuccessView: View {
             .padding(.horizontal, 20)
         }
         
-        .navigationBarBackButtonHidden(true)
-        .navigationBarTitleDisplayMode(.inline)
     }
 
 }

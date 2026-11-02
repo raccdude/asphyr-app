@@ -7,19 +7,24 @@
 
 import SwiftUI
 
+/// The title and subtitle under `AuthTopBar`.
 struct AuthHeader: View {
     let heading: String
     let subheading: String
-    
+
     var body: some View {
-        Text(heading)
-            .font(.system(size: 24, weight: .bold)) // change
-            .foregroundStyle(Color.asphyrTextPrimary)
-            .padding(.top, 40)
-        
-        Text(subheading)
-            .font(.system(size: 16, weight: .medium)) // change
-            .foregroundStyle(Color.asphyrTextSecondary)
-        
+        VStack(spacing: 8) {
+            Text(heading)
+                .font(AppTypography.screenTitle)
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+
+            Text(subheading)
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 36)
     }
 }

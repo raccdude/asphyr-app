@@ -20,6 +20,7 @@ These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should 
 - **Selected archetype/aspiration card:** the original style, Elevated Surface fill + green drop shadow (y 1, blur 2). No solid green border.
 - **Back button:** the iOS 26 **system** back button (round glass chevron). It keeps swipe-back working, so stop hiding it with `.navigationBarBackButtonHidden(true)`.
   - **Exception:** Welcome keeps it hidden, because going back to Splash gives the user nothing.
+  - **Exception:** auth screens use a custom glass back button in `AuthTopBar`, with swipe-back kept. The system button can't move, and it left the header too tight under the Dynamic Island, so this header sits 14pt lower. Create Account, Login, Account Recovery and Recovery Success all use it.
 - **Demo data:** the account email is `lou@gmail.com`. The Google sign-in button uses the Google "G" logo.
 
 ## Screens

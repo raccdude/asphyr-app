@@ -46,6 +46,12 @@ enum AppTypography {
         size: 16
     )
 
+    // Figma "Body Semi Bold"
+    static let bodySemiBold = Font.custom(
+        "Inter-SemiBold",
+        size: 16
+    )
+
     static let bodySecondary = Font.custom(
         "Inter-Regular",
         size: 14

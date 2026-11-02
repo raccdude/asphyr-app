@@ -11,19 +11,11 @@ struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(AppRouter.self) private var router
 
     var body: some View {
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-            
+        AuthScreen {
             VStack(spacing: 16) {
-                WordMarkView() {
-                    dismiss()
-                }
-                
                 AuthHeader(heading: "WELCOME BACK", subheading: "CONTINUE YOUR JOURNEY")
                 
                 Spacer()
@@ -86,10 +78,8 @@ struct LoginView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 12)
+            .padding(.bottom, 12)
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

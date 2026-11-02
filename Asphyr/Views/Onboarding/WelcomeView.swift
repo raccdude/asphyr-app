@@ -13,31 +13,13 @@ struct WelcomeView: View {
     var body: some View {
         // No NavigationStack here: Welcome is pushed onto RootView's stack,
         // so Create Account and Log In are pushed onto that same stack.
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-
-            // Fills the screen at the default text size, and only scrolls
-            // when larger text no longer fits.
-            GeometryReader { proxy in
-                ScrollView {
-                    content
-                        .frame(minHeight: proxy.size.height)
-                }
-                .scrollBounceBehavior(.basedOnSize)
-            }
+        AuthScreen(showsBackButton: false) {
+            content
         }
-        .navigationBarBackButtonHidden(true)
     }
 
     private var content: some View {
         VStack(spacing: 0) {
-            // WORDMARK
-            Text("ASPHYR")
-                .font(AppTypography.wordMark)
-                .tracking(1.44)
-                .foregroundStyle(Color.asphyrAccentPrimary)
-
             Spacer(minLength: 24)
 
             // CHARACTER + MESSAGE + CTA
@@ -68,7 +50,7 @@ struct WelcomeView: View {
                 .padding(.top, 37)
             }
             // Sits slightly above centre, as in Figma
-            .padding(.bottom, 22)
+            .padding(.bottom, 49)
 
             Spacer(minLength: 24)
 
