@@ -12,10 +12,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Splash and Welcome inspection | Done | — |
 | Splash and Welcome polish | Merged | `fix/splash-welcome-polish` |
 | Create Account | Merged | `feat/create-account-v2` |
-| Login | In review | `feat/login-v2` |
-| Account Recovery | Next | — |
-| Recovery Success | Not started | — |
-| Build Your Identity | Not started | — |
+| Login | Merged | `feat/login-v2` |
+| Account Recovery and Recovery Success | In review | `feat/account-recovery-v2` |
+| Build Your Identity | Next | — |
 | Your Character | Not started | — |
 | Tab bar and Home | Not started | — |
 | Quests, Quest Details, Create Quest, Reward | Not started | — |
@@ -56,6 +55,12 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## Login
 - **Mock validation:** "Incorrect email or password" appears on submit for a malformed email or an empty field, and clears on edit. Any well-formed email with a password logs in. Replace this in `LoginView.submit()` when the backend arrives.
 - **After login:** still goes to the bare `HomeView`. Sign-up and login both connect to the tab bar in the Tab bar and Home step.
+
+## Account Recovery
+- **Spirit:** `SpiritView` shows wave, focused, surprised or cheer, and crossfades between them. The assets are original-color SVGs in the catalog. Add other moods there when their screens are built.
+- **Mock behaviour:** no email is sent. Resend shows the toast and starts a 30-second countdown, which resets when the screen is left. Replace this in `RecoverySuccessView.resend()` when the backend arrives.
+- **Keyboard:** the email field sits low, so Recovery scrolls it into view when focused. `AuthTopBar` has a solid background so scrolling content doesn't show behind the wordmark. Use the same scroll approach on any screen with a low field.
+- **`AsphyrToast`** is reusable, with a Reset Progress toast planned in DESIGN-DECISIONS.md.
 
 ## Figma updates for later
 Development comes first. Make these only when asked. Add to this list as the code moves ahead of Figma.

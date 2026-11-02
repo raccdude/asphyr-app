@@ -49,6 +49,8 @@ struct AuthTopBar: View {
         .frame(minHeight: 44)
         .padding(.horizontal, 20)
         .padding(.top, 14)
+        // Solid, so content scrolling up doesn't show behind the wordmark
+        .background(Color.asphyrBackground.ignoresSafeArea(edges: .top))
     }
 }
 

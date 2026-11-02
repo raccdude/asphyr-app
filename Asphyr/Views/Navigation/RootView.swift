@@ -25,8 +25,8 @@ struct RootView: View {
                         LoginView()
                     case .recover:
                         RecoverAccountView()
-                    case .recoverySuccess:
-                        RecoverySuccessView()
+                    case .recoverySuccess(let email):
+                        RecoverySuccessView(email: email)
                     case .identity:
                         IdentityCreationView()
                     case .archetype:

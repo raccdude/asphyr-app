@@ -8,46 +8,110 @@
 import SwiftUI
 
 struct RecoverAccountView: View {
-    @State private var email: String = ""
+    private enum Field: Hashable {
+        case email
+    }
 
     @Environment(AppRouter.self) private var router
 
+    @State private var email: String = ""
+    @State private var showsError = false
+
+    @FocusState private var focus: Field?
+
+    private var spiritMood: SpiritView.Mood {
+        if showsError { return .surprised }
+        return focus == .email ? .focused : .wave
+    }
+
     var body: some View {
         AuthScreen {
-            VStack(spacing: 16) {
-                AuthHeader(heading: "ACCOUNT RECOVERY", subheading: "RESET YOUR PASSWORD")
-                
-                VStack(spacing: 8) {
-                    Image("asphyrLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                    
-                    Text("We'll help you get\nback on track.")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.bottom, 40)
-                }
-                
-                Text("Enter the email associated\nwith your ASPHYR account.")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(Color.asphyrTextPrimary)
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 20)
-                
-                AsphyrTextField(placeholder: "Email", text: $email)
-                
-                Spacer()
-                
-                PrimaryButton(name: "SEND RESET LINK") {
-                    if !email.isEmpty {
-                        router.push(.recoverySuccess)
+            content
+        }
+        .animation(.easeInOut(duration: 0.2), value: showsError)
+        .onChange(of: focus) { oldValue, _ in
+            // Only checks what the user has typed, so an empty field stays calm
+            if oldValue == .email {
+                showsError = !email.isEmpty && !email.isValidEmail
+            }
+        }
+        .onChange(of: email) {
+            showsError = false
+        }
+    }
+
+    private var content: some View {
+        ScrollViewReader { proxy in
+            fields
+                .onChange(of: focus) { _, newValue in
+                    guard newValue == .email else { return }
+                    // The field sits low enough for the keyboard to cover it,
+                    // so bring it up once the keyboard has opened
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(350))
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            proxy.scrollTo(Field.email, anchor: UnitPoint(x: 0.5, y: 0.85))
+                        }
                     }
                 }
+        }
+    }
+
+    private var fields: some View {
+        VStack(spacing: 0) {
+            AuthHeader(heading: "ACCOUNT RECOVERY", subheading: "RESET YOUR PASSWORD")
+
+            SpiritMessage(mood: spiritMood, message: "“We’ll help you get\nback on track.”")
+                .padding(.top, 20)
+
+            Text("Enter the email associated\nwith your ASPHYR account.")
+                .font(AppTypography.body)
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(1)
+                .padding(.top, 40)
+
+            AsphyrInputField(
+                placeholder: "Email",
+                icon: "iconMail",
+                text: $email,
+                focus: $focus,
+                field: .email,
+                hasError: showsError
+            )
+            .textContentType(.username)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .submitLabel(.send)
+            .onSubmit(submit)
+            .id(Field.email)
+            .padding(.top, 18)
+
+            if showsError {
+                FieldErrorRow(message: "Enter a valid email address.")
+                    .padding(.top, 8)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 12)
+
+            Spacer(minLength: 24)
+
+            PrimaryButtonV2(title: "SEND RESET LINK", action: submit)
+        }
+        .padding(.horizontal, 20)
+        // Tapping empty space dismisses the keyboard
+        .contentShape(Rectangle())
+        .onTapGesture {
+            focus = nil
+        }
+    }
+
+    private func submit() {
+        focus = nil
+
+        if email.isValidEmail {
+            router.push(.recoverySuccess(email: email))
+        } else {
+            showsError = true
         }
     }
 }

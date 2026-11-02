@@ -13,7 +13,7 @@ enum AuthRoute: Hashable {
     case createAccount
     case login
     case recover
-    case recoverySuccess
+    case recoverySuccess(email: String)
     case identity
     case archetype
     case home
