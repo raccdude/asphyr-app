@@ -13,24 +13,27 @@ final class QuestStore {
     static let maxOpenPersonalQuests = 5
 
     var quests: [Quest]
-    /// A placeholder until the real progression system exists.
     private(set) var earnedXP = 0
-    /// Everything starts at 10 until the real progression system exists.
+    private(set) var unlockedCloaks: [CloakReward] = []
+    /// The highest level Reward has shown, so each level is announced once.
+    private var announcedLevel = 1
+    /// Every attribute starts at 10.
     private var attributeGains: [String: Int] = [:]
 
     init(quests: [Quest] = [Quest.sampleDaily]) {
         self.quests = quests
     }
 
-    /// The level and bar on Home use a flat 500 XP per level for now.
-    static let xpPerLevel = 500
-
     var level: Int {
-        earnedXP / Self.xpPerLevel + 1
+        RewardRules.progress(totalXP: earnedXP).level
     }
 
     var xpIntoLevel: Int {
-        earnedXP % Self.xpPerLevel
+        RewardRules.progress(totalXP: earnedXP).xpIntoLevel
+    }
+
+    var xpForLevel: Int {
+        RewardRules.progress(totalXP: earnedXP).xpForLevel
     }
 
     /// The quest on Home: what the user is working on, then today's daily quest,
@@ -68,7 +71,13 @@ final class QuestStore {
         quest.type != .dailyQuest && quest.status != .completed
     }
 
+    /// A main quest's XP goes with it, so deleting and recreating gains nothing.
     func delete(_ quest: Quest) {
+        if quest.type == .mainQuest {
+            let stepXP = RewardRules.xpPerStep(difficulty: quest.difficulty ?? .moderate)
+            earnedXP = max(0, earnedXP - quest.completedStepCount * stepXP)
+        }
+
         quests.removeAll { $0.id == quest.id }
     }
 
@@ -108,14 +117,49 @@ final class QuestStore {
         }
     }
 
+    /// Unticking is always allowed. Ticking stops at the daily limit.
+    func canToggle(_ step: QuestStep) -> Bool {
+        step.isDone || stepsTickedToday < RewardRules.maxStepsPerDay
+    }
+
+    private var stepsTickedToday: Int {
+        quests.flatMap(\.steps).filter { step in
+            step.doneAt.map(Calendar.current.isDateInToday) ?? false
+        }.count
+    }
+
     /// Each step's XP is earned when it's ticked, and lost if it's unticked.
     func toggleStep(_ step: QuestStep, in quest: Quest) {
+        guard canToggle(step) else { return }
+
         update(quest) { quest in
             guard let index = quest.steps.firstIndex(where: { $0.id == step.id }) else { return }
 
             quest.steps[index].isDone.toggle()
-            earnedXP += quest.steps[index].isDone ? QuestReward.xpPerStep : -QuestReward.xpPerStep
+            quest.steps[index].doneAt = quest.steps[index].isDone ? .now : nil
+            let stepXP = RewardRules.xpPerStep(difficulty: quest.difficulty ?? .moderate)
+            earnedXP += quest.steps[index].isDone ? stepXP : -stepXP
         }
+    }
+
+    /// Personal quests past the daily limit earn the flat bonus instead.
+    func canEarnFullReward(_ quest: Quest) -> Bool {
+        quest.type != .personalQuest || hasFullPersonalRewardsLeft
+    }
+
+    var hasFullPersonalRewardsLeft: Bool {
+        let fullRewardsToday = quests.filter { other in
+            other.type == .personalQuest
+                && !other.isBonusReward
+                && other.completedAt.map(Calendar.current.isDateInToday) ?? false
+        }
+        return fullRewardsToday.count < RewardRules.maxFullRewardPersonalQuestsPerDay
+    }
+
+    /// The quest as it should be shown: an open quest past the daily limit
+    /// shows the bonus it would earn now. The stored quest is unchanged.
+    func withCurrentRewards(_ quest: Quest) -> Quest {
+        quest.status != .completed && !canEarnFullReward(quest) ? quest.withBonusReward() : quest
     }
 
     func canComplete(_ quest: Quest) -> Bool {
@@ -128,8 +172,16 @@ final class QuestStore {
     func complete(_ quest: Quest) -> QuestCompletion? {
         guard canComplete(quest) else { return nil }
 
+        let earnsFullReward = canEarnFullReward(quest)
+
         update(quest) { quest in
             quest.status = .completed
+            quest.completedAt = .now
+
+            if !earnsFullReward {
+                quest = quest.withBonusReward()
+            }
+
             quest.pausedAt = quest.pausedAt ?? .now
             // Quests with steps have already earned their XP
             if quest.steps.isEmpty {
@@ -142,14 +194,22 @@ final class QuestStore {
 
         guard let completed = quests.first(where: { $0.id == quest.id }) else { return nil }
 
+        // Every cloak the level has reached, so one reached by ticking steps
+        // isn't lost if that main quest is later deleted
+        let newCloaks = RewardRules.cloaks.filter { $0.level <= level && !unlockedCloaks.contains($0) }
+        unlockedCloaks += newCloaks
+
+        let levelBefore = announcedLevel
+        announcedLevel = max(announcedLevel, level)
+
         return QuestCompletion(
             quest: completed,
             elapsed: completed.elapsed(at: .now),
-            // A main quest's XP was earned as its steps were ticked, so this
-            // looks back across the whole quest
-            levelBefore: max(0, earnedXP - completed.xpReward) / Self.xpPerLevel + 1,
+            levelBefore: levelBefore,
             levelAfter: level,
-            xpIntoLevel: xpIntoLevel
+            xpIntoLevel: xpIntoLevel,
+            xpForLevel: xpForLevel,
+            newCloaks: newCloaks
         )
     }
 
@@ -166,6 +226,8 @@ struct QuestCompletion: Identifiable {
     let levelBefore: Int
     let levelAfter: Int
     let xpIntoLevel: Int
+    let xpForLevel: Int
+    let newCloaks: [CloakReward]
 
     var didLevelUp: Bool {
         levelAfter > levelBefore
@@ -181,7 +243,7 @@ extension Quest {
         objective: "Implement one small gameplay mechanic in your current project.",
         iconName: "iconQuestGamepad",
         category: "DEVELOPMENT",
-        difficulty: "MODERATE",
+        difficulty: .moderate,
         durationMinutes: 30,
         xpReward: 100,
         attributeRewards: [
@@ -197,6 +259,7 @@ extension Quest {
             type: .mainQuest,
             title: "STUDY MIDTERM",
             iconName: "iconQuestBook",
+            difficulty: .moderate,
             xpReward: 500,
             status: .active,
             steps: [
@@ -214,7 +277,7 @@ extension Quest {
             objective: "Implement one small gameplay mechanic in your current project.",
             iconName: "iconQuestGamepad",
             category: "DEVELOPMENT",
-            difficulty: "MODERATE",
+            difficulty: .moderate,
             durationMinutes: 30,
             xpReward: 100,
             attributeRewards: [

@@ -134,7 +134,8 @@ struct QuestCard: View {
         .foregroundStyle(Color.asphyrTextSecondary)
         .padding(.horizontal, 10)
         .frame(height: 25)
-        .background(Color.asphyrSurfaceElevated, in: RoundedRectangle(cornerRadius: 8))
+        // The active card is already the elevated color
+        .background(isActive ? Color.asphyrBackground : Color.asphyrSurfaceElevated, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 

@@ -113,7 +113,9 @@ struct QuestView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: { quest in
-            Text("\(quest.title) and its progress will be removed. This can’t be undone.")
+            Text(quest.completedStepCount > 0
+                ? "\(quest.title), its progress and the XP from its steps will be removed. This can’t be undone."
+                : "\(quest.title) and its progress will be removed. This can’t be undone.")
         }
     }
 
@@ -225,7 +227,7 @@ struct QuestView: View {
                         Button {
                             selectedQuestID = quest.id
                         } label: {
-                            QuestLogCard(quest: quest)
+                            QuestLogCard(quest: questStore.withCurrentRewards(quest))
                         }
                         .buttonStyle(.plain)
                         .questLogRow(top: 6)

@@ -14,10 +14,10 @@ struct QuestDetailsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var isConfirmingAbandon = false
-    @State private var showsStepsError = false
     @State private var toastMessage: String?
     @State private var toastCount = 0
     @State private var completion: QuestCompletion?
+    @State private var blockedTapCount = 0
 
     private var quest: Quest? {
         questStore.quests.first { $0.id == questID }
@@ -45,7 +45,6 @@ struct QuestDetailsView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: toastMessage)
         .animation(.easeInOut(duration: 0.2), value: quest?.status)
-        .animation(.easeInOut(duration: 0.2), value: showsStepsError)
         .task(id: toastCount) {
             await hideToastAfterDelay()
         }
@@ -61,7 +60,7 @@ struct QuestDetailsView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("It goes back to your available quests, and its timer resets.")
+            Text("Its timer resets, and it moves back to Available.")
         }
     }
 
@@ -275,8 +274,11 @@ struct QuestDetailsView: View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(quest.steps) { step in
                     Button {
-                        questStore.toggleStep(step, in: quest)
-                        showsStepsError = false
+                        if questStore.canToggle(step) {
+                            questStore.toggleStep(step, in: quest)
+                        } else {
+                            showToast("That’s today’s \(RewardRules.maxStepsPerDay) steps. More tomorrow.")
+                        }
                     } label: {
                         QuestStepRow(step: step)
                             .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
@@ -288,41 +290,51 @@ struct QuestDetailsView: View {
                 }
             }
             .padding(.top, 6)
-
-            if showsStepsError {
-                FieldErrorRow(message: "Finish every step to complete this quest.")
-                    .padding(.top, 8)
-            }
         }
     }
 
+    /// Anything the user should know sits above the button, so it's read
+    /// before tapping rather than after.
     @ViewBuilder
     private func actions(_ quest: Quest) -> some View {
-        switch quest.status {
-        case .available:
-            PrimaryButtonV2(title: "ACCEPT QUEST") {
-                if questStore.canStart(quest) {
-                    questStore.start(quest)
-                } else {
-                    showToast("You already have an active quest. Finish or abandon it first.")
-                }
+        VStack(spacing: 14) {
+            if quest.status != .completed, !questStore.canEarnFullReward(quest) {
+                notice("Today’s full rewards are earned. This quest gives a small bonus.")
             }
-        case .active:
-            VStack(spacing: 14) {
+
+            switch quest.status {
+            case .available:
+                let canStart = questStore.canStart(quest)
+
+                if !canStart {
+                    blockerNotice("Finish or abandon your active quest first.")
+                }
+
+                PrimaryButtonV2(title: "ACCEPT QUEST") {
+                    if canStart {
+                        questStore.start(quest)
+                    } else {
+                        nudgeBlocker()
+                    }
+                }
+                .opacity(canStart ? 1 : 0.5)
+            case .active:
                 TimelineView(.periodic(from: .now, by: 1)) { context in
-                    let timeLeft = quest.timeUntilCompletable(at: context.date)
+                    let blocker = completionBlocker(for: quest, at: context.date)
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: 14) {
+                        if let blocker {
+                            blockerNotice(blocker)
+                        }
+
                         PrimaryButtonV2(title: "COMPLETE QUEST") {
-                            attemptCompletion(of: quest)
+                            if blocker == nil {
+                                completion = questStore.complete(quest)
+                            } else {
+                                nudgeBlocker()
+                            }
                         }
-                        .opacity(timeLeft > 0 ? 0.5 : 1)
-
-                        if timeLeft > 0 {
-                            Text(completableText(timeLeft: timeLeft))
-                                .font(AppTypography.captionMedium)
-                                .foregroundStyle(Color.asphyrTextSecondary)
-                        }
+                        .opacity(blocker == nil ? 1 : 0.5)
                     }
                 }
 
@@ -331,28 +343,56 @@ struct QuestDetailsView: View {
                 }
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(Color.asphyrTextSecondary)
+            case .completed:
+                EmptyView()
             }
-        case .completed:
-            EmptyView()
         }
     }
 
-    private func attemptCompletion(of quest: Quest) {
-        let timeLeft = quest.timeUntilCompletable(at: .now)
+    /// Shakes when its locked button is tapped, so the tap gets an answer.
+    private func blockerNotice(_ message: String) -> some View {
+        notice(message)
+            .modifier(ShakeEffect(shakes: CGFloat(blockedTapCount)))
+            .sensoryFeedback(.warning, trigger: blockedTapCount)
+    }
 
-        if timeLeft > 0 {
-            showToast(completableText(timeLeft: timeLeft))
-        } else if questStore.canComplete(quest) {
-            completion = questStore.complete(quest)
-        } else {
-            showsStepsError = true
+    private func nudgeBlocker() {
+        withAnimation(.linear(duration: 0.4)) {
+            blockedTapCount += 1
         }
     }
 
-    private func completableText(timeLeft: TimeInterval) -> String {
-        timeLeft < 60
-            ? "You can complete this quest in under 1 min"
-            : "You can complete this quest in \(Int(timeLeft / 60) + 1) min"
+    private func notice(_ message: String) -> some View {
+        HStack(spacing: 10) {
+            Image("iconAlert")
+                .foregroundStyle(Color.asphyrWarning)
+                .accessibilityHidden(true)
+
+            Text(message)
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(14)
+        .background(Color.asphyrWarning.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.asphyrWarning.opacity(0.25), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func completionBlocker(for quest: Quest, at date: Date) -> String? {
+        if quest.completedStepCount < quest.steps.count {
+            return "Finish every step first."
+        }
+
+        let timeLeft = quest.timeUntilCompletable(at: date)
+        guard timeLeft > 0 else { return nil }
+
+        return timeLeft < 60
+            ? "Available in under 1 min."
+            : "Available in \(Int(timeLeft / 60) + 1) min."
     }
 
     private func sectionLabel(_ title: String) -> some View {
@@ -368,7 +408,7 @@ struct QuestDetailsView: View {
             rows.append(("DURATION", "\(durationMinutes) MIN"))
         }
         if let difficulty = quest.difficulty {
-            rows.append(("DIFFICULTY", difficulty))
+            rows.append(("DIFFICULTY", difficulty.rawValue))
         }
         if let category = quest.category {
             rows.append(("CATEGORY", category))
@@ -378,10 +418,11 @@ struct QuestDetailsView: View {
     }
 
     private func rewardRows(_ quest: Quest) -> [(title: String, value: String)] {
+        let quest = questStore.withCurrentRewards(quest)
         var rows: [(title: String, value: String)] = [("EXPERIENCE", "+\(quest.xpReward)")]
 
         if !quest.steps.isEmpty {
-            rows.append(("EARNED SO FAR", "+\(quest.completedStepCount * QuestReward.xpPerStep)"))
+            rows.append(("EARNED", "+\(quest.completedStepCount * RewardRules.xpPerStep(difficulty: quest.difficulty ?? .moderate))"))
         }
 
         rows += quest.attributeRewards.map { ($0.name, "+\($0.value)") }
@@ -435,6 +476,19 @@ struct QuestDetailsView: View {
         } catch {
             // A newer toast restarted the delay
         }
+    }
+}
+
+private struct ShakeEffect: GeometryEffect {
+    var shakes: CGFloat
+
+    var animatableData: CGFloat {
+        get { shakes }
+        set { shakes = newValue }
+    }
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        ProjectionTransform(CGAffineTransform(translationX: sin(shakes * .pi * 3) * 6, y: 0))
     }
 }
 

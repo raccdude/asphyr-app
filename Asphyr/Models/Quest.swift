@@ -15,15 +15,28 @@ struct Quest: Identifiable {
     var objective: String?
     let iconName: String
     var category: String?
-    var difficulty: String?
+    var difficulty: QuestDifficulty?
     var durationMinutes: Int?
-    let xpReward: Int
+    var xpReward: Int
     var attributeRewards: [AttributeReward] = []
     var status: QuestStatusType
     var steps: [QuestStep] = []
     var startedAt: Date?
     var pausedAt: Date?
     var pausedDuration: TimeInterval = 0
+    var completedAt: Date?
+    /// True when a personal quest was completed past the daily limit, so its
+    /// rewards were swapped for the flat bonus.
+    var isBonusReward = false
+
+    /// The same quest with its rewards swapped for the flat bonus.
+    func withBonusReward() -> Quest {
+        var quest = self
+        quest.isBonusReward = true
+        quest.xpReward = RewardRules.bonusXP
+        quest.attributeRewards = RewardRules.bonusAttributes(from: attributeRewards)
+        return quest
+    }
 
     var completedStepCount: Int {
         steps.filter(\.isDone).count
@@ -87,6 +100,7 @@ struct QuestStep: Identifiable {
     let id = UUID()
     let title: String
     var isDone = false
+    var doneAt: Date?
 }
 
 /// The order here is the section order in the quest log.
@@ -116,10 +130,7 @@ enum QuestType: CaseIterable {
     }
 }
 
-/// A placeholder until rewards are inferred from the duration and difficulty.
 enum QuestReward {
-    static let xpPerStep = 100
-
     /// The share of a quest's duration that must pass before it can be completed.
     /// Debug builds use a tiny share so the rest of the flow stays quick to test.
     #if DEBUG
@@ -127,15 +138,6 @@ enum QuestReward {
     #else
     static let minimumTimeFraction = 0.5
     #endif
-
-    static func xp(forMinutes minutes: Int) -> Int {
-        minutes * 5 / 3
-    }
-
-    /// Main quests have no duration, so their steps make up the total.
-    static func xp(forStepCount stepCount: Int) -> Int {
-        stepCount * xpPerStep
-    }
 }
 
 enum QuestStatusType: String {

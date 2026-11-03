@@ -51,7 +51,7 @@ struct PrimaryButtonV2: View {
 }
 
 /// Slight shrink + dim while the button is held down.
-private struct PressableButtonStyle: ButtonStyle {
+struct PressableButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.98 : 1)

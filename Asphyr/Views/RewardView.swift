@@ -60,6 +60,14 @@ struct RewardView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 17)
 
+                if quest.isBonusReward {
+                    Text("Small progress is still progress.")
+                        .font(AppTypography.bodySecondary)
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 14)
+                }
+
                 if completion.didLevelUp {
                     levelUpBanner
                         .padding(.top, 29)
@@ -68,7 +76,7 @@ struct RewardView: View {
                 experience
                     .padding(.top, completion.didLevelUp ? 14 : 29)
 
-                if completion.didLevelUp {
+                if !completion.newCloaks.isEmpty {
                     unlockedReward
                         .padding(.top, 20)
                 }
@@ -249,17 +257,17 @@ struct RewardView: View {
             HStack {
                 Text("EXPERIENCE")
                 Spacer()
-                Text("\(completion.xpIntoLevel) / \(QuestStore.xpPerLevel) XP")
+                Text("\(completion.xpIntoLevel) / \(completion.xpForLevel) XP")
             }
             .font(AppTypography.captionMedium)
             .foregroundStyle(Color.asphyrTextSecondary)
 
-            XPBar(progress: CGFloat(completion.xpIntoLevel) / CGFloat(QuestStore.xpPerLevel))
+            XPBar(progress: CGFloat(completion.xpIntoLevel) / CGFloat(completion.xpForLevel))
         }
     }
 
-    /// Expands in place, with no separate screen. A placeholder until
-    /// achievements exist, and "View in Character" comes with that screen.
+    /// Expands in place, with no separate screen. "View in Character" comes with
+    /// that screen.
     private var unlockedReward: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.2)) {
@@ -297,15 +305,17 @@ struct RewardView: View {
                         .frame(height: 1)
                         .padding(.top, 14)
 
-                    Text("Level \(completion.levelAfter) badge")
-                        .font(AppTypography.bodySemiBold)
-                        .foregroundStyle(Color.asphyrTextPrimary)
-                        .padding(.top, 14)
+                    ForEach(completion.newCloaks, id: \.level) { cloak in
+                        Text(cloak.name)
+                            .font(AppTypography.bodySemiBold)
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                            .padding(.top, 14)
 
-                    Text("Earned for reaching level \(completion.levelAfter).")
-                        .font(AppTypography.bodySecondary)
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                        .padding(.top, 2)
+                        Text("Unlocked at level \(cloak.level).")
+                            .font(AppTypography.bodySecondary)
+                            .foregroundStyle(Color.asphyrTextSecondary)
+                            .padding(.top, 2)
+                    }
                 }
             }
             .padding(15)
@@ -327,9 +337,11 @@ struct RewardView: View {
         completion: QuestCompletion(
             quest: Quest.sampleDaily,
             elapsed: 1800,
-            levelBefore: 1,
-            levelAfter: 2,
-            xpIntoLevel: 0
+            levelBefore: 2,
+            levelAfter: 3,
+            xpIntoLevel: 0,
+            xpForLevel: 900,
+            newCloaks: [RewardRules.cloaks[0]]
         )
     )
     .environment(OnboardingProfile())
@@ -342,7 +354,9 @@ struct RewardView: View {
             elapsed: 768,
             levelBefore: 1,
             levelAfter: 1,
-            xpIntoLevel: 100
+            xpIntoLevel: 100,
+            xpForLevel: 500,
+            newCloaks: []
         )
     )
     .environment(OnboardingProfile())

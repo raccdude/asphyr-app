@@ -32,6 +32,7 @@ struct HomeView: View {
     @State private var isShowingSettings = false
     @State private var selectedQuestID: UUID?
     @State private var isShowingCreateQuest = false
+    @State private var characterMood: CharacterPortrait.Mood = .idle
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: .now) {
@@ -66,12 +67,20 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 26)
 
-                    Image(profile.color.noviceImageName(holdingItemOf: profile.archetype))
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 126, height: 126)
-                        .accessibilityHidden(true)
-                        .padding(.top, -6)
+                    Button {
+                        characterMood = characterMood.next
+                    } label: {
+                        CharacterPortrait(
+                            imageName: profile.color.noviceImageName(holdingItemOf: profile.archetype),
+                            color: profile.color,
+                            mood: characterMood
+                        )
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                    .sensoryFeedback(.selection, trigger: characterMood)
+                    .accessibilityLabel("Character")
+                    .accessibilityHint("Changes the character’s expression")
+                    .padding(.top, -6)
 
                     identity
                         .padding(.top, 18)
@@ -94,7 +103,7 @@ struct HomeView: View {
                         Button {
                             selectedQuestID = quest.id
                         } label: {
-                            QuestCard(quest: quest)
+                            QuestCard(quest: questStore.withCurrentRewards(quest))
                         }
                         .buttonStyle(.plain)
                         .padding(.top, 14)
@@ -219,17 +228,17 @@ struct HomeView: View {
     private var xpProgress: some View {
         VStack(spacing: 8) {
             HStack {
-                Text("\(questStore.xpIntoLevel) / \(QuestStore.xpPerLevel) XP")
+                Text("\(questStore.xpIntoLevel) / \(questStore.xpForLevel) XP")
                     .foregroundStyle(Color.asphyrTextPrimary)
 
                 Spacer()
 
-                Text("\(QuestStore.xpPerLevel - questStore.xpIntoLevel) XP TO LEVEL \(questStore.level + 1)")
+                Text("\(questStore.xpForLevel - questStore.xpIntoLevel) XP TO LEVEL \(questStore.level + 1)")
                     .foregroundStyle(Color.asphyrTextSecondary)
             }
             .font(AppTypography.captionMedium)
 
-            XPBar(progress: CGFloat(questStore.xpIntoLevel) / CGFloat(QuestStore.xpPerLevel))
+            XPBar(progress: CGFloat(questStore.xpIntoLevel) / CGFloat(questStore.xpForLevel))
         }
     }
 }

@@ -76,7 +76,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## Tab bar and Home
 - **Tab bar:** `MainTabBar` is custom because iOS's bar can't match Figma's shape. `TabView` still keeps each tab's state, with its own bar hidden. `.mainTabBar()` is applied inside each tab's root so pushed screens cover the bar.
 - **Home data:** the name, color, archetype and aspiration come from `OnboardingProfile`. Login skips onboarding until real accounts exist, so it shows "Traveler" and a green character with no item, and hides the archetype and aspiration.
-- **Placeholders:** the level and XP bar use a flat 500 XP per level from `QuestStore.earnedXP`. Attributes start at 10 and rise by a quest's attribute rewards when it's completed. Only the daily quest has attribute rewards so far; user-created quests get them when rewards are system inferred.
+- **Progress:** the level and XP bar come from `QuestStore`, and attributes start at 10 and rise when a quest is completed.
 - **Home's quest (`QuestStore.homeQuest`):** the active daily or personal quest first, then today's daily if it isn't finished, then the active main quest, then any available quest. The section reads "ACTIVE QUEST" for any active quest, "TODAY'S QUEST" for an available daily and "AVAILABLE QUEST" for any other available quest. Which quest was accepted first doesn't matter: a daily or personal quest always shows ahead of an active main quest, because its timer is running and the main quest has no deadline.
 - **Completion card:** from `9.2 - Home Screen (Completion)`, shown under "TODAY'S PROGRESS" once nothing is active or available. It counts every completed quest and totals their XP, and its button opens Create Quest. The count should become today's only when daily quests renew. The copy for more than one quest is ours. New and ongoing users start on the available card. Once started, it uses the active style and elapsed-time row from `9.1 - Home Screen (Active Quest)`.
 - **Streak chip:** built and checked, but hidden while `streakDays` is 0. Nothing counts streaks yet.
@@ -95,8 +95,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Presentation:** a system sheet at the large detent, opened by the + button in the quest log. iOS shows this detent edge to edge, seen on the iPhone 17 simulator, so it uses a 20pt margin instead of the 12pt margin on Create Aspiration's floating sheet. The content is taller than the screen, so the reward card needs a scroll.
 - **Quest type selection:** our own version, because Figma has no design yet. Two cards, Main and Personal, sit above Estimated Duration. Daily isn't offered because the system creates it. It uses the same selected style as this screen's duration and category controls.
 - **Default state:** Personal, 30m and Development (the first category) are selected, with an empty title and description. Type, duration and category always keep a selection.
-- **Validation:** on submit only. The title is required and the description is optional. Main quests also need at least one step. Each error clears on edit.
-- **Main quest steps:** our own version. A STEPS section appears on this screen when Main is selected, with 1 to 10 steps that can be removed before saving. Text left in the step field is added on submit. Checking steps off comes with Quest Details.
+- **Validation:** on submit only. The title is required and the description is optional. Main quests also need at least 3 steps. Each error clears on edit.
+- **Main quest steps:** our own version. A STEPS section appears on this screen when Main is selected, with 3 to 10 steps that can be removed before saving. Text left in the step field is added on submit. Checking steps off comes with Quest Details.
 - **Quest limits:** one open main quest and five open personal quests at a time; completed quests don't count. A card at its limit is dimmed and reads "Already created" or "Limit reached", and tapping it shows a toast explaining the limit. If Personal is at its limit, Main is selected instead. If both are, "Finish a quest to create a new one." appears and Create Quest does nothing.
 - **Main quests have no time limit:** Estimated Duration is hidden when Main is selected, and they save with no duration. Users go at their own pace.
 - **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
@@ -107,36 +107,50 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## Quest Details
 - **Data:** opened with a quest's id and read from `QuestStore`, so the timer and status stay live on Home and in the log.
 - **Timer:** daily and personal quests time themselves from Accept, using `Quest.startedAt`, `pausedAt` and `pausedDuration`, so it keeps counting in the background. It doesn't stop at the duration: the bar stays full and the time left reads "Time's up".
-- **Minimum time:** a timed quest can be completed only after half its duration has passed (`QuestReward.minimumTimeFraction`), and paused time doesn't count. Until then, Complete Quest is dimmed with a live message, and tapping it shows a toast. **Debug builds use 1%** so testing stays quick, so 30 minutes needs 18 seconds in Xcode and 15 minutes in release. Main quests have no minimum.
+- **Minimum time:** a timed quest can be completed only after half its duration has passed (`QuestReward.minimumTimeFraction`), and paused time doesn't count. Until then, Complete Quest is dimmed, with "Available in 12 min." above it. Tapping a locked button shakes that notice with a warning vibration. **Debug builds use 1%** so testing stays quick, so 30 minutes needs 18 seconds in Xcode and 15 minutes in release. Main quests have no minimum.
 - **Complete Quest:** marks the quest completed, awards its XP and opens Reward.
 - **Abandon quest:** asks for confirmation and returns the quest to available, resetting the timer. A main quest keeps its ticked steps and their XP.
-- **Main quests (our own version):** no timer. A STEPS section with a progress bar replaces the timer card, and steps can be ticked once the quest is accepted. Completing needs every step ticked, otherwise "Finish every step to complete this quest." appears.
-- **Hidden when empty:** quests created by users have no objective, difficulty or attribute rewards yet, so those rows are hidden. Difficulty comes with the XP system.
+- **Daily personal reward limit:** 3 personal quests a day earn full rewards (`RewardRules.maxFullRewardPersonalQuestsPerDay`). Later ones earn a flat +10 XP and +1 main attribute. Open quests past the limit show the bonus on Home, in the log and on Quest Details (`QuestStore.withCurrentRewards`), going back to full rewards the next day. Reward shows the small cards with "Small progress is still progress." There's no overall daily XP cap.
+- **Daily step limit:** 3 main quest steps a day (`RewardRules.maxStepsPerDay`), counted by calendar day across main quests. A blocked tick shows a toast, and unticking frees one up. It uses the device clock, so changing the date can get around it until there's a backend.
+- **Main quests (our own version):** no timer. A STEPS section with a progress bar replaces the timer card, and steps can be ticked once the quest is accepted. Completing needs every step ticked, otherwise the button is dimmed with "Finish every step first." above it.
+- **Hidden when empty:** quests created by users have no objective, so that section is hidden.
 - **Completed quests:** open read-only, with no buttons.
 
 ## Reward
 - **Presentation:** a full-screen cover over Quest Details. Continue closes it and returns to where the quest was opened, so back can't reach it again.
 - **Data:** `QuestStore.complete` returns a `QuestCompletion`, which holds the quest, time taken, levels and XP at that moment.
 - **Loot cards:** XP in the middle, with up to two attributes tilted beside it. A quest with no attribute rewards shows XP alone. They fade and pop in one by one when the screen opens, XP first, then left, then right, with a success haptic.
-- **Level up:** the banner and New Reward Unlocked only appear when the quest crossed a level. For a main quest, this looks back across all its steps, because their XP was earned earlier.
-- **Experience:** shows real progress on the placeholder 500 XP per level, not Figma's sample 0 / 700.
-- **New Reward Unlocked:** expands in place, as in DESIGN-DECISIONS.md. The "Level 2 badge" content is a placeholder until achievements exist, and "View in Character" comes with that screen.
+- **Level up:** the banner appears when a completion finds a level Reward hasn't shown yet, including one reached earlier by ticking steps. Each level is announced once.
+- **New Reward Unlocked:** appears only when a cloak unlocks, and expands in place, as in DESIGN-DECISIONS.md. "View in Character" comes with that screen.
 - **Spirit line:** timed quests show the time taken; main quests show their step count, because they have no timer.
+
+## Character moods
+- **Home:** tapping the character cycles idle, happy, sleepy and focused, from `13.5 - Hooded traveler / Moods`. The mood resets when Home is recreated.
+- **How it's drawn:** `CharacterPortrait` overlays a visor and the mood's face on the character image, so it works for all 30 color and archetype images without 90 more. The face uses `CharacterColor.faceColor`.
+- **Not used:** happy's sparkles in that frame belong to the Strategist's orb, so they aren't drawn.
 
 ## UI polish for later
 Don't build these until asked.
+- **Expressions on achievements:** change the character's and the flame spirit's expressions when there's an achievement or a completion.
+- **Character glow:** wherever the character appears, add a soft glow or ring around it in the user's chosen color. Not bright.
+- **Character tap effect:** add a visual effect when the character is tapped. Tapping already cycles its expressions on Home.
+- **Create Quest reward card:** redesign it, possibly as a dropdown.
+- **Quest Details active banner:** redesign the active timer card.
 - **XP bars:** animate every progress bar with a moving linear gradient.
 - **Quest cards:** animate the outlines. The developer also suggested a circle animation, possibly for these; where it goes isn't decided.
 
 ## Quest rules
-- **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept shows a toast.
+- **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept is dimmed, with the reason above it.
 - **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
-- **Deleting quests:** swipe left on a main or personal quest in the quest log, tap Delete, then confirm. Daily quests can't be deleted because the system renews them, and completed quests stay as a record. The cards are `List` rows, because swipe actions need one. Deleting gives no XP back or penalty yet; decide this when XP is real.
+- **Deleting quests:** swipe left on a main or personal quest in the quest log, tap Delete, then confirm. Daily quests can't be deleted because the system renews them, and completed quests stay as a record. The cards are `List` rows, because swipe actions need one. Deleting a main quest takes back the XP from its ticked steps, and can lower the level, but earned cloaks stay.
 
-## XP and progression (future)
-- **Rewards are system inferred** from the estimated duration and how difficult the task is. Users don't set them. This may need AI to judge difficulty; not decided.
-- **Placeholder:** `QuestReward.xp(forMinutes:)` uses duration only: 15m is 25 XP, 30m is 50, 1h is 100 and 2h+ is 200. Replace it when the real system is designed. Sample and daily quests keep Figma's fixed values for now.
-- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Each step's XP is awarded when it's ticked and taken back if it's unticked, not all at the end, because a quest with no deadline can run for a long time.
+## XP and rewards
+The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
+- **Code:** `RewardRules` holds XP, attributes, the level curve and cloaks. `DifficultyEstimator` is the only place that decides difficulty.
+- **Difficulty:** keywords for now, from the title and description. Add words to its lists as new quests get misjudged. Hard wins over Easy, and no match means Moderate.
+- **On-device AI trial (3 Nov 2026):** couldn't run, because Apple Intelligence isn't enabled on this Mac, so it's still unproven. Enable it to retry; the titles are in the plan.
+- **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. Wearing them comes with the Character screen.
+- **Still placeholders:** the sample daily quest's fixed rewards, and generating and renewing daily quests.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -162,14 +176,17 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Home:** move the header down 14pt to match the auth screens.
 - **Quests frames:** move the content down 14pt to line up with Home's header.
 - **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
-- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add the locked Complete Quest state, a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
+- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add the dimmed button states with their notices above the button, the daily step limit toast, a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
 - **`7 - Reward Screen`:** move the content down 14pt, use `PrimaryButtonV2`'s button, add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card.
+- **Home:** make the character tappable through its moods.
 - **Home:** change the section title by state ("ACTIVE QUEST", "TODAY'S QUEST", "AVAILABLE QUEST"), add the available state for any quest type, and `9.2`'s copy for more than one completed quest.
 - **`8 - Quests (All)`:** completed quests don't appear under ALL.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
-- **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least one step." error. The sheet's content is taller as a result, so it can scroll.
+- **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least 3 steps." error. The sheet's content is taller as a result, so it can scroll.
 - **Main quest card:** add the available state, with the status pill in the header under the XP reward.
-- **Create Quest frames:** hide Estimated Duration for Main, with "100 XP for each step" in the reward card, and add the limit toasts.
+- **Create Quest frames:** move the reward card directly under the description, hide Estimated Duration for Main, with XP for each step in the reward card, add the attributes and difficulty that update while typing, the bonus state and the limit toasts.
+- **`7 - Reward Screen`:** show cloaks in the unlocked card, and add the bonus reward state with "Small progress is still progress."
+- **Quest Details frames:** add the bonus reward note and amounts.
 - **Quests frames:** add the swipe-to-delete action and its confirmation.
 - **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 - **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
@@ -189,6 +206,12 @@ Development comes first. Make these only when asked. Add to this list as the cod
 ## Known issues
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
+- **Medium:** attribute points don't scale with duration, so 15m quests earn them eight times faster than 2h+ ones. The daily limit caps the total.
+- **Medium:** the minimum time and daily limits use the device clock, so changing the date gets around them until there's a backend. Read from the code; not tried.
+- **Low:** a keyword anywhere in the description makes a quest Hard, so any quest can be inflated.
+- **Low:** a level and cloak reached by ticking steps can be claimed by completing another quest, and the cloak stays after the main quest is deleted and its XP is taken back.
+- **Low:** typing immediately after pressing return in the step field can drop characters. Seen at automated typing speed only; a 2-second gap was fine.
+- **Low:** a newly added step field on Create Quest can be partly hidden behind the button.
 - **Low:** at large text sizes, words break mid-word on Home's attribute cards ("KNOWLED / GE", "CREATIVIT / Y"). Seen at Accessibility Large on 3 Nov 2026.
 - **Low:** `CreateAspirationView`'s header uses the same stacked layout Create Quest had, so Cancel can overlap its title at large text sizes. Inferred from the code; not checked on screen.
 - **Low:** using the eye button while a password field is focused briefly drops focus, so "Passwords don't match" can appear while the user is still typing. The error clears on the next edit.

@@ -65,10 +65,18 @@ struct CreateQuestView: View {
 
     @FocusState private var focus: Field?
 
+    private var difficulty: QuestDifficulty {
+        DifficultyEstimator.estimate(title: title, description: description)
+    }
+
+    private var xpPerStep: Int {
+        RewardRules.xpPerStep(difficulty: difficulty)
+    }
+
     private var xpReward: Int {
         questType == .mainQuest
-            ? QuestReward.xp(forStepCount: steps.count)
-            : QuestReward.xp(forMinutes: duration.minutes)
+            ? xpPerStep * steps.count
+            : RewardRules.xp(minutes: duration.minutes, difficulty: difficulty)
     }
 
     private var canCreateAnyType: Bool {
@@ -166,6 +174,9 @@ struct CreateQuestView: View {
             descriptionField
                 .padding(.top, 12)
 
+            completionReward
+                .padding(.top, 12)
+
             sectionLabel("QUEST TYPE")
                 .padding(.top, 22)
 
@@ -213,10 +224,7 @@ struct CreateQuestView: View {
                 }
             }
             .padding(.top, 10)
-
-            completionReward
-                .padding(.top, 22)
-                .padding(.bottom, 12)
+            .padding(.bottom, 12)
         }
         .padding(.horizontal, 20)
         .padding(.top, 37)
@@ -322,7 +330,7 @@ struct CreateQuestView: View {
             .padding(.top, 10)
 
             if showsStepsError {
-                FieldErrorRow(message: "Add at least one step.")
+                FieldErrorRow(message: "Add at least \(RewardRules.minStepsPerMainQuest) steps.")
                     .padding(.top, 8)
             }
         }
@@ -380,27 +388,41 @@ struct CreateQuestView: View {
     }
 
     private var completionReward: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("COMPLETION REWARD")
-                    .font(AppTypography.captionMedium)
-                    .foregroundStyle(Color.asphyrTextPrimary)
+        let isBonus = questType == .personalQuest && !questStore.hasFullPersonalRewardsLeft
+        let shownXP = isBonus ? RewardRules.bonusXP : xpReward
+        let attributes = RewardRules.attributes(category: category, difficulty: difficulty)
+        let shownAttributes = isBonus ? RewardRules.bonusAttributes(from: attributes) : attributes
 
-                Text(questType == .mainQuest ? "\(QuestReward.xpPerStep) XP for each step" : "Earned upon quest completion")
-                    .font(AppTypography.bodySecondary)
-                    .foregroundStyle(Color.asphyrTextSecondary)
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("COMPLETION REWARD")
+                        .font(AppTypography.captionMedium)
+                        .foregroundStyle(Color.asphyrTextPrimary)
+
+                    Text(rewardSubtitle(isBonus: isBonus))
+                        .font(AppTypography.bodySecondary)
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                HStack(spacing: 4) {
+                    Image("iconQuestReward")
+                        .accessibilityHidden(true)
+
+                    Text("+\(shownXP) XP")
+                        .font(AppTypography.sectionTitle)
+                        .fixedSize()
+                        // Rolls as the difficulty and duration change
+                        .contentTransition(.numericText(value: Double(shownXP)))
+                        .animation(.snappy, value: shownXP)
+                }
+                .foregroundStyle(Color.asphyrWarning)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack(spacing: 4) {
-                Image("iconQuestReward")
-                    .accessibilityHidden(true)
-
-                Text("+\(xpReward) XP")
-                    .font(AppTypography.sectionTitle)
-                    .fixedSize()
-            }
-            .foregroundStyle(Color.asphyrWarning)
+            Text(shownAttributes.map { "+\($0.value) \($0.name)" }.joined(separator: "   "))
+                .font(AppTypography.captionMedium)
+                .foregroundStyle(Color.asphyrWarning)
         }
         .padding(.horizontal, 17)
         .padding(.vertical, 12)
@@ -411,6 +433,12 @@ struct CreateQuestView: View {
                 .strokeBorder(Color.asphyrWarning.opacity(0.25), lineWidth: 1)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private func rewardSubtitle(isBonus: Bool) -> String {
+        if isBonus { return "Small bonus today" }
+        if questType == .mainQuest { return "\(difficulty.rawValue.capitalized): \(xpPerStep) XP for each step" }
+        return "\(difficulty.rawValue.capitalized) difficulty"
     }
 
     private func sectionLabel(_ title: String) -> some View {
@@ -551,7 +579,7 @@ struct CreateQuestView: View {
         let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
 
         showsTitleError = trimmedTitle.isEmpty
-        showsStepsError = questType == .mainQuest && steps.isEmpty
+        showsStepsError = questType == .mainQuest && steps.count < RewardRules.minStepsPerMainQuest
 
         guard !showsTitleError, !showsStepsError else { return }
 
@@ -562,8 +590,10 @@ struct CreateQuestView: View {
                 description: trimmedDescription.isEmpty ? nil : trimmedDescription,
                 iconName: questType.iconName,
                 category: category.uppercased(),
+                difficulty: difficulty,
                 durationMinutes: questType == .mainQuest ? nil : duration.minutes,
                 xpReward: xpReward,
+                attributeRewards: RewardRules.attributes(category: category, difficulty: difficulty),
                 status: .available,
                 steps: questType == .mainQuest ? steps : []
             )

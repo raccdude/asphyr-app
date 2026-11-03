@@ -30,6 +30,18 @@ enum CharacterColor: String, CaseIterable, Identifiable {
         }
     }
 
+    /// The eyes and mouth, matching the character art.
+    var faceColor: Color {
+        switch self {
+        case .green: Color(red: 128 / 255, green: 255 / 255, blue: 160 / 255)     // #80FFA0
+        case .oxblood: Color(red: 255 / 255, green: 122 / 255, blue: 138 / 255)   // #FF7A8A
+        case .yellow: Color(red: 255 / 255, green: 236 / 255, blue: 166 / 255)    // #FFECA6
+        case .snow: Color(red: 250 / 255, green: 251 / 255, blue: 255 / 255)      // #FAFBFF
+        case .midnight: Color(red: 127 / 255, green: 166 / 255, blue: 255 / 255)  // #7FA6FF
+        case .plum: Color(red: 181 / 255, green: 140 / 255, blue: 255 / 255)      // #B58CFF
+        }
+    }
+
     var noviceImageName: String { "characterNovice\(rawValue)" }
 
     /// The novice holding the archetype's item, or empty-handed without one.
