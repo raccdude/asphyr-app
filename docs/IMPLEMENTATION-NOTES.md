@@ -113,7 +113,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## XP and progression (future)
 - **Rewards are system inferred** from the estimated duration and how difficult the task is. Users don't set them. This may need AI to judge difficulty; not decided.
 - **Placeholder:** `QuestReward.xp(forMinutes:)` uses duration only: 15m is 25 XP, 30m is 50, 1h is 100 and 2h+ is 200. Replace it when the real system is designed. Sample and daily quests keep Figma's fixed values for now.
-- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Proposed: award each step's XP when it's ticked instead of all at the end, because a quest with no deadline can run for a long time. Not decided.
+- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Each step's XP is awarded when it's ticked, not all at the end, because a quest with no deadline can run for a long time. Build this with Quest Details.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
