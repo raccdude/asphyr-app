@@ -17,7 +17,7 @@ enum CharacterColor: String, CaseIterable, Identifiable {
     case midnight = "Midnight"
     case plum = "Plum"
 
-    var id: Self { self }
+    var id: Self { self }   
 
     var swatch: Color {
         switch self {

@@ -27,7 +27,10 @@ private enum MainTab: String, CaseIterable, Identifiable {
 
 struct MainTabView: View {
     @State private var selection: MainTab = .home
-    @State private var questStore = QuestStore()
+    @Environment(OnboardingProfile.self) private var profile
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var questStore = QuestStore(quests: [])
 
     var body: some View {
         TabView(selection: $selection) {
@@ -57,6 +60,17 @@ struct MainTabView: View {
             }
         }
         .environment(questStore)
+        .onAppear(perform: refreshDailyQuest)
+        // A new day can start while the app is in the background
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
+                refreshDailyQuest()
+            }
+        }
+    }
+
+    private func refreshDailyQuest() {
+        questStore.refreshDailyQuest(aspiration: profile.aspiration, archetype: profile.archetype)
     }
 }
 

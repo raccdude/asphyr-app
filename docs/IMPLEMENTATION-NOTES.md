@@ -143,21 +143,27 @@ Don't build these until asked.
 - **Quest cards:** animate the outlines. The developer also suggested a circle animation, possibly for these; where it goes isn't decided.
 
 ## Journey
-- **Stars:** completed quests light them in order, at 1, 3, 5, 8, 11, 15 and 20 quests. These numbers are ours; Figma only shows "2 quests until Apprentice". Quests earning only the small bonus still count.
+- **Constellations:** each aspiration uses a real constellation, in [JOURNEY-CONSTELLATIONS-SPEC.md](JOURNEY-CONSTELLATIONS-SPEC.md). `ConstellationData.swift` is generated from the d3-celestial data, whose license is in `Resources`. Don't edit its positions by hand.
+- **Stars:** every constellation takes 20 quests, spread evenly across its 5 to 10 stars, and quests earning only the small bonus still count. Tapping a star shows its name, goal and progress in the guide card for 4 seconds, and a locked star also shakes with a warning vibration.
+- **Chapters:** every aspiration has 5 constellations and 100 quests in total. Every chapter's stars are written for the aspiration (`JourneyPath` for chapter 1, `JourneyChapterStars` for the rest), and custom aspirations use shared themed stars for chapters 2 to 5: practice, depth, craft and giving back. All of this copy is ours. Finishing a chapter moves straight to the next, with a message once.
+- **Sky map:** pinch out or tap the header button to see all 5 chapters along a path that winds out from chapter 1 at the center, in a different layout for each aspiration (`JourneySkyLayout`). Reached chapters can be opened, and later ones are faint and unnamed, and shake with a toast. Later chapters use constellations chosen to suit the aspiration, from the same 13.
 - **Paths (`JourneyPath`):** each aspiration has its own seven star names and goals: the 5 listed on Identity and the 7 others in Create Aspiration's popular choices. Matching ignores capitals and spacing. A custom aspiration, or none after Login, gets the general path. All of this copy is ours; Figma's "Swift" stars were samples. Add new aspirations to `paths`.
 - **Destination:** the last star masters one skill, like "Anatomy Master", as Figma's "Swift Master" does. It's never the aspiration itself, because no one becomes a doctor in 20 quests.
 - **States:** new user, on the way, star unlocked (shown once, until leaving the tab), welcome back (no completed quest for 3 days) and all lit. All lit is ours; Figma has no frame. There's no next chapter yet.
 - **Welcome back can't appear in the app yet:** progress resets on relaunch. Check it in the preview.
-- **Layout:** Figma's fixed positions at 402pt wide, so the constellation keeps its shape. The header is pinned, and the rest scrolls. Spirit positions beside Consistency, Debugger, Scholar and Master are ours; Figma only places it at First Steps, Apprentice and Builder.
+- **Sky:** `StarField` fills the screen with small stars that stay put, and the sky map adds more.
+- **Layout (`JourneyLayout`):** the constellation is 340pt across and centered in the space above the guide card, the header is pinned, and the rest scrolls. The flame spirit stays in a guide card under the constellation, replacing Figma's following spirit, speech bubble and banner. Its top line is the spirit's message, up to two lines, and its bottom line is the next star, or that star's goal right after one lights. Other goals appear when a star is tapped. The current star and destination always get a label; other labels only show if they have room.
+- **Data generator:** `ConstellationData.swift` came from a script outside the repo, with stars chosen by hand. Stars under 34pt apart on screen were merged, and Auriga's two small stars beside Capella were left out so it can end on Capella.
 
 ## Journey ideas (future)
 Not built, and needs a design first.
-- **Real constellations:** each path uses a real constellation that represents the aspiration, instead of arbitrary positions.
-- **Sky map:** zoom out to see other constellations as later chapters of the user's path.
-- **Locked stars:** tapping one shakes it and says how many quests are left.
+- **After 5 chapters:** the journey ends at all lit. More chapters could come later.
 
-## Daily quests (future)
-System generated, renewing every 24 hours, from both the aspiration and the archetype. The Journey paths can feed this.
+## Daily quests
+- **Source (`DailyQuests`):** written by hand, with three quests for each of the 12 aspirations plus the general set, for each of the 4 archetypes. They rotate by day. Custom aspirations and Login use the general set, and Login uses the Explorer's. AI could replace this later.
+- **Archetype:** shapes the objective and the main attribute: Strategist is Problem Solving, Scholar is Knowledge, Creator is Creativity and Explorer is Discipline. The aspiration's category gives the second attribute.
+- **Rewards:** a fixed 30 minutes at Moderate, so +100 XP, +5 and +2.
+- **Renewal:** by calendar day when the tabs appear or the app returns to the foreground. An untouched daily is replaced, a started one stays until finished, and completed ones stay as a record.
 
 ## Quest rules
 - **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept is dimmed, with the reason above it.
@@ -170,7 +176,6 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Difficulty:** keywords for now, from the title and description. Add words to its lists as new quests get misjudged. Hard wins over Easy, and no match means Moderate.
 - **On-device AI trial (3 Nov 2026):** couldn't run, because Apple Intelligence isn't enabled on this Mac, so it's still unproven. Enable it to retry; the titles are in the plan.
 - **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. Wearing them comes with the Character screen.
-- **Still placeholders:** the sample daily quest's fixed rewards, and generating and renewing daily quests.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -189,44 +194,93 @@ Midnight, Oxblood and Plum are planned as unlockable cloaks: the starter charact
 In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The hand color `#3A3F4C` becomes the cloak top × 1.25.
 
 ## Figma updates for later
-- **Identity frames:** add a ring on the selected color swatch. Figma doesn't mark the selection.
-- **Identity frames:** move the content down 14pt to match the lowered back button, and add the "Enter your name." and "Choose an aspiration." errors.
-- **Create Aspiration:** add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
-- **Identity frames and `13.4 - Colours`:** replace orange (`#FF9F40`) with snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`).
-- **Home:** move the header down 14pt to match the auth screens.
-- **Quests frames:** move the content down 14pt to line up with Home's header.
-- **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
-- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add the dimmed button states with their notices above the button, the daily step limit toast, a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
-- **`7 - Reward Screen`:** move the content down 14pt, use `PrimaryButtonV2`'s button, add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card.
-- **Home:** make the character tappable through its moods.
-- **Journey frames:** move the content down 14pt, replace the Swift samples with the aspiration paths, and add the all lit state and the spirit's other positions.
-- **Home:** change the section title by state ("ACTIVE QUEST", "TODAY'S QUEST", "AVAILABLE QUEST"), add the available state for any quest type, and `9.2`'s copy for more than one completed quest.
-- **`8 - Quests (All)`:** completed quests don't appear under ALL.
-- **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
-- **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least 3 steps." error. The sheet's content is taller as a result, so it can scroll.
-- **Main quest card:** add the available state, with the status pill in the header under the XP reward.
-- **Create Quest frames:** move the reward card directly under the description, hide Estimated Duration for Main, with XP for each step in the reward card, add the attributes and difficulty that update while typing, the bonus state and the limit toasts.
-- **`7 - Reward Screen`:** show cloaks in the unlocked card, and add the bonus reward state with "Small progress is still progress."
-- **Quest Details frames:** add the bonus reward note and amounts.
-- **Quests frames:** add the swipe-to-delete action and its confirmation.
-- **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
-- **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
-- **Character:** add the novice holding the book, brush and lantern, and each item in all six colors. Include the dark details on Snow and Yellow, and the white book lines on the dark colors.
-- **Character:** the five non-green novice characters are generated outside Figma, including Snow's dark crest. Add them to Figma if you want it to stay the source of truth.
+Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
-Development comes first. Make these only when asked. Add to this list as the code moves ahead of Figma.
+### All screens
+- **Header position:** screens with a back button or top header sit 14pt lower than Figma (back button top 76pt, not 62pt). Move the content below down with it.
+- **Toasts:** add the app's toast style wherever it's used: limits on Create Quest, the sky map and step limits.
 
-- **Back button and wordmark:** move them down 14pt on `4 - Login` and the Account Recovery frames (back button top from 62pt to 76pt), and everything below them with it.
-- **`2 - Welcome`:** move the wordmark down 20pt so it lines up with the other auth screens. The rest of the frame stays where it is.
-- **Login frames `4` to `4.2`:** end "Forgot password?" at the field's right edge (about 6pt in), and center the "Don’t have an account? CREATE ACCOUNT" row (about 6pt left).
-- **Create Account frames `3` to `3.5`:** add the back button, with the same header as Login.
-- **Create Account:** add a frame for a weak password on submit, with the checklist showing unmet items and no error row.
-- **Password field:** add the open-eye icon for the revealed state. The app uses the SF Symbol `eye` for now.
-- **`2 - Welcome`:** center the "Already have an account? LOG IN" row. It sits about 5pt right of center, and the app centers it.
+### Welcome
+- Move the wordmark down 20pt to line up with the other auth screens. The rest of the frame stays.
+- Center the "Already have an account? LOG IN" row. It sits about 5pt right of center.
+
+### Create Account (`3` to `3.5`)
+- Add the back button, with the same header as Login.
+- Add a frame for a weak password on submit, with the checklist showing unmet items and no error row.
+- Add the open-eye icon for a revealed password. The app uses the SF Symbol `eye` for now.
+
+### Login (`4` to `4.2`)
+- Move the back button and wordmark down 14pt, with everything below.
+- End "Forgot password?" at the field's right edge (about 6pt in).
+- Center the "Don’t have an account? CREATE ACCOUNT" row (about 6pt left).
+
+### Account Recovery
+- Move the back button and wordmark down 14pt, with everything below.
+
+### Build Your Identity
+- Add a ring on the selected color swatch, as Figma doesn't mark the selection.
+- Move the content down 14pt, and add the "Enter your name." and "Choose an aspiration." errors.
+- Replace orange (`#FF9F40`) with Snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`), including `13.4 - Colours`.
+
+### Create Aspiration
+- Add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
+
+### Your Character
+- Add the unselected state and the "Choose an archetype." error, and move the content down 14pt.
+
+### Character art
+- Add the novice holding the book, brush and lantern, with each item in all six colors, the dark details on Snow and Yellow, and the white book lines on the dark colors.
+- The five non-green novice characters were generated outside Figma, including Snow's dark crest. Add them if Figma should stay the source of truth.
+- Add the three character mood faces for every color, as Home now uses them.
+
+### Home
+- Move the header down 14pt.
+- Make the character tappable through its moods.
+- Make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started, with darker tags on its active card.
+- Change the section title by state: "ACTIVE QUEST", "TODAY'S QUEST" or "AVAILABLE QUEST".
+- Add the available and active cards for any quest type, and aspiration-specific daily quests. Figma only has Build a Small Mechanic.
+- Show `9.2` only once nothing is active or available, add its button's link to Create Quest, and its copy for more than one completed quest.
+- Show level and XP on the new curve, such as 100 / 700 XP.
+
+### Quests (`8`)
+- Move the content down 14pt, and add the meaning of ALL: every open quest, with completed quests only under Completed.
+- By default, show only the daily quest, marked available. Main and personal quests appear after the user creates them. Revisit the Active frame and the "no logs" frames, as the daily means ALL and Available are never empty by default.
+- Add the swipe-to-delete action and its confirmation, including the message about main quest XP.
+- Add the main quest card's available state, with its status pill under the XP. The active card has no pill.
+- Add the +10 XP bonus shown on open personal quests past the daily limit.
+
+### Create Quest
+- Move the reward card directly under the description, with attributes and difficulty that update as the user types.
+- Add the quest type selection: Main and Personal, Personal selected by default, the disabled states and their toasts, and "Finish a quest to create a new one."
+- Select Development by default, and change the reward with duration and difficulty.
+- For Main, hide Estimated Duration, show XP for each step, and add the steps section with "Add at least 3 steps."
+- Add the bonus state, "Small bonus today", with +10 XP and +1.
+
+### Quest Details (`6`, `6.1`)
+- Move the content down 14pt.
+- Put notices above the button, with dimmed locked buttons: "Available in 12 min.", "Finish every step first.", "Finish or abandon your active quest first." and the bonus message.
+- Add the main quest version, with steps, no timer and "EARNED", plus the daily step limit toast.
+- Add the paused state, "Time's up", the abandon confirmation, the completed state and the bonus reward amounts.
+
+### Reward (`7`)
+- Move the content down 14pt and use `PrimaryButtonV2`'s button.
+- Add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card showing cloaks.
+- Add the bonus state, with +10, +1 and "Small progress is still progress."
+
+### Journey (`10`)
+- Move the content down 14pt, replace Swift samples with the 13 real constellations and aspiration paths, and add the meaning line under the chapter.
+- Replace the following spirit, speech bubble and banner with the guide card and its messages.
+- Add five chapters with their own stars for each aspiration, the chapter complete message and the all lit state.
+- Add the denser star field, the larger constellation, tap details on stars and the locked star shake.
+- Add the sky map with its button, with chapter 1 at the center and a path winding out around it, in a different layout for each aspiration, showing completed, current and locked chapters, with the locked chapter toast.
+
+### Design documents
+- `DESIGN-DECISIONS.md` says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 
 ## Known issues
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
+- **Low:** the data script that generates `ConstellationData.swift` isn't in the repo.
 - **Medium:** attribute points don't scale with duration, so 15m quests earn them eight times faster than 2h+ ones. The daily limit caps the total.
 - **Medium:** the minimum time and daily limits use the device clock, so changing the date gets around them until there's a backend. Read from the code; not tried.
 - **Low:** a keyword anywhere in the description makes a quest Hard, so any quest can be inflated.

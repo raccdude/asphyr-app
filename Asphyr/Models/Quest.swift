@@ -21,6 +21,8 @@ struct Quest: Identifiable {
     var attributeRewards: [AttributeReward] = []
     var status: QuestStatusType
     var steps: [QuestStep] = []
+    /// The day the system made this daily quest.
+    var generatedOn: Date?
     var startedAt: Date?
     var pausedAt: Date?
     var pausedDuration: TimeInterval = 0

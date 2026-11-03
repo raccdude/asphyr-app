@@ -21,6 +21,8 @@ struct JourneyProgress {
         case starUnlocked
         case welcomeBack
         case allLit
+        case chapterComplete
+        case chapterStart
     }
 
     static let welcomeBackDays = 3
@@ -29,6 +31,9 @@ struct JourneyProgress {
     let completedQuests: Int
     let litStarsAlreadySeen: Int
     let lastCompletedAt: Date?
+    var chapterIndex = 0
+    /// True until the user has seen that the previous chapter finished.
+    var hasChapterNews = false
 
     static func stars(aspiration: String?) -> [JourneyStar] {
         JourneyPath.path(for: aspiration).stars
@@ -48,7 +53,10 @@ struct JourneyProgress {
     }
 
     func state(at date: Date = .now) -> State {
-        if completedQuests == 0 { return .newUser }
+        if completedQuests == 0 {
+            if chapterIndex == 0 { return .newUser }
+            return hasChapterNews ? .chapterComplete : .chapterStart
+        }
         if litCount > litStarsAlreadySeen { return .starUnlocked }
         if currentIndex == nil { return .allLit }
 
@@ -61,157 +69,298 @@ struct JourneyProgress {
     }
 }
 
-/// The stars for one aspiration. Each has its own names and goals, with the same
-/// number of quests needed at every position. The last star masters one skill,
-/// never the aspiration itself, because no one reaches a dream in 20 quests.
-struct JourneyPath {
-    private static let questsNeeded = [1, 3, 5, 8, 11, 15, 20]
+/// How the journey's quests divide into chapters. Each takes 20 quests, and the
+/// quests finished in one chapter carry straight on into the next.
+enum JourneyChapters {
+    static let count = 5
+    static let questsPerChapter = 20
 
+    static func currentIndex(completedQuests: Int) -> Int {
+        min(completedQuests / questsPerChapter, count - 1)
+    }
+
+    static func quests(completedQuests: Int, inChapter chapter: Int) -> Int {
+        min(questsPerChapter, max(0, completedQuests - chapter * questsPerChapter))
+    }
+}
+
+/// The stars for one aspiration: a real constellation that represents it, with
+/// names and goals for each star. The last star masters one skill, never the
+/// aspiration itself, because no one reaches a dream in 20 quests.
+struct JourneyPath {
+    private static let totalQuests = 20
+
+    let constellation: Constellation
     let stars: [JourneyStar]
 
-    /// Star names and goals in order, ending with the destination. The third
-    /// star uses the aspiration's own icon.
-    private init(iconName: String, _ steps: [(name: String, goal: String)]) {
-        let icons = ["iconJourneyFlag", "iconJourneyTarget", iconName, "iconJourneyCompass",
-                     "iconAttributeProblemSolving", "iconQuestBook", "iconJourneyCrown"]
+    /// Spreads the same 20 quests evenly, however many stars there are.
+    static func questThresholds(starCount: Int) -> [Int] {
+        (0..<starCount).map { index in
+            Int((1 + Double(totalQuests - 1) * Double(index) / Double(starCount - 1)).rounded())
+        }
+    }
 
+    /// Star names and goals in order. The third star uses the aspiration's icon,
+    /// and the last is always the crown.
+    private init(constellationID: String, iconName: String, _ steps: [(name: String, goal: String)]) {
+        guard let constellation = Constellation.all[constellationID] else {
+            preconditionFailure("Unknown constellation \(constellationID)")
+        }
+        let generalIcons = ["iconJourneyCompass", "iconAttributeProblemSolving", "iconQuestBook"]
+        let thresholds = Self.questThresholds(starCount: steps.count)
+
+        self.constellation = constellation
         stars = steps.indices.map { index in
-            JourneyStar(
+            let icon: String
+            switch index {
+            case 0: icon = "iconJourneyFlag"
+            case 1: icon = "iconJourneyTarget"
+            case 2: icon = iconName
+            case steps.count - 1: icon = "iconJourneyCrown"
+            default: icon = generalIcons[(index - 3) % generalIcons.count]
+            }
+
+            return JourneyStar(
                 name: steps[index].name,
                 goal: steps[index].goal,
-                questsNeeded: Self.questsNeeded[index],
-                iconName: icons[index]
+                questsNeeded: thresholds[index],
+                iconName: icon
             )
         }
     }
 
+    /// The five chapters: the aspiration's own path, then four more constellations
+    /// that suit it. Each is written for the aspiration, except custom aspirations,
+    /// which use themed stars about how the journey grows.
+    static func chapters(for aspiration: String?) -> [JourneyPath] {
+        let name = aspiration?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        let order = chapterOrder[name] ?? ["Her", "Aur", "Peg", "Lyr"]
+
+        let written = laterChapters[name]
+
+        return [path(for: aspiration)] + order.enumerated().map { index, id in
+            guard let lines = written?[index] else {
+                return themed(constellationID: id, theme: themes[index])
+            }
+
+            let steps = lines.map { line -> (name: String, goal: String) in
+                let parts = line.split(separator: "|")
+                return (String(parts[0]), String(parts[1]))
+            }
+            return JourneyPath(constellationID: id, iconName: themes[index].iconName, steps)
+        }
+    }
+
+    private static func themed(constellationID: String, theme: Theme) -> JourneyPath {
+        let starCount = Constellation.all[constellationID]?.stars.count ?? theme.steps.count + 1
+        return JourneyPath(
+            constellationID: constellationID,
+            iconName: theme.iconName,
+            Array(theme.steps.prefix(starCount - 1)) + [theme.destination]
+        )
+    }
+
+    private typealias Theme = (iconName: String, steps: [(name: String, goal: String)], destination: (name: String, goal: String))
+
+    private static let chapterOrder: [String: [String]] = [
+        "game developer": ["Her", "Per", "Peg", "UMi"],
+        "mechanical engineer": ["Aur", "Vel", "Her", "UMi"],
+        "psychologist": ["Cen", "Oph", "Cyg", "UMi"],
+        "doctor": ["Cen", "Her", "Per", "UMi"],
+        "writer": ["Lyr", "Peg", "Per", "UMi"],
+        "artist": ["CrB", "Lyr", "Cyg", "UMi"],
+        "entrepreneur": ["UMi", "Aur", "Her", "Dra"],
+        "musician": ["Cyg", "Peg", "Cen", "UMi"],
+        "athlete": ["Per", "Dra", "Cen", "UMi"],
+        "teacher": ["Oph", "UMi", "Lyr", "Her"],
+        "designer": ["Peg", "Lyr", "Aur", "UMi"],
+        "engineer": ["Hor", "Vel", "Her", "UMi"]
+    ]
+
+    private static let themes: [Theme] = [
+        ("iconQuestHammer", [
+            ("Steady Start", "Show up again"),
+            ("Daily Rhythm", "Make it part of your day"),
+            ("Skill Builder", "Practice what’s hard"),
+            ("Second Wind", "Keep going when it’s dull"),
+            ("Quick Learner", "Learn from a mistake"),
+            ("Habit Keeper", "Hold a steady streak"),
+            ("Fine Tuner", "Polish one small skill"),
+            ("Reliable Hand", "Get it right every time"),
+            ("Dedicated", "Choose practice over mood")
+        ], ("Practice Keeper", "Make practice a habit")),
+        ("iconBulb", [
+            ("Deep Diver", "Go past the basics"),
+            ("Question Asker", "Ask why it works"),
+            ("Pattern Finder", "Spot what connects"),
+            ("Careful Thinker", "Slow down and check"),
+            ("Note Taker", "Write down what you learn"),
+            ("Puzzle Solver", "Crack a hard problem"),
+            ("Second Reader", "Revisit something hard"),
+            ("Clear Explainer", "Explain it simply"),
+            ("Expert in Training", "Learn from the best")
+        ], ("Depth Keeper", "Understand it deeply")),
+        ("iconSparklesSmall", [
+            ("Risk Taker", "Try the harder way"),
+            ("Own Voice", "Do it your own way"),
+            ("Project Starter", "Begin something real"),
+            ("Finisher", "See a project through"),
+            ("Sharer", "Show your work"),
+            ("Feedback Seeker", "Ask for honest notes"),
+            ("Comeback", "Recover from a setback"),
+            ("Bold Mover", "Take on a real challenge"),
+            ("Standout", "Make something you love")
+        ], ("Craft Keeper", "Make work you’re proud of")),
+        ("iconQuestBook", [
+            ("Guide", "Help someone starting out"),
+            ("Mentor", "Share what you know"),
+            ("Team Player", "Build something together"),
+            ("Steady Leader", "Keep others going"),
+            ("Big Picture", "See how it all connects"),
+            ("Long Hauler", "Think in years"),
+            ("Pathfinder", "Go where few have gone"),
+            ("Trusted Voice", "Be someone others ask"),
+            ("Lifelong Student", "Stay curious")
+        ], ("Trailblazer", "Keep going beyond the map"))
+    ]
+
     /// Matches listed and popular aspirations whatever their capitals or spacing.
     /// Anything else is a custom aspiration, which gets the general path.
     static func path(for aspiration: String?) -> JourneyPath {
-        let name = aspiration?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return paths[name.lowercased()] ?? general
+        let name = aspiration?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        return paths[name] ?? general
     }
 
-    private static var general: JourneyPath {
-        JourneyPath(iconName: "iconSparklesSmall", [
-            ("First Steps", "Complete your first quest"),
-            ("Consistency", "Keep showing up"),
-            ("Apprentice", "Keep learning the basics"),
-            ("Practitioner", "Put your skills to use"),
-            ("Problem Solver", "Work through something hard"),
-            ("Expert", "Go deeper than before"),
-            ("Foundations Master", "Master the basics")
-        ])
-    }
+    private static let general = JourneyPath(constellationID: "UMi", iconName: "iconSparklesSmall", [
+        ("First Steps", "Complete your first quest"),
+        ("Consistency", "Keep showing up"),
+        ("Apprentice", "Learn the basics"),
+        ("Practitioner", "Put your skills to use"),
+        ("Problem Solver", "Solve something hard"),
+        ("Expert", "Go deeper than before"),
+        ("Foundations Master", "Master the basics")
+    ])
 
     private static let paths: [String: JourneyPath] = [
-        "game developer": JourneyPath(iconName: "iconLaptop", [
+        "game developer": JourneyPath(constellationID: "Dra", iconName: "iconLaptop", [
             ("First Prototype", "Make something playable"),
             ("Game Jammer", "Finish small games often"),
-            ("Mechanics Coder", "Build a mechanic that feels good"),
-            ("Level Designer", "Design a level worth replaying"),
+            ("Mechanics Coder", "Make a mechanic feel good"),
+            ("Level Designer", "Design a replayable level"),
+            ("Art Tinkerer", "Give the game your look"),
+            ("Sound Tinkerer", "Give the game its sound"),
             ("Bug Hunter", "Track down a tricky bug"),
-            ("Playtester", "Learn from people playing your game"),
-            ("Prototype Master", "Finish a small game of your own")
+            ("Playtester", "Watch people play it"),
+            ("Polisher", "Polish the small details"),
+            ("Prototype Master", "Finish a small game")
         ]),
-        "mechanical engineer": JourneyPath(iconName: "iconWrench", [
+        "mechanical engineer": JourneyPath(constellationID: "Hor", iconName: "iconWrench", [
             ("First Sketch", "Draw your first design"),
             ("Tinkerer", "Take things apart and learn"),
             ("Drafter", "Model a part in detail"),
             ("Prototyper", "Build something that moves"),
-            ("Troubleshooter", "Find out why a design failed"),
-            ("Systems Thinker", "See how the parts work together"),
             ("Workshop Master", "Build a working model")
         ]),
-        "psychologist": JourneyPath(iconName: "iconBulb", [
+        "psychologist": JourneyPath(constellationID: "Per", iconName: "iconBulb", [
             ("First Question", "Get curious about the mind"),
             ("Observer", "Notice how people behave"),
+            ("Note Taker", "Track what you notice"),
             ("Student of Mind", "Learn the core theories"),
-            ("Researcher", "Read and question a study"),
-            ("Listener", "Practice listening with care"),
-            ("Case Thinker", "Connect theory to real people"),
-            ("Observation Master", "Understand how people behave")
+            ("Researcher", "Read a study closely"),
+            ("Listener", "Listen with care"),
+            ("Empath", "See another side"),
+            ("Case Thinker", "Link theory to people"),
+            ("Observation Master", "Understand behavior")
         ]),
-        "doctor": JourneyPath(iconName: "iconStethoscope", [
+        "doctor": JourneyPath(constellationID: "Oph", iconName: "iconStethoscope", [
             ("First Lesson", "Begin your medical studies"),
             ("Study Habit", "Study a little every day"),
             ("Anatomy Student", "Learn how the body works"),
-            ("Clinical Mind", "Practice reasoning through cases"),
-            ("Diagnostician", "Work through a hard diagnosis"),
-            ("Caregiver", "Learn to care for patients"),
+            ("Clinical Mind", "Reason through cases"),
+            ("Case Reader", "Study real cases"),
+            ("Diagnostician", "Solve a hard diagnosis"),
+            ("Good Listener", "Talk with patients"),
+            ("Caregiver", "Learn to care for people"),
             ("Anatomy Master", "Master the body’s basics")
         ]),
-        "writer": JourneyPath(iconName: "iconPen", [
+        "writer": JourneyPath(constellationID: "Cyg", iconName: "iconPen", [
             ("First Page", "Write your first page"),
             ("Daily Writer", "Write a little every day"),
+            ("Close Reader", "Study writers you admire"),
             ("Storyteller", "Finish a short piece"),
             ("Drafter", "Complete a full draft"),
             ("Editor", "Rewrite until it reads right"),
+            ("Feedback Seeker", "Get someone to read it"),
             ("Stylist", "Find your own voice"),
-            ("Story Master", "Finish a story you’re proud of")
+            ("Story Master", "Finish a story you love")
         ]),
-        "artist": JourneyPath(iconName: "iconCreator", [
+        "artist": JourneyPath(constellationID: "Peg", iconName: "iconCreator", [
             ("First Sketch", "Make your first piece"),
             ("Daily Sketcher", "Draw a little every day"),
+            ("Line Student", "Learn to see and draw form"),
             ("Color Student", "Study color and light"),
             ("Composer", "Plan a piece with intention"),
             ("Experimenter", "Try a new medium"),
+            ("Studio Critic", "Learn from your own work"),
             ("Visionary", "Develop your own style"),
-            ("Sketch Master", "Fill a sketchbook with finished work")
+            ("Sketch Master", "Fill a sketchbook")
         ]),
-        "entrepreneur": JourneyPath(iconName: "iconStrategist", [
-            ("First Idea", "Write down a problem worth solving"),
+        "entrepreneur": JourneyPath(constellationID: "Vel", iconName: "iconStrategist", [
+            ("First Idea", "Name a problem worth solving"),
             ("Validator", "Talk to people who have it"),
             ("Planner", "Shape the idea into a plan"),
             ("Builder", "Make a first version"),
             ("Problem Solver", "Get past a real setback"),
+            ("Pitcher", "Explain your idea simply"),
             ("Seller", "Win your first customers"),
             ("Idea Master", "Prove people want your idea")
         ]),
-        "musician": JourneyPath(iconName: "iconSparklesSmall", [
+        "musician": JourneyPath(constellationID: "Lyr", iconName: "iconSparklesSmall", [
             ("First Notes", "Play your first notes"),
             ("Daily Practice", "Practice a little every day"),
-            ("Ear Trainer", "Learn to hear what you play"),
-            ("Performer", "Learn a full piece"),
+            ("Ear Trainer", "Hear what you play"),
             ("Improviser", "Play without the page"),
-            ("Songwriter", "Write something of your own"),
-            ("Practice Master", "Play a full piece for someone")
+            ("Songwriter", "Write your own piece"),
+            ("Practice Master", "Play for someone")
         ]),
-        "athlete": JourneyPath(iconName: "iconExplorer", [
+        "athlete": JourneyPath(constellationID: "Her", iconName: "iconExplorer", [
             ("First Session", "Finish your first workout"),
             ("Regular", "Train on a steady schedule"),
             ("Trainee", "Learn the right technique"),
-            ("Competitor", "Test yourself against a goal"),
+            ("Endurance", "Go further than last time"),
+            ("Competitor", "Test yourself"),
             ("Comeback", "Push through a hard stretch"),
             ("Strategist", "Train with a plan"),
-            ("Training Master", "Complete a full training block")
+            ("Training Master", "Finish a training block")
         ]),
-        "teacher": JourneyPath(iconName: "iconScholar", [
+        "teacher": JourneyPath(constellationID: "Cen", iconName: "iconScholar", [
             ("First Lesson", "Explain something to someone"),
-            ("Lifelong Learner", "Study your subject every day"),
+            ("Lifelong Learner", "Study every day"),
             ("Lesson Planner", "Plan a complete lesson"),
+            ("Explainer", "Make a hard idea simple"),
             ("Classroom Guide", "Teach a group"),
+            ("Question Asker", "Ask questions that matter"),
             ("Problem Solver", "Help a struggling learner"),
             ("Mentor", "Guide someone over time"),
             ("Lesson Master", "Teach a lesson that lands")
         ]),
-        "designer": JourneyPath(iconName: "iconCreator", [
-            ("First Draft", "Design your first screen or page"),
+        "designer": JourneyPath(constellationID: "CrB", iconName: "iconCreator", [
+            ("First Draft", "Design your first page"),
             ("Daily Designer", "Design a little every day"),
             ("Layout Student", "Learn type, color and layout"),
             ("Prototyper", "Make an idea you can try"),
-            ("User Tester", "Learn from people using it"),
+            ("User Tester", "Watch people use it"),
             ("Systems Designer", "Make a design consistent"),
-            ("Layout Master", "Finish a design you’re proud of")
+            ("Layout Master", "Finish a design you love")
         ]),
-        "engineer": JourneyPath(iconName: "iconWrench", [
+        "engineer": JourneyPath(constellationID: "Aur", iconName: "iconWrench", [
             ("First Build", "Build something small"),
             ("Tinkerer", "Learn how things work"),
             ("Apprentice", "Learn the fundamentals"),
-            ("Maker", "Build something people can use"),
+            ("Maker", "Build something useful"),
             ("Debugger", "Fix a hard problem"),
             ("Systems Thinker", "See the whole system"),
-            ("Build Master", "Finish a build that works")
+            ("Build Master", "Finish a working build")
         ])
     ]
 }

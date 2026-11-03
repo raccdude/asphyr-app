@@ -56,6 +56,20 @@ final class QuestStore {
         10 + attributeGains[name, default: 0]
     }
 
+    /// Gives the user today's daily quest. A daily that's been started stays
+    /// until it's finished, and completed ones stay as a record.
+    func refreshDailyQuest(aspiration: String?, archetype: Archetype?, on date: Date = .now) {
+        let calendar = Calendar.current
+        let hasToday = quests.contains { quest in
+            quest.type == .dailyQuest && quest.generatedOn.map { calendar.isDate($0, inSameDayAs: date) } ?? false
+        }
+        let hasActive = quests.contains { $0.type == .dailyQuest && $0.status == .active }
+        guard !hasToday, !hasActive else { return }
+
+        quests.removeAll { $0.type == .dailyQuest && $0.status == .available }
+        quests.append(DailyQuests.quest(aspiration: aspiration, archetype: archetype, on: date))
+    }
+
     /// Whether another quest of this type can be created. One main quest and
     /// a limited number of personal quests can be open at a time.
     func canCreate(_ type: QuestType) -> Bool {

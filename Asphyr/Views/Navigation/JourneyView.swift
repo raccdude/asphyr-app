@@ -8,63 +8,85 @@
 import SwiftUI
 
 struct JourneyView: View {
-    /// Figma's positions. They're fixed so the constellation keeps its shape,
-    /// measured from the top of the 402pt frame, minus the header's height.
-    private enum Layout {
-        static let width: CGFloat = 402
-        static let topOffset: CGFloat = 140
-        static let height: CGFloat = 595
-
-        static let stars: [CGPoint] = [
-            CGPoint(x: 110, y: 700), CGPoint(x: 230, y: 640), CGPoint(x: 150, y: 540), CGPoint(x: 290, y: 470),
-            CGPoint(x: 90, y: 410), CGPoint(x: 210, y: 350), CGPoint(x: 201, y: 230)
-        ]
-
-        /// Pairs of star indexes joined by a line.
-        static let lines = [(0, 1), (1, 2), (2, 3), (2, 4), (3, 5), (4, 5), (5, 6)]
-
-        static let backgroundDots: [CGPoint] = [
-            CGPoint(x: 30, y: 180), CGPoint(x: 90, y: 250), CGPoint(x: 360, y: 210), CGPoint(x: 330, y: 330),
-            CGPoint(x: 60, y: 470), CGPoint(x: 372, y: 520), CGPoint(x: 140, y: 600), CGPoint(x: 300, y: 640),
-            CGPoint(x: 50, y: 700), CGPoint(x: 250, y: 180), CGPoint(x: 180, y: 420), CGPoint(x: 370, y: 420),
-            CGPoint(x: 20, y: 330), CGPoint(x: 230, y: 720), CGPoint(x: 120, y: 140)
-        ]
-
-        static func point(_ point: CGPoint) -> CGPoint {
-            CGPoint(x: point.x, y: point.y - topOffset)
-        }
-    }
-
-    /// Where the spirit and its speech bubble sit beside each star.
-    private struct SpiritPlacement {
-        let spirit: CGPoint
-        let bubbleX: CGFloat
-        /// The bubble's top edge, or its bottom edge when `isAbove`.
-        let bubbleEdgeY: CGFloat
-        let isAbove: Bool
-        let bubbleWidth: CGFloat
-        let pointyCorner: UnitPoint
-
-        static let all = [
-            SpiritPlacement(spirit: CGPoint(x: 56, y: 672), bubbleX: 8, bubbleEdgeY: 640, isAbove: true, bubbleWidth: 112, pointyCorner: .bottomLeading),
-            SpiritPlacement(spirit: CGPoint(x: 290, y: 636), bubbleX: 272, bubbleEdgeY: 604, isAbove: true, bubbleWidth: 118, pointyCorner: .bottomTrailing),
-            SpiritPlacement(spirit: CGPoint(x: 90, y: 536), bubbleX: 8, bubbleEdgeY: 572, isAbove: false, bubbleWidth: 112, pointyCorner: .topTrailing),
-            SpiritPlacement(spirit: CGPoint(x: 344, y: 470), bubbleX: 272, bubbleEdgeY: 436, isAbove: true, bubbleWidth: 118, pointyCorner: .bottomTrailing),
-            SpiritPlacement(spirit: CGPoint(x: 36, y: 396), bubbleX: 8, bubbleEdgeY: 364, isAbove: true, bubbleWidth: 112, pointyCorner: .bottomLeading),
-            SpiritPlacement(spirit: CGPoint(x: 270, y: 346), bubbleX: 272, bubbleEdgeY: 314, isAbove: true, bubbleWidth: 118, pointyCorner: .bottomLeading),
-            SpiritPlacement(spirit: CGPoint(x: 270, y: 222), bubbleX: 272, bubbleEdgeY: 256, isAbove: false, bubbleWidth: 118, pointyCorner: .topLeading)
-        ]
-    }
-
     @Environment(QuestStore.self) private var questStore
     @Environment(OnboardingProfile.self) private var profile
 
-    private var progress: JourneyProgress {
+    @State private var isShowingSky = false
+    /// The star whose details the guide card is showing.
+    @State private var selectedStar: Int?
+    @State private var lockedTapCount = 0
+    @State private var selectionCount = 0
+    @State private var starShakes: [Int: Int] = [:]
+
+    /// The chapter being looked at. Nil follows the user's current chapter.
+    @State private var viewedChapter: Int?
+
+    private var chapters: [JourneyPath] {
+        JourneyPath.chapters(for: profile.aspiration)
+    }
+
+    private var completedCount: Int {
+        questStore.completedQuests.count
+    }
+
+    private var currentChapter: Int {
+        JourneyChapters.currentIndex(completedQuests: completedCount)
+    }
+
+    private var chapterIndex: Int {
+        viewedChapter ?? currentChapter
+    }
+
+    private var path: JourneyPath {
+        chapters[chapterIndex]
+    }
+
+    /// Every star lit so far, across all chapters.
+    private var totalLitStars: Int {
+        chapters.indices.reduce(0) { total, index in
+            total + chapterProgress(index, seen: 0).litCount
+        }
+    }
+
+    private func litStarsBefore(chapter: Int) -> Int {
+        (0..<chapter).reduce(0) { $0 + chapters[$1].stars.count }
+    }
+
+    private func chapterProgress(_ index: Int, seen: Int) -> JourneyProgress {
         JourneyProgress(
-            stars: JourneyProgress.stars(aspiration: profile.aspiration),
-            completedQuests: questStore.completedQuests.count,
-            litStarsAlreadySeen: questStore.seenLitStarCount,
-            lastCompletedAt: questStore.completedQuests.compactMap(\.completedAt).max()
+            stars: chapters[index].stars,
+            completedQuests: JourneyChapters.quests(completedQuests: completedCount, inChapter: index),
+            litStarsAlreadySeen: seen,
+            lastCompletedAt: questStore.completedQuests.compactMap(\.completedAt).max(),
+            chapterIndex: index,
+            hasChapterNews: questStore.seenLitStarCount < totalLitStarsUpTo(index)
+        )
+    }
+
+    private func totalLitStarsUpTo(_ chapter: Int) -> Int {
+        litStarsBefore(chapter: chapter)
+    }
+
+    private var constellation: Constellation {
+        path.constellation
+    }
+
+    private var progress: JourneyProgress {
+        // Stars already seen, counted within this chapter. A past chapter opened
+        // from the sky map has no news to announce.
+        let seen = viewedChapter == nil || viewedChapter == currentChapter
+            ? max(0, questStore.seenLitStarCount - litStarsBefore(chapter: chapterIndex))
+            : chapters[chapterIndex].stars.count
+
+        return chapterProgress(chapterIndex, seen: seen)
+    }
+
+    private var layout: JourneyLayout {
+        JourneyLayout(
+            constellation: constellation,
+            names: progress.stars.map(\.name),
+            litCount: progress.litCount,
+            currentIndex: progress.currentIndex
         )
     }
 
@@ -73,24 +95,18 @@ struct JourneyView: View {
     }
 
     private var chapterTitle: String {
-        if state == .newUser { return "Chapter 1 · Your first constellation" }
-        return "Chapter 2 · " + (profile.aspiration.map { "The \($0) constellation" } ?? "Your constellation")
+        "Chapter \(chapterIndex + 1) · \(constellation.name)"
     }
 
     private var displayName: String {
         profile.name.isEmpty ? "Traveler" : profile.name
     }
 
-    /// The star the spirit stays beside. It rests on the last star once all are lit.
-    private var spiritStarIndex: Int {
-        progress.currentIndex ?? progress.stars.count - 1
-    }
-
     private var spiritMood: SpiritView.Mood {
         switch state {
         case .newUser: .wave
         case .onTheWay: .focused
-        case .starUnlocked, .allLit: .cheer
+        case .starUnlocked, .allLit, .chapterComplete, .chapterStart: .cheer
         case .welcomeBack: .sleepy
         }
     }
@@ -100,9 +116,9 @@ struct JourneyView: View {
 
         switch state {
         case .newUser:
-            return "Hi \(displayName)! Let’s light your first star."
+            return "Hi \(displayName)! Let’s light a star!"
         case .onTheWay:
-            return count == 1 ? "One more quest and this star lights up!" : "\(spelledOut(count) ?? "\(count)") more quests and this star lights up!"
+            return count == 1 ? "One more quest to light it up!" : "\(spelledOut(count)) more quests to light it up!"
         case .starUnlocked:
             let lit = progress.stars[progress.litCount - 1].name
             guard let current = progress.currentIndex else { return "\(lit) is lit! You lit them all." }
@@ -111,26 +127,30 @@ struct JourneyView: View {
             return "Welcome back! One small quest wakes me up."
         case .allLit:
             return "Every star is lit. Look how far you’ve come!"
+        case .chapterComplete:
+            return "Chapter \(chapterIndex) is complete. Look how far you’ve come!"
+        case .chapterStart:
+            return "A new constellation to light. Let’s go!"
         }
     }
 
-    private var bannerMessage: String {
-        let count = progress.questsUntilNextStar
+    private func spelledOut(_ number: Int) -> String {
+        let words = ["Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
+        return (2...10).contains(number) ? words[number - 2] : "\(number)"
+    }
 
-        switch state {
-        case .newUser:
-            return "Complete your first quest to light this star"
-        case .onTheWay:
-            let name = progress.currentIndex.map { progress.stars[$0].name } ?? ""
-            return count == 1 ? "1 quest until \(name) lights up" : "\(count) quests until \(name) lights up"
-        case .starUnlocked:
-            guard let current = progress.currentIndex else { return "Every star in this chapter is lit" }
-            return "New star: \(progress.stars[current].name) · \(progress.stars[current].goal)"
-        case .welcomeBack:
-            return "Your stars stay lit. Pick up where you left off"
-        case .allLit:
-            return "Every star in this chapter is lit"
+    /// What's next, so the card says something the spirit's message doesn't.
+    private var nextStepMessage: String {
+        if state == .starUnlocked, let current = progress.currentIndex {
+            return progress.stars[current].goal
         }
+        if state == .chapterComplete {
+            return "Next: Chapter \(chapterIndex + 1), \(constellation.name)."
+        }
+        guard let current = progress.currentIndex else {
+            return chapterIndex == JourneyChapters.count - 1 ? "You finished all 5 chapters." : "This chapter is complete."
+        }
+        return "Next: \(progress.stars[current].name)."
     }
 
     var body: some View {
@@ -138,101 +158,161 @@ struct JourneyView: View {
             Color.asphyrBackground
                 .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 9) {
-                    constellation
-                        .frame(maxWidth: .infinity)
+            StarField()
 
-                    banner
+            if isShowingSky {
+                JourneySkyMap(
+                    chapters: chapters.map(\.constellation),
+                    spots: JourneySkyLayout.spots(for: profile.aspiration),
+                    currentChapter: currentChapter,
+                    completedQuests: completedCount
+                ) { chapter in
+                    // The current chapter follows the user as they progress
+                    viewedChapter = chapter == currentChapter ? nil : chapter
+                    selectedStar = nil
+                    setSkyVisible(false)
+                }
+                .padding(.bottom, 24)
+                .transition(.scale(scale: 1.4).combined(with: .opacity))
+            } else {
+                ScrollView {
+                    constellationView
+                        .frame(maxWidth: .infinity)
+                        // Centers the constellation in the space it has
+                        .containerRelativeFrame(.vertical)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.hidden)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    guideCard
                         .padding(.horizontal, 20)
+                        .padding(.top, 20)
                         .padding(.bottom, 16)
                 }
+                .transition(.scale(scale: 0.6).combined(with: .opacity))
             }
-            .scrollIndicators(.hidden)
         }
+        .simultaneousGesture(
+            MagnifyGesture().onEnded { value in
+                // Pinching out shows the sky, and pinching in comes back
+                if value.magnification < 0.85 {
+                    setSkyVisible(true)
+                } else if value.magnification > 1.15 {
+                    setSkyVisible(false)
+                }
+            }
+        )
         .safeAreaInset(edge: .top, spacing: 0) {
             header
         }
-        // The new star's message shows once, then the screen moves on
+        .sensoryFeedback(.warning, trigger: lockedTapCount)
+        .task(id: selectionCount) {
+            guard selectedStar != nil else { return }
+
+            do {
+                try await Task.sleep(for: .seconds(4))
+                selectedStar = nil
+            } catch {
+                // A newer tap restarted the delay
+            }
+        }
         .onDisappear {
-            questStore.seenLitStarCount = progress.litCount
+            // The new star's message shows once, so it only counts as seen if
+            // the constellation was showing
+            if !isShowingSky, viewedChapter == nil {
+                questStore.seenLitStarCount = totalLitStars
+            }
+            isShowingSky = false
+            viewedChapter = nil
+            selectedStar = nil
+        }
+    }
+
+    private func setSkyVisible(_ isVisible: Bool) {
+        withAnimation(.smooth(duration: 0.4)) {
+            isShowingSky = isVisible
         }
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("YOUR PATH")
-                .font(AppTypography.captionMedium)
-                .foregroundStyle(Color.asphyrTextSecondary)
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("YOUR PATH")
+                    .font(AppTypography.captionMedium)
+                    .foregroundStyle(Color.asphyrTextSecondary)
 
-            Text("JOURNEY")
-                .font(AppTypography.screenTitle)
-                .foregroundStyle(Color.asphyrTextPrimary)
-                .accessibilityAddTraits(.isHeader)
-                .padding(.top, 4)
+                Text("JOURNEY")
+                    .font(AppTypography.screenTitle)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.top, 4)
 
-            Text(chapterTitle)
-                .font(AppTypography.bodySecondary)
-                .foregroundStyle(Color.asphyrTextSecondary)
-                .padding(.top, 8)
+                Text(chapterTitle)
+                    .font(AppTypography.bodySecondary)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .padding(.top, 8)
+
+                Text(constellation.meaning)
+                    .font(AppTypography.captionMedium)
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .padding(.top, 3)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                setSkyVisible(!isShowingSky)
+            } label: {
+                Image(systemName: isShowingSky ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Circle())
+            }
+            .glassEffect(.regular.interactive(), in: Circle())
+            // Dark glass until the app's light colors exist
+            .environment(\.colorScheme, .dark)
+            .accessibilityLabel(isShowingSky ? "Back to this constellation" : "See the whole sky")
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
         // Lines up with the header on Home
         .padding(.top, 14)
         .padding(.bottom, 6)
-        // Solid, so content scrolling up doesn't show behind the title
-        .background(Color.asphyrBackground.ignoresSafeArea(edges: .top))
     }
 
-    private var constellation: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(Layout.backgroundDots.indices, id: \.self) { index in
-                Circle()
-                    .fill(Color.asphyrTextPrimary.opacity(0.35))
-                    .frame(width: 2, height: 2)
-                    .position(Layout.point(Layout.backgroundDots[index]))
-            }
+    private var constellationView: some View {
+        let layout = layout
 
+        return ZStack(alignment: .topLeading) {
             lines
 
             ForEach(progress.stars.indices, id: \.self) { index in
                 starNode(index)
-                    .position(Layout.point(Layout.stars[index]))
+                    .position(JourneyLayout.starPoint(constellation, index))
+                    // The current star is never hidden by a neighbor
+                    .zIndex(index == progress.currentIndex ? 1 : 0)
             }
 
-            spirit
+            ForEach(Array(layout.labels.keys), id: \.self) { index in
+                starLabel(index)
+                    .position(layout.labels[index] ?? .zero)
+            }
+            .zIndex(2)
         }
-        .frame(width: Layout.width, height: Layout.height)
+        .frame(width: JourneyLayout.width, height: JourneyLayout.height)
     }
 
     private var lines: some View {
         ZStack {
-            litLines
+            ConstellationLines(constellation: constellation) { isReached($0.0) && isReached($0.1) }
                 .stroke(Color.asphyrAccentPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .shadow(color: Color.asphyrAccentPrimary.opacity(0.6), radius: 4)
 
-            lockedLines
+            ConstellationLines(constellation: constellation) { !(isReached($0.0) && isReached($0.1)) }
                 .stroke(Color.asphyrTextSecondary.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [3, 5]))
         }
+        .frame(width: JourneyLayout.shapeSize, height: JourneyLayout.shapeSize)
+        .offset(x: JourneyLayout.origin.x, y: JourneyLayout.origin.y)
         .accessibilityHidden(true)
-    }
-
-    private var litLines: Path {
-        linePath { isReached($0.0) && isReached($0.1) }
-    }
-
-    private var lockedLines: Path {
-        linePath { !(isReached($0.0) && isReached($0.1)) }
-    }
-
-    private func linePath(where include: ((Int, Int)) -> Bool) -> Path {
-        var path = Path()
-        for line in Layout.lines where include(line) {
-            path.move(to: Layout.point(Layout.stars[line.0]))
-            path.addLine(to: Layout.point(Layout.stars[line.1]))
-        }
-        return path
     }
 
     /// A star that's lit, or the one being worked towards.
@@ -246,11 +326,12 @@ struct JourneyView: View {
         let isLastStar = index == progress.stars.count - 1
         let isLit = index < progress.litCount
         let isCurrent = index == progress.currentIndex
-        let nodeSize: CGFloat = isLit ? 28 : isCurrent ? 40 : isLastStar ? 48 : 24
 
-        VStack(spacing: 6) {
-            Group {
-                if isLit {
+        Group {
+            if isLit {
+                Button {
+                    select(index)
+                } label: {
                     Image(star.iconName)
                         .resizable()
                         .scaledToFit()
@@ -259,7 +340,13 @@ struct JourneyView: View {
                         .frame(width: 28, height: 28)
                         .background(Color.asphyrAccentPrimary, in: Circle())
                         .shadow(color: Color.asphyrAccentPrimary.opacity(0.5), radius: 6)
-                } else if isCurrent {
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+            } else if isCurrent {
+                Button {
+                    select(index)
+                } label: {
                     Image(star.iconName)
                         .resizable()
                         .scaledToFit()
@@ -272,113 +359,124 @@ struct JourneyView: View {
                                 .strokeBorder(Color.asphyrAccentPrimary, lineWidth: 2.5)
                         }
                         .shadow(color: Color.asphyrAccentPrimary.opacity(0.5), radius: 14)
-                } else if isLastStar {
-                    Image(star.iconName)
-                        .foregroundStyle(Color.asphyrWarning)
-                        .frame(width: 48, height: 48)
-                        .background(Color.asphyrWarning.opacity(0.12), in: Circle())
-                        .overlay {
-                            Circle()
-                                .strokeBorder(Color.asphyrWarning, lineWidth: 1.5)
-                        }
-                        .shadow(color: Color.asphyrWarning.opacity(0.4), radius: 14)
-                } else {
-                    Image("iconJourneyLock")
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                        .frame(width: 24, height: 24)
-                        .background(Color.asphyrSurfaceElevated, in: Circle())
-                        .overlay {
-                            Circle()
-                                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
-                        }
+                        .contentShape(Circle())
                 }
+                .buttonStyle(.plain)
+            } else {
+                Button {
+                    tapLockedStar(index)
+                } label: {
+                    lockedNode(star, isLastStar: isLastStar)
+                        .modifier(ShakeEffect(shakes: CGFloat(starShakes[index, default: 0])))
+                }
+                .buttonStyle(.plain)
             }
-            .accessibilityHidden(true)
-
-            Text(star.name.uppercased())
-                .font(AppTypography.captionRegular)
-                .foregroundStyle(labelColor(isLit: isLit, isCurrent: isCurrent, isLastStar: isLastStar))
-                .multilineTextAlignment(.center)
-                .frame(width: 120)
         }
-        .fixedSize()
-        // Centers the node on its point, with the label hanging below
-        .alignmentGuide(VerticalAlignment.center) { $0[.top] + nodeSize / 2 }
-        .frame(width: 120, height: nodeSize)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(star.name)
         .accessibilityValue(isLit ? "Lit" : isCurrent ? "Current" : "Locked")
     }
 
-    private func labelColor(isLit: Bool, isCurrent: Bool, isLastStar: Bool) -> Color {
-        if isLit { return .asphyrTextPrimary }
-        if isCurrent { return .asphyrAccentPrimary }
-        return isLastStar ? .asphyrWarning : .asphyrTextSecondary
-    }
-
-    private var spirit: some View {
-        let placement = SpiritPlacement.all[spiritStarIndex]
-        let bubbleY = placement.bubbleEdgeY - Layout.topOffset
-
-        return ZStack(alignment: .topLeading) {
-            SpiritView(mood: spiritMood, size: 56)
-                .position(Layout.point(placement.spirit))
-
-            Text(spiritMessage)
-                .font(AppTypography.captionMedium)
-                .foregroundStyle(Color.asphyrTextPrimary)
-                // Takes the height it needs, as the frame below offers none
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(9)
-                .frame(width: placement.bubbleWidth, alignment: .leading)
-                .background {
-                    bubbleShape(pointyCorner: placement.pointyCorner)
-                        .fill(Color.asphyrSurfaceElevated)
-                        .overlay {
-                            bubbleShape(pointyCorner: placement.pointyCorner)
-                                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
-                        }
+    @ViewBuilder
+    private func lockedNode(_ star: JourneyStar, isLastStar: Bool) -> some View {
+        if isLastStar {
+            Image(star.iconName)
+                .foregroundStyle(Color.asphyrWarning)
+                .frame(width: 48, height: 48)
+                .background(Color.asphyrWarning.opacity(0.12), in: Circle())
+                .overlay {
+                    Circle()
+                        .strokeBorder(Color.asphyrWarning, lineWidth: 1.5)
                 }
-                .fixedSize(horizontal: false, vertical: true)
-                // A zero-height frame lets the bubble grow away from its edge
-                .frame(height: 0, alignment: placement.isAbove ? .bottom : .top)
-                .offset(x: placement.bubbleX, y: bubbleY)
+                .shadow(color: Color.asphyrWarning.opacity(0.4), radius: 14)
+                .contentShape(Circle())
+        } else {
+            Image("iconJourneyLock")
+                .foregroundStyle(Color.asphyrTextSecondary)
+                .frame(width: 24, height: 24)
+                .background(Color.asphyrSurfaceElevated, in: Circle())
+                .overlay {
+                    Circle()
+                        .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+                }
+                // A larger target that still leaves close neighbors tappable
+                .frame(width: 36, height: 36)
+                .contentShape(Circle())
         }
-        .frame(width: Layout.width, height: Layout.height, alignment: .topLeading)
     }
 
-    private func bubbleShape(pointyCorner: UnitPoint) -> UnevenRoundedRectangle {
-        UnevenRoundedRectangle(
-            topLeadingRadius: pointyCorner == .topLeading ? 3 : 12,
-            bottomLeadingRadius: pointyCorner == .bottomLeading ? 3 : 12,
-            bottomTrailingRadius: pointyCorner == .bottomTrailing ? 3 : 12,
-            topTrailingRadius: pointyCorner == .topTrailing ? 3 : 12
-        )
+    private func tapLockedStar(_ index: Int) {
+        withAnimation(.linear(duration: 0.4)) {
+            starShakes[index, default: 0] += 1
+        }
+        select(index)
+        lockedTapCount += 1
     }
 
-    private var banner: some View {
-        HStack(spacing: 10) {
-            Image("iconJourneyBolt")
-                .foregroundStyle(Color.asphyrAccentPrimary)
-                .accessibilityHidden(true)
-
-            Text(bannerMessage)
-                .font(AppTypography.bodySecondary)
-                .foregroundStyle(Color.asphyrTextPrimary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+    private func select(_ index: Int) {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            selectedStar = index
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .frame(minHeight: 52)
-        .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 14))
+        selectionCount += 1
+    }
+
+    private func starLabel(_ index: Int) -> some View {
+        let isLastStar = index == progress.stars.count - 1
+        let color: Color = index < progress.litCount
+            ? .asphyrTextPrimary
+            : index == progress.currentIndex ? .asphyrAccentPrimary : isLastStar ? .asphyrWarning : .asphyrTextSecondary
+
+        return Text(progress.stars[index].name.uppercased())
+            .font(AppTypography.captionRegular)
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .fixedSize()
+            .accessibilityHidden(true)
+    }
+
+    /// The flame spirit guides from one place, and tapping a star shows its
+    /// details here for a few seconds.
+    private var guideCard: some View {
+        HStack(spacing: 12) {
+            SpiritView(mood: spiritMood, size: 52)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(guideTitle)
+                    .font(AppTypography.bodySecondarySemiBold)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+
+                Text(guideDetail)
+                    .font(AppTypography.captionMedium)
+                    .foregroundStyle(Color.asphyrTextSecondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .id(selectedStar)
+            .transition(.opacity)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(minHeight: 76)
+        .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 16))
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(Color.asphyrBorder, lineWidth: 1)
         }
+        .accessibilityElement(children: .combine)
     }
 
-    private func spelledOut(_ number: Int) -> String? {
-        let words = ["Two", "Three", "Four", "Five"]
-        return (2...5).contains(number) ? words[number - 2] : nil
+    private var guideTitle: String {
+        guard let selectedStar else { return spiritMessage }
+        return progress.stars[selectedStar].name
+    }
+
+    private var guideDetail: String {
+        guard let selectedStar else { return nextStepMessage }
+
+        let star = progress.stars[selectedStar]
+        if selectedStar < progress.litCount { return "Lit. \(star.goal)." }
+
+        let questsLeft = star.questsNeeded - progress.completedQuests
+        return "\(questsLeft) to go. \(star.goal)."
     }
 }
 
@@ -391,32 +489,35 @@ private func completedQuests(_ count: Int, daysAgo: Double = 0) -> [Quest] {
     }
 }
 
-#Preview("New user") {
-    JourneyView()
-        .environment(QuestStore())
-        .environment(OnboardingProfile())
-}
+private func journeyPreview(aspiration: String?, completed: Int = 3, daysAgo: Double = 0, seen: Int = 99) -> some View {
+    let store = QuestStore(quests: completedQuests(completed, daysAgo: daysAgo))
+    store.seenLitStarCount = seen
 
-#Preview("On the way") {
-    let store = QuestStore(quests: completedQuests(3))
-    store.seenLitStarCount = 2
+    let profile = OnboardingProfile()
+    profile.aspiration = aspiration
 
     return JourneyView()
         .environment(store)
-        .environment(OnboardingProfile())
+        .environment(profile)
 }
 
-#Preview("Star unlocked") {
-    JourneyView()
-        .environment(QuestStore(quests: completedQuests(5)))
-        .environment(OnboardingProfile())
-}
+#Preview("New user") { journeyPreview(aspiration: "Doctor", completed: 0, seen: 0) }
+#Preview("Star unlocked") { journeyPreview(aspiration: "Doctor", completed: 5, seen: 0) }
+#Preview("Welcome back") { journeyPreview(aspiration: "Doctor", daysAgo: 4) }
+#Preview("Chapter complete") { journeyPreview(aspiration: "Doctor", completed: 20, seen: 0) }
+#Preview("Chapter 2") { journeyPreview(aspiration: "Doctor", completed: 25) }
+#Preview("All lit") { journeyPreview(aspiration: "Doctor", completed: 100) }
 
-#Preview("Welcome back") {
-    let store = QuestStore(quests: completedQuests(3, daysAgo: 4))
-    store.seenLitStarCount = 2
-
-    return JourneyView()
-        .environment(store)
-        .environment(OnboardingProfile())
-}
+#Preview("Doctor") { journeyPreview(aspiration: "Doctor") }
+#Preview("Musician") { journeyPreview(aspiration: "Musician") }
+#Preview("Teacher") { journeyPreview(aspiration: "Teacher") }
+#Preview("Athlete") { journeyPreview(aspiration: "Athlete") }
+#Preview("Entrepreneur") { journeyPreview(aspiration: "Entrepreneur") }
+#Preview("Mechanical Engineer") { journeyPreview(aspiration: "Mechanical Engineer") }
+#Preview("Engineer") { journeyPreview(aspiration: "Engineer") }
+#Preview("Designer") { journeyPreview(aspiration: "Designer") }
+#Preview("Game Developer") { journeyPreview(aspiration: "Game Developer") }
+#Preview("Artist") { journeyPreview(aspiration: "Artist") }
+#Preview("Writer") { journeyPreview(aspiration: "Writer") }
+#Preview("Psychologist") { journeyPreview(aspiration: "Psychologist") }
+#Preview("Custom") { journeyPreview(aspiration: "Marine Biologist") }
