@@ -15,6 +15,8 @@ final class QuestStore {
     var quests: [Quest]
     private(set) var earnedXP = 0
     private(set) var unlockedCloaks: [CloakReward] = []
+    /// How many Journey stars have been announced, so each shows once.
+    var seenLitStarCount = 0
     /// The highest level Reward has shown, so each level is announced once.
     private var announcedLevel = 1
     /// Every attribute starts at 10.

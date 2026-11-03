@@ -20,8 +20,11 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Quests list | Merged | `feat/quests-v2` |
 | Create Quest | Merged | `feat/create-quest-v2` |
 | Quest Details | Merged | `feat/quest-details-v2` |
-| Reward | In review | `feat/reward-v2` |
-| Journey, Character, Settings | Not started | — |
+| Reward | Merged | `feat/reward-v2` |
+| XP system | Merged | `feat/xp-system` |
+| Journey | In review | `feat/journey-v2` |
+| Character | Next | — |
+| Settings | Not started | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -139,6 +142,23 @@ Don't build these until asked.
 - **XP bars:** animate every progress bar with a moving linear gradient.
 - **Quest cards:** animate the outlines. The developer also suggested a circle animation, possibly for these; where it goes isn't decided.
 
+## Journey
+- **Stars:** completed quests light them in order, at 1, 3, 5, 8, 11, 15 and 20 quests. These numbers are ours; Figma only shows "2 quests until Apprentice". Quests earning only the small bonus still count.
+- **Paths (`JourneyPath`):** each aspiration has its own seven star names and goals: the 5 listed on Identity and the 7 others in Create Aspiration's popular choices. Matching ignores capitals and spacing. A custom aspiration, or none after Login, gets the general path. All of this copy is ours; Figma's "Swift" stars were samples. Add new aspirations to `paths`.
+- **Destination:** the last star masters one skill, like "Anatomy Master", as Figma's "Swift Master" does. It's never the aspiration itself, because no one becomes a doctor in 20 quests.
+- **States:** new user, on the way, star unlocked (shown once, until leaving the tab), welcome back (no completed quest for 3 days) and all lit. All lit is ours; Figma has no frame. There's no next chapter yet.
+- **Welcome back can't appear in the app yet:** progress resets on relaunch. Check it in the preview.
+- **Layout:** Figma's fixed positions at 402pt wide, so the constellation keeps its shape. The header is pinned, and the rest scrolls. Spirit positions beside Consistency, Debugger, Scholar and Master are ours; Figma only places it at First Steps, Apprentice and Builder.
+
+## Journey ideas (future)
+Not built, and needs a design first.
+- **Real constellations:** each path uses a real constellation that represents the aspiration, instead of arbitrary positions.
+- **Sky map:** zoom out to see other constellations as later chapters of the user's path.
+- **Locked stars:** tapping one shakes it and says how many quests are left.
+
+## Daily quests (future)
+System generated, renewing every 24 hours, from both the aspiration and the archetype. The Journey paths can feed this.
+
 ## Quest rules
 - **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept is dimmed, with the reason above it.
 - **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
@@ -179,6 +199,7 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Quest Details frames:** move the content down 14pt to match the lowered back button, and add the dimmed button states with their notices above the button, the daily step limit toast, a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
 - **`7 - Reward Screen`:** move the content down 14pt, use `PrimaryButtonV2`'s button, add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card.
 - **Home:** make the character tappable through its moods.
+- **Journey frames:** move the content down 14pt, replace the Swift samples with the aspiration paths, and add the all lit state and the spirit's other positions.
 - **Home:** change the section title by state ("ACTIVE QUEST", "TODAY'S QUEST", "AVAILABLE QUEST"), add the available state for any quest type, and `9.2`'s copy for more than one completed quest.
 - **`8 - Quests (All)`:** completed quests don't appear under ALL.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
@@ -218,7 +239,7 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **Medium:** Journey, Character and Settings are bare placeholders that follow the device appearance, so they can show white with the tab bar's dark fade. Fix in their steps.
+- **Medium:** Character and Settings are bare placeholders that follow the device appearance, so they can show white with the tab bar's dark fade. Fix in their steps.
 - **Medium:** the app follows the device appearance instead of defaulting to dark, and the color sets have no Light values.
 - **Low:** Figma's "Already have an account? LOG IN" row on Welcome sits about 5pt right of center. The code centers it deliberately; update Figma to match if that's agreed.
 - **Medium:** Home has no back control and no log out. Fix with the Settings step.
