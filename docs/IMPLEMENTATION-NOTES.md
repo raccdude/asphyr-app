@@ -232,6 +232,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **What counts:** a day with any finished quest, including bonus-reward ones. Ticking a main quest's step doesn't count, as Figma says "Finish any quest". Rules are in `StreakRules`, counted from the finished quests, so resetting progress clears them.
 - **Active:** a streak stays alive until the end of the day after the last finished quest, so today shows as open until a quest is finished.
 - **Resting:** with nothing finished yesterday or today, Home shows the Rest chip and the sleeping character, and the sheet offers Find a Quest, which opens Quests. The next quest starts again from 1. Nothing is ever taken away.
+- **Spirit:** tapping it in the sheet cycles its expressions, like the character on Home. It opens happy, or sleepy when resting.
 - **New users:** Home shows no chip until the first quest is finished, as there's nothing to count.
 - **Toggles:** Show streak on Home and the Settings toggle are the same setting. Off hides the chip and the sleeping character, and stops the alert.
 - **Streak alerts:** a real local notification at 8 PM on the last day that keeps the streak going. Finishing a quest moves it to the next day.
@@ -308,6 +309,7 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 
 ### Streaks
 - Hide the chip on Home until the first quest is finished.
+- Make the sheet's spirit tappable through its expressions.
 - Add a state for a one-day streak: "You took a step today." or "You took a step yesterday."
 
 ### Contrast

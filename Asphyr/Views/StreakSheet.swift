@@ -13,6 +13,8 @@ struct StreakSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openQuests) private var openQuests
 
+    @State private var spiritMood: SpiritView.Mood = .happy
+
     private var isResting: Bool {
         status.state == .resting
     }
@@ -25,8 +27,16 @@ struct StreakSheet: View {
                 dismiss()
             }
 
-            SpiritView(mood: isResting ? .sleepy : .happy, size: 110)
-                .padding(.top, 14)
+            Button {
+                spiritMood = spiritMood.next
+            } label: {
+                SpiritView(mood: spiritMood, size: 110)
+            }
+            .buttonStyle(PressableButtonStyle())
+            .hapticFeedback(.selection, trigger: spiritMood)
+            .accessibilityLabel("Flame spirit")
+            .accessibilityHint("Changes the spirit’s expression")
+            .padding(.top, 14)
 
             Text(status.title)
                 .font(AppTypography.screenTitle)
@@ -82,6 +92,9 @@ struct StreakSheet: View {
         .padding(.horizontal, 19)
         .padding(.top, 24)
         .padding(.bottom, 24)
+        .onAppear {
+            spiritMood = isResting ? .sleepy : .happy
+        }
         .settingsSheet(height: isResting ? 740 : 720)
     }
 

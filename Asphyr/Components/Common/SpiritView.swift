@@ -9,13 +9,19 @@ import SwiftUI
 
 /// The flame spirit, crossfading when its mood changes.
 struct SpiritView: View {
-    enum Mood: String {
+    enum Mood: String, CaseIterable {
+        case happy = "spiritHappy"
+        case cheer = "spiritCheer"
         case wave = "spiritWave"
         case focused = "spiritFocused"
         case surprised = "spiritSurprised"
-        case cheer = "spiritCheer"
-        case happy = "spiritHappy"
         case sleepy = "spiritSleepy"
+
+        var next: Mood {
+            let moods = Mood.allCases
+            let index = moods.firstIndex(of: self) ?? 0
+            return moods[(index + 1) % moods.count]
+        }
     }
 
     let mood: Mood
