@@ -19,6 +19,18 @@ final class QuestStore {
     var todaysQuest: Quest? {
         quests.first { $0.type == .dailyQuest }
     }
+
+    /// Whether another quest of this type can be created. One main quest and
+    /// five personal quests can be open at a time.
+    func canCreate(_ type: QuestType) -> Bool {
+        let openCount = quests.filter { $0.type == type && $0.status != .completed }.count
+
+        switch type {
+        case .mainQuest: return openCount < 1
+        case .personalQuest: return openCount < 5
+        case .dailyQuest: return false
+        }
+    }
 }
 
 extension Quest {

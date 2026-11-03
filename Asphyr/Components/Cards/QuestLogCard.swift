@@ -46,9 +46,17 @@ struct QuestLogCard: View {
                         .padding(.top, 5)
                 }
 
-                HStack(spacing: 12) {
-                    QuestStatus(status: quest.status)
-                    xpReward
+                // Stacks at large text sizes so nothing is cut off
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        QuestStatus(status: quest.status)
+                        xpReward
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        QuestStatus(status: quest.status)
+                        xpReward
+                    }
                 }
                 .padding(.top, 12)
             }
@@ -94,6 +102,12 @@ struct QuestLogCard: View {
                 }
             }
             .padding(.top, 14)
+
+            // Figma only has the active main quest, which shows no status
+            if !isActive {
+                QuestStatus(status: quest.status)
+                    .padding(.top, 14)
+            }
         }
     }
 

@@ -28,6 +28,7 @@ struct QuestStatus: View {
             Text(status.rawValue)
                 .font(AppTypography.captionRegular)
                 .lineLimit(1)
+                .fixedSize()
         }
         .foregroundStyle(isTinted ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
         .padding(.horizontal, 11)

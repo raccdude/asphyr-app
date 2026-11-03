@@ -48,6 +48,21 @@ enum QuestType: CaseIterable {
     var sectionTitle: String {
         "\(title)S"
     }
+
+    var iconName: String {
+        switch self {
+        case .mainQuest: "iconQuestBook"
+        case .dailyQuest: "iconQuestGamepad"
+        case .personalQuest: "iconQuestHammer"
+        }
+    }
+}
+
+/// A placeholder until rewards are inferred from the duration and difficulty.
+enum QuestReward {
+    static func xp(forMinutes minutes: Int) -> Int {
+        minutes * 5 / 3
+    }
 }
 
 enum QuestStatusType: String {

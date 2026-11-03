@@ -17,9 +17,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Build Your Identity and Create Aspiration | Merged | `feat/identity-v2` |
 | Your Character | Merged | `feat/archetype-selection-v2` |
 | Tab bar and Home | Merged | `feat/home-v2` |
-| Quests list | In review | `feat/quests-v2` |
-| Create Quest | Next | — |
-| Quest Details | Not started | — |
+| Quests list | Merged | `feat/quests-v2` |
+| Create Quest | In review | `feat/create-quest-v2` |
+| Quest Details | Next | — |
 | Reward | Not started | — |
 | Journey, Character, Settings | Not started | — |
 
@@ -32,13 +32,13 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
   - Do not add a `NavigationStack` to a pushed screen. It sends the app back to the root screen. Changing `[AuthRoute]` to `NavigationPath` does not help.
   - Do not use a view-destination `NavigationLink { SomeView() }`. It crashes with `AnyNavigationPath.Error.comparisonTypeMismatch`. Use a `Button` that calls the router.
-- **Unreachable screens not converted yet:** `QuestDetailsView`, `RewardView` and `CreateQuestView` still push a new `HomeView`. Fix them when they are rebuilt.
+- **Unreachable screens not converted yet:** `QuestDetailsView` and `RewardView` still push a new `HomeView`. Fix them when they are rebuilt.
 
 ## Platform scope
 - **Current target:** iPhone only, portrait only.
 - **Future work:** landscape, iPad and other screen sizes. Enabling them means changing the device family and orientation build settings, and designing and testing layouts for each.
 - **Not in scope for now:** VoiceOver and Reduce Motion work. Leave the support already in the code in place, but don't plan or test it.
-- **Still in scope:** large text sizes. Don't truncate copy; let layouts wrap or scroll.
+- **Large text:** don't truncate copy; let layouts wrap or scroll. It isn't checked on screen, to save tokens. The quest screens were checked once at Accessibility Large on 3 Nov 2026, and the two issues left are under Known issues.
 
 ## Fonts
 - The app bundles **Inter 3.19** (`Inter Desktop` OTFs from the [official release](https://github.com/rsms/inter/releases/tag/v3.19)), with its license in `Fonts/Inter-LICENSE.txt`.
@@ -89,11 +89,28 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
 - **Filters:** ALL shows everything, and the others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
 - **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
-- **Not connected yet:** the + button does nothing until Create Quest is rebuilt. Cards and steps aren't tappable; Quest Details comes in its own step.
+- **Not connected yet:** cards and steps aren't tappable; Quest Details comes in its own step.
 - **Unused now:** `iconGamepad` is left over from the old card. Delete it in a cleanup.
 
-## Create Quest (planned)
-- **Quest type selection:** choose Main or Personal. Daily isn't offered because the system creates it. Figma has no design for this yet, so the app gets its own version first, with default states, and Figma follows later.
+## Create Quest
+- **Presentation:** a system sheet at the large detent, opened by the + button in the quest log. iOS shows this detent edge to edge, seen on the iPhone 17 simulator, so it uses a 20pt margin instead of the 12pt margin on Create Aspiration's floating sheet. The content is taller than the screen, so the reward card needs a scroll.
+- **Quest type selection:** our own version, because Figma has no design yet. Two cards, Main and Personal, sit above Estimated Duration. Daily isn't offered because the system creates it. It uses the same selected style as this screen's duration and category controls.
+- **Default state:** Personal, 30m and Development (the first category) are selected, with an empty title and description. Type, duration and category always keep a selection.
+- **Validation:** on submit only. The title is required and the description is optional. Main quests also need at least one step. Each error clears on edit.
+- **Main quest steps:** our own version. A STEPS section appears on this screen when Main is selected, with 1 to 10 steps that can be removed before saving. Text left in the step field is added on submit. Checking steps off comes with Quest Details.
+- **Quest limits:** one open main quest and five open personal quests at a time; completed quests don't count. A card at its limit is disabled and reads "Already created" or "Limit reached". If Personal is at its limit, Main is selected instead. If both are, "Finish a quest to create a new one." appears and Create Quest does nothing.
+- **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
+- **Placeholders:** main quests use the book icon and personal quests the hammer.
+- **Unused now:** nothing calls `AsphyrTextField` anymore. Delete it in a cleanup.
+- **Available main quests:** the checklist card shows an AVAILABLE pill. Figma only has the active main quest, which shows no pill.
+
+## Quest rules
+- **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforce this when Quest Details adds starting a quest.
+- **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
+
+## XP and progression (future)
+- **Rewards are system inferred** from the estimated duration and how difficult the task is. Users don't set them. This may need AI to judge difficulty; not decided.
+- **Placeholder:** `QuestReward.xp(forMinutes:)` uses duration only: 15m is 25 XP, 30m is 50, 1h is 100 and 2h+ is 200. Replace it when the real system is designed. Sample and daily quests keep Figma's fixed values for now.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -120,7 +137,8 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Quests frames:** move the content down 14pt to line up with Home's header.
 - **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
-- **Create Quest frames:** add the quest type selection (Main and Personal), once the app's version is settled.
+- **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least one step." error. The sheet's content is taller as a result, so it can scroll.
+- **Main quest card:** add the available state, with its pill.
 - **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 - **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
 - **Character:** add the novice holding the book, brush and lantern, and each item in all six colors. Include the dark details on Snow and Yellow, and the white book lines on the dark colors.
@@ -139,6 +157,8 @@ Development comes first. Make these only when asked. Add to this list as the cod
 ## Known issues
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
+- **Low:** at large text sizes, words break mid-word on Home's attribute cards ("KNOWLED / GE", "CREATIVIT / Y"). Seen at Accessibility Large on 3 Nov 2026.
+- **Low:** `CreateAspirationView`'s header uses the same stacked layout Create Quest had, so Cancel can overlap its title at large text sizes. Inferred from the code; not checked on screen.
 - **Low:** using the eye button while a password field is focused briefly drops focus, so "Passwords don't match" can appear while the user is still typing. The error clears on the next edit.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 

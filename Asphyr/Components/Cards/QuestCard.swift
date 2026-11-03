@@ -73,25 +73,19 @@ struct QuestCard: View {
                 .frame(height: 1)
                 .padding(.top, 14)
 
-            HStack(spacing: 0) {
-                Image("iconLightning")
-                    .foregroundStyle(Color.asphyrWarning)
-                    .accessibilityHidden(true)
-
-                Text("+\(quest.xpReward) XP")
-                    .padding(.leading, 4)
-
-                if let attributeReward = quest.attributeReward {
-                    Text(attributeReward)
-                        .padding(.leading, 12)
+            // Stacks at large text sizes so nothing is cut off
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 0) {
+                    rewards
+                    Spacer(minLength: 8)
+                    QuestStatus(status: quest.status)
                 }
 
-                Spacer(minLength: 8)
-
-                QuestStatus(status: quest.status)
+                VStack(alignment: .leading, spacing: 8) {
+                    rewards
+                    QuestStatus(status: quest.status)
+                }
             }
-            .font(AppTypography.captionMedium)
-            .foregroundStyle(Color.asphyrWarning)
             .padding(.top, 14)
         }
         .padding(.horizontal, 16)
@@ -99,6 +93,24 @@ struct QuestCard: View {
         .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
         .questCardBackground(isActive: isActive)
+    }
+
+    private var rewards: some View {
+        HStack(spacing: 0) {
+            Image("iconLightning")
+                .accessibilityHidden(true)
+
+            Text("+\(quest.xpReward) XP")
+                .padding(.leading, 4)
+
+            if let attributeReward = quest.attributeReward {
+                Text(attributeReward)
+                    .padding(.leading, 12)
+            }
+        }
+        .font(AppTypography.captionMedium)
+        .foregroundStyle(Color.asphyrWarning)
+        .lineLimit(1)
     }
 
     private func tag<Content: View>(@ViewBuilder content: () -> Content) -> some View {

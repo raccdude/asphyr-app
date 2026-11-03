@@ -52,8 +52,10 @@ struct QuestView: View {
     }
 
     @Environment(QuestStore.self) private var questStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var selectedFilter: QuestFilter = .all
+    @State private var isShowingCreateQuest = false
     @Namespace private var filterNamespace
 
     private var filteredQuests: [Quest] {
@@ -85,6 +87,9 @@ struct QuestView: View {
                 // Sits 16pt above the tab bar
                 .padding(.bottom, 4)
         }
+        .sheet(isPresented: $isShowingCreateQuest) {
+            CreateQuestView()
+        }
     }
 
     private var header: some View {
@@ -112,18 +117,32 @@ struct QuestView: View {
     }
 
     private var filterBar: some View {
-        HStack(spacing: 2) {
-            ForEach(QuestFilter.allCases, id: \.self) { filter in
-                filterButton(filter)
+        Group {
+            // Two rows at the largest text sizes, so the labels aren't cut off
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 2) {
+                    filterRow([.all, .active])
+                    filterRow([.available, .completed])
+                }
+            } else {
+                filterRow(QuestFilter.allCases)
             }
         }
         // 4pt plus Figma's 1pt border
         .padding(5)
-        .frame(height: 44)
+        .frame(minHeight: 44)
         .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 13))
         .overlay {
             RoundedRectangle(cornerRadius: 13)
                 .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
+    }
+
+    private func filterRow(_ filters: [QuestFilter]) -> some View {
+        HStack(spacing: 2) {
+            ForEach(filters, id: \.self) { filter in
+                filterButton(filter)
+            }
         }
     }
 
@@ -139,8 +158,9 @@ struct QuestView: View {
                 .font(AppTypography.captionMedium)
                 .foregroundStyle(isSelected ? Color.asphyrTextPrimary : Color.asphyrTextSecondary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .minimumScaleFactor(0.7)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 34)
                 .background {
                     if isSelected {
                         RoundedRectangle(cornerRadius: 9)
@@ -218,9 +238,9 @@ struct QuestView: View {
         .padding(.bottom, 85)
     }
 
-    /// Display only until Create Quest is rebuilt.
     private var createQuestButton: some View {
         Button {
+            isShowingCreateQuest = true
         } label: {
             Image("iconQuestCreate")
                 .foregroundStyle(Color(red: 3 / 255, green: 20 / 255, blue: 10 / 255))
