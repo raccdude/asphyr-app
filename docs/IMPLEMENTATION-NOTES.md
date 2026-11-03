@@ -19,8 +19,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Tab bar and Home | Merged | `feat/home-v2` |
 | Quests list | Merged | `feat/quests-v2` |
 | Create Quest | Merged | `feat/create-quest-v2` |
-| Quest Details | In review | `feat/quest-details-v2` |
-| Reward | Next | — |
+| Quest Details | Merged | `feat/quest-details-v2` |
+| Reward | In review | `feat/reward-v2` |
 | Journey, Character, Settings | Not started | — |
 
 ## Navigation
@@ -32,7 +32,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
   - Do not add a `NavigationStack` to a pushed screen. It sends the app back to the root screen. Changing `[AuthRoute]` to `NavigationPath` does not help.
   - Do not use a view-destination `NavigationLink { SomeView() }`. It crashes with `AnyNavigationPath.Error.comparisonTypeMismatch`. Use a `Button` that calls the router.
-- **Unreachable screens not converted yet:** `RewardView` still pushes a new `HomeView`. Fix them when they are rebuilt.
 
 ## Platform scope
 - **Current target:** iPhone only, portrait only.
@@ -107,12 +106,27 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 
 ## Quest Details
 - **Data:** opened with a quest's id and read from `QuestStore`, so the timer and status stay live on Home and in the log.
-- **Timer:** daily and personal quests time themselves from Accept, using `Quest.startedAt`, `pausedAt` and `pausedDuration`, so it keeps counting in the background. It doesn't stop at the duration: the bar stays full and the time left reads "Time's up", and the quest can be completed at any time.
-- **Complete Quest:** marks the quest completed, awards its XP and goes back. Reward comes in its own step.
+- **Timer:** daily and personal quests time themselves from Accept, using `Quest.startedAt`, `pausedAt` and `pausedDuration`, so it keeps counting in the background. It doesn't stop at the duration: the bar stays full and the time left reads "Time's up".
+- **Minimum time:** a timed quest can be completed only after half its duration has passed (`QuestReward.minimumTimeFraction`), and paused time doesn't count. Until then, Complete Quest is dimmed with a live message, and tapping it shows a toast. **Debug builds use 1%** so testing stays quick, so 30 minutes needs 18 seconds in Xcode and 15 minutes in release. Main quests have no minimum.
+- **Complete Quest:** marks the quest completed, awards its XP and opens Reward.
 - **Abandon quest:** asks for confirmation and returns the quest to available, resetting the timer. A main quest keeps its ticked steps and their XP.
 - **Main quests (our own version):** no timer. A STEPS section with a progress bar replaces the timer card, and steps can be ticked once the quest is accepted. Completing needs every step ticked, otherwise "Finish every step to complete this quest." appears.
 - **Hidden when empty:** quests created by users have no objective, difficulty or attribute rewards yet, so those rows are hidden. Difficulty comes with the XP system.
 - **Completed quests:** open read-only, with no buttons.
+
+## Reward
+- **Presentation:** a full-screen cover over Quest Details. Continue closes it and returns to where the quest was opened, so back can't reach it again.
+- **Data:** `QuestStore.complete` returns a `QuestCompletion`, which holds the quest, time taken, levels and XP at that moment.
+- **Loot cards:** XP in the middle, with up to two attributes tilted beside it. A quest with no attribute rewards shows XP alone. They fade and pop in one by one when the screen opens, XP first, then left, then right, with a success haptic.
+- **Level up:** the banner and New Reward Unlocked only appear when the quest crossed a level. For a main quest, this looks back across all its steps, because their XP was earned earlier.
+- **Experience:** shows real progress on the placeholder 500 XP per level, not Figma's sample 0 / 700.
+- **New Reward Unlocked:** expands in place, as in DESIGN-DECISIONS.md. The "Level 2 badge" content is a placeholder until achievements exist, and "View in Character" comes with that screen.
+- **Spirit line:** timed quests show the time taken; main quests show their step count, because they have no timer.
+
+## UI polish for later
+Don't build these until asked.
+- **XP bars:** animate every progress bar with a moving linear gradient.
+- **Quest cards:** animate the outlines. The developer also suggested a circle animation, possibly for these; where it goes isn't decided.
 
 ## Quest rules
 - **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept shows a toast.
@@ -148,7 +162,8 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Home:** move the header down 14pt to match the auth screens.
 - **Quests frames:** move the content down 14pt to line up with Home's header.
 - **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
-- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
+- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add the locked Complete Quest state, a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
+- **`7 - Reward Screen`:** move the content down 14pt, use `PrimaryButtonV2`'s button, add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card.
 - **Home:** change the section title by state ("ACTIVE QUEST", "TODAY'S QUEST", "AVAILABLE QUEST"), add the available state for any quest type, and `9.2`'s copy for more than one completed quest.
 - **`8 - Quests (All)`:** completed quests don't appear under ALL.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.

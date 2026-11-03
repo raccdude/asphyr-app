@@ -17,12 +17,13 @@ struct SpiritView: View {
     }
 
     let mood: Mood
+    var size: CGFloat = 140
 
     var body: some View {
         Image(mood.rawValue)
             .resizable()
             .scaledToFit()
-            .frame(width: 140, height: 140)
+            .frame(width: size, height: size)
             .id(mood)
             .transition(.opacity)
             .animation(.easeInOut(duration: 0.2), value: mood)

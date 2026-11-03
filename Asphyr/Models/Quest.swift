@@ -42,6 +42,13 @@ struct Quest: Identifiable {
         return max(0, (pausedAt ?? date).timeIntervalSince(startedAt) - pausedDuration)
     }
 
+    /// How long is left before a timed quest can be completed. Paused time
+    /// doesn't count.
+    func timeUntilCompletable(at date: Date) -> TimeInterval {
+        guard hasTimer, let durationMinutes else { return 0 }
+        return max(0, Double(durationMinutes * 60) * QuestReward.minimumTimeFraction - elapsed(at: date))
+    }
+
     /// From 0 to 1.
     func timerProgress(at date: Date) -> Double {
         guard let durationMinutes else { return 0 }
@@ -62,6 +69,10 @@ struct Quest: Identifiable {
 struct AttributeReward {
     let name: String
     let value: Int
+
+    var iconName: String {
+        UserAttribute.iconNames.first { $0.name == name }?.iconName ?? "iconSparklesSmall"
+    }
 }
 
 extension TimeInterval {
@@ -108,6 +119,14 @@ enum QuestType: CaseIterable {
 /// A placeholder until rewards are inferred from the duration and difficulty.
 enum QuestReward {
     static let xpPerStep = 100
+
+    /// The share of a quest's duration that must pass before it can be completed.
+    /// Debug builds use a tiny share so the rest of the flow stays quick to test.
+    #if DEBUG
+    static let minimumTimeFraction = 0.01
+    #else
+    static let minimumTimeFraction = 0.5
+    #endif
 
     static func xp(forMinutes minutes: Int) -> Int {
         minutes * 5 / 3

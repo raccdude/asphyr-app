@@ -12,4 +12,11 @@ struct UserAttribute {
     let name: String
     let value: String
     let iconName: String
+
+    static let iconNames = [
+        (name: "KNOWLEDGE", iconName: "iconAttributeKnowledge"),
+        (name: "DISCIPLINE", iconName: "iconAttributeDiscipline"),
+        (name: "CREATIVITY", iconName: "iconAttributeCreativity"),
+        (name: "PROBLEM SOLVING", iconName: "iconAttributeProblemSolving")
+    ]
 }

@@ -8,15 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    private static let attributeIcons = [
-        (name: "KNOWLEDGE", iconName: "iconAttributeKnowledge"),
-        (name: "DISCIPLINE", iconName: "iconAttributeDiscipline"),
-        (name: "CREATIVITY", iconName: "iconAttributeCreativity"),
-        (name: "PROBLEM SOLVING", iconName: "iconAttributeProblemSolving")
-    ]
-
     private var attributes: [UserAttribute] {
-        Self.attributeIcons.map { attribute in
+        UserAttribute.iconNames.map { attribute in
             UserAttribute(
                 name: attribute.name,
                 value: "\(questStore.attributeValue(named: attribute.name))",

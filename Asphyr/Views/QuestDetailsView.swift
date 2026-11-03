@@ -17,6 +17,7 @@ struct QuestDetailsView: View {
     @State private var showsStepsError = false
     @State private var toastMessage: String?
     @State private var toastCount = 0
+    @State private var completion: QuestCompletion?
 
     private var quest: Quest? {
         questStore.quests.first { $0.id == questID }
@@ -47,6 +48,10 @@ struct QuestDetailsView: View {
         .animation(.easeInOut(duration: 0.2), value: showsStepsError)
         .task(id: toastCount) {
             await hideToastAfterDelay()
+        }
+        // Continue goes back past this screen to where the quest was opened
+        .fullScreenCover(item: $completion, onDismiss: { dismiss() }) { completion in
+            RewardView(completion: completion)
         }
         .alert("Abandon this quest?", isPresented: $isConfirmingAbandon) {
             Button("Abandon", role: .destructive) {
@@ -304,12 +309,20 @@ struct QuestDetailsView: View {
             }
         case .active:
             VStack(spacing: 14) {
-                PrimaryButtonV2(title: "COMPLETE QUEST") {
-                    if questStore.canComplete(quest) {
-                        questStore.complete(quest)
-                        dismiss()
-                    } else {
-                        showsStepsError = true
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    let timeLeft = quest.timeUntilCompletable(at: context.date)
+
+                    VStack(spacing: 10) {
+                        PrimaryButtonV2(title: "COMPLETE QUEST") {
+                            attemptCompletion(of: quest)
+                        }
+                        .opacity(timeLeft > 0 ? 0.5 : 1)
+
+                        if timeLeft > 0 {
+                            Text(completableText(timeLeft: timeLeft))
+                                .font(AppTypography.captionMedium)
+                                .foregroundStyle(Color.asphyrTextSecondary)
+                        }
                     }
                 }
 
@@ -322,6 +335,24 @@ struct QuestDetailsView: View {
         case .completed:
             EmptyView()
         }
+    }
+
+    private func attemptCompletion(of quest: Quest) {
+        let timeLeft = quest.timeUntilCompletable(at: .now)
+
+        if timeLeft > 0 {
+            showToast(completableText(timeLeft: timeLeft))
+        } else if questStore.canComplete(quest) {
+            completion = questStore.complete(quest)
+        } else {
+            showsStepsError = true
+        }
+    }
+
+    private func completableText(timeLeft: TimeInterval) -> String {
+        timeLeft < 60
+            ? "You can complete this quest in under 1 min"
+            : "You can complete this quest in \(Int(timeLeft / 60) + 1) min"
     }
 
     private func sectionLabel(_ title: String) -> some View {

@@ -119,11 +119,14 @@ final class QuestStore {
     }
 
     func canComplete(_ quest: Quest) -> Bool {
-        quest.status == .active && quest.completedStepCount == quest.steps.count
+        quest.status == .active
+            && quest.completedStepCount == quest.steps.count
+            && quest.timeUntilCompletable(at: .now) == 0
     }
 
-    func complete(_ quest: Quest) {
-        guard canComplete(quest) else { return }
+    /// Returns what the Reward screen shows.
+    func complete(_ quest: Quest) -> QuestCompletion? {
+        guard canComplete(quest) else { return nil }
 
         update(quest) { quest in
             quest.status = .completed
@@ -136,11 +139,36 @@ final class QuestStore {
                 attributeGains[reward.name, default: 0] += reward.value
             }
         }
+
+        guard let completed = quests.first(where: { $0.id == quest.id }) else { return nil }
+
+        return QuestCompletion(
+            quest: completed,
+            elapsed: completed.elapsed(at: .now),
+            // A main quest's XP was earned as its steps were ticked, so this
+            // looks back across the whole quest
+            levelBefore: max(0, earnedXP - completed.xpReward) / Self.xpPerLevel + 1,
+            levelAfter: level,
+            xpIntoLevel: xpIntoLevel
+        )
     }
 
     private func update(_ quest: Quest, _ change: (inout Quest) -> Void) {
         guard let index = quests.firstIndex(where: { $0.id == quest.id }) else { return }
         change(&quests[index])
+    }
+}
+
+struct QuestCompletion: Identifiable {
+    let id = UUID()
+    let quest: Quest
+    let elapsed: TimeInterval
+    let levelBefore: Int
+    let levelAfter: Int
+    let xpIntoLevel: Int
+
+    var didLevelUp: Bool {
+        levelAfter > levelBefore
     }
 }
 
