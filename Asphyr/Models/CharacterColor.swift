@@ -41,32 +41,61 @@ enum CharacterColor: String, CaseIterable, Identifiable {
         case .plum: Color(red: 181 / 255, green: 140 / 255, blue: 255 / 255)      // #B58CFF
         }
     }
-
-    var noviceImageName: String { "characterNovice\(rawValue)" }
-
-    /// The novice holding the archetype's item, or empty-handed without one.
-    func noviceImageName(holdingItemOf archetype: Archetype?, wearing cloak: CharacterCloak? = nil) -> String {
-        noviceImageName + (archetype?.rawValue ?? "") + (cloak.map { "Cloak\($0.rawValue)" } ?? "")
-    }
 }
 
-/// The cloaks earned by leveling up, which go over any character color.
+/// The colors a cloak is drawn with.
+struct CloakPalette: Equatable {
+    let top: Color
+    let bottom: Color
+    let hand: Color
+
+    /// The look every character starts with.
+    static let starter = CloakPalette(
+        top: Color(red: 43 / 255, green: 48 / 255, blue: 61 / 255),      // #2B303D
+        bottom: Color(red: 18 / 255, green: 20 / 255, blue: 26 / 255),   // #12141A
+        hand: Color(red: 58 / 255, green: 63 / 255, blue: 76 / 255)      // #3A3F4C
+    )
+}
+
+/// The cloaks, which go over any character color. Adding one only needs its
+/// colors here, as the art is tinted in code. Hands are the top color × 1.25.
 enum CharacterCloak: String, CaseIterable, Identifiable {
     case midnight = "Midnight"
     case oxblood = "Oxblood"
     case plum = "Plum"
+    case green = "Green"
+    case yellow = "Yellow"
+    case snow = "Snow"
+    case teal = "Teal"
 
     var id: Self { self }
 
-    var swatch: Color {
+    var palette: CloakPalette {
         switch self {
-        case .midnight: Color(red: 34 / 255, green: 56 / 255, blue: 111 / 255)  // #22386F
-        case .oxblood: Color(red: 90 / 255, green: 26 / 255, blue: 40 / 255)    // #5A1A28
-        case .plum: Color(red: 63 / 255, green: 34 / 255, blue: 104 / 255)      // #3F2268
+        case .midnight: palette(top: 0x22386F, bottom: 0x0E1730, hand: 0x2B468B)
+        case .oxblood: palette(top: 0x5A1A28, bottom: 0x2A0A12, hand: 0x712132)
+        case .plum: palette(top: 0x3F2268, bottom: 0x1D0F33, hand: 0x4F2B82)
+        case .green: palette(top: 0x14532B, bottom: 0x07210F, hand: 0x196836)
+        case .yellow: palette(top: 0x6B5314, bottom: 0x2B2108, hand: 0x866819)
+        case .snow: palette(top: 0x8B90A3, bottom: 0x3A3D4A, hand: 0xAEB4CC)
+        case .teal: palette(top: 0x12565E, bottom: 0x06252A, hand: 0x176C76)
         }
     }
 
+    /// The level reward that unlocks it. Cloaks without one come with the store.
     var reward: CloakReward? {
         RewardRules.cloaks.first { $0.name == "\(rawValue) cloak" }
+    }
+
+    private func palette(top: Int, bottom: Int, hand: Int) -> CloakPalette {
+        CloakPalette(top: color(top), bottom: color(bottom), hand: color(hand))
+    }
+
+    private func color(_ hex: Int) -> Color {
+        Color(
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255
+        )
     }
 }

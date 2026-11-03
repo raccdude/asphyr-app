@@ -17,6 +17,7 @@ struct CharacterView: View {
     @State private var toast: String?
     @State private var toastCount = 0
 
+    private let cloakColumns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 4)
     private let badgeColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
     /// Login skips onboarding until real accounts exist, so the name can be empty.
@@ -37,8 +38,9 @@ struct CharacterView: View {
                         mood = mood.next
                     } label: {
                         CharacterPortrait(
-                            imageName: profile.color.noviceImageName(holdingItemOf: profile.archetype, wearing: profile.cloak),
                             color: profile.color,
+                            archetype: profile.archetype,
+                            cloak: profile.cloak,
                             mood: mood,
                             size: 184
                         )
@@ -211,11 +213,11 @@ struct CharacterView: View {
     }
 
     private var cloakPicker: some View {
-        HStack(alignment: .top, spacing: 0) {
+        LazyVGrid(columns: cloakColumns, alignment: .center, spacing: 16) {
             cloakOption(
                 title: "Starter",
                 detail: "",
-                swatch: Color(red: 43 / 255, green: 48 / 255, blue: 61 / 255),  // #2B303D
+                swatch: CloakPalette.starter.top,
                 isSelected: profile.cloak == nil,
                 isLocked: false
             ) {
@@ -224,11 +226,12 @@ struct CharacterView: View {
 
             ForEach(CharacterCloak.allCases) { cloak in
                 let isLocked = cloak.reward.map { !questStore.unlockedCloaks.contains($0) } ?? true
+                let level = cloak.reward?.level
 
                 cloakOption(
                     title: cloak.rawValue,
-                    detail: "Level \(cloak.reward?.level ?? 0)",
-                    swatch: cloak.swatch,
+                    detail: level.map { "Level \($0)" } ?? "Coming soon",
+                    swatch: cloak.palette.top,
                     isSelected: profile.cloak == cloak,
                     isLocked: isLocked
                 ) {
@@ -237,7 +240,7 @@ struct CharacterView: View {
                             cloakShakes[cloak, default: 0] += 1
                         }
                         lockedTapCount += 1
-                        showToast("Complete a quest at level \(cloak.reward?.level ?? 0) to unlock this cloak.")
+                        showToast(level.map { "Complete a quest at level \($0) to unlock this cloak." } ?? "This cloak is coming soon to the store.")
                     } else {
                         profile.cloak = cloak
                     }

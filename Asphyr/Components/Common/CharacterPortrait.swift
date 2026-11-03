@@ -30,14 +30,15 @@ struct CharacterPortrait: View {
         }
     }
 
-    let imageName: String
     let color: CharacterColor
+    var archetype: Archetype?
+    var cloak: CharacterCloak?
     var mood: Mood = .idle
     var size: CGFloat = 126
 
     var body: some View {
         ZStack {
-            layer(imageName)
+            CharacterArt(color: color, archetype: archetype, cloak: cloak)
 
             if let faceImageName = mood.faceImageName {
                 layer("characterFaceVisor")
@@ -67,7 +68,7 @@ struct CharacterPortrait: View {
 #Preview {
     HStack {
         ForEach(CharacterPortrait.Mood.allCases, id: \.self) { mood in
-            CharacterPortrait(imageName: "characterNoviceGreen", color: .green, mood: mood)
+            CharacterPortrait(color: .green, mood: mood)
         }
     }
     .background(Color.asphyrBackground)

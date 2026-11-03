@@ -1,0 +1,15 @@
+<svg width="126" height="126" viewBox="0 0 126 126" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Vector_8" d="M63 77.49L67.41 83.16L63 88.83L58.59 83.16L63 77.49Z" fill="#12141A"/>
+<path id="Vector_9" d="M63 80.01L65.016 83.16L63 86.31L60.984 83.16L63 80.01Z" fill="#5A6172"/>
+<path id="Vector_11" d="M63 8.82C54.6 10.5 47.46 15.12 41.58 22.68" stroke-width="2.52" stroke-linecap="round" stroke-linejoin="round" stroke="white" stroke-opacity="0.1"/>
+<path id="Vector_12" d="M63 64.89C74.1341 64.89 83.16 56.7102 83.16 46.62C83.16 36.5298 74.1341 28.35 63 28.35C51.8659 28.35 42.84 36.5298 42.84 46.62C42.84 56.7102 51.8659 64.89 63 64.89Z" fill="url(#paint5_radial_0_49)"/>
+<path id="Vector_15" d="M55.8684 43.6464C55.8684 42.1503 54.6584 40.9374 53.1657 40.9374C51.673 40.9374 50.463 42.1503 50.463 43.6464V47.0736C50.463 48.5697 51.673 49.7826 53.1657 49.7826C54.6584 49.7826 55.8684 48.5697 55.8684 47.0736V43.6464Z" fill="#FAFBFF"/>
+<path id="Vector_16" d="M75.5244 43.6464C75.5244 42.1503 74.3144 40.9374 72.8217 40.9374C71.329 40.9374 70.119 42.1503 70.119 43.6464V47.0736C70.119 48.5697 71.329 49.7826 72.8217 49.7826C74.3144 49.7826 75.5244 48.5697 75.5244 47.0736V43.6464Z" fill="#FAFBFF"/>
+<path id="Vector_17" d="M59.0688 54.18C61.6896 56.4732 64.3104 56.4732 66.9312 54.18" stroke-width="2.1672" stroke-linecap="round" stroke-linejoin="round" stroke="#FAFBFF"/>
+<defs>
+<radialGradient id="paint5_radial_0_49" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(63 50.4) scale(22.68)">
+<stop/>
+<stop offset="1" stop-color="#0B0D12"/>
+</radialGradient>
+</defs>
+</svg>

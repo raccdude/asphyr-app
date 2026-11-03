@@ -124,9 +124,7 @@ struct IdentityCreationView: View {
     }
 
     private var character: some View {
-        Image(profile.color.noviceImageName)
-            .resizable()
-            .scaledToFit()
+        CharacterArt(color: profile.color)
             .frame(width: 126, height: 126)
             .id(profile.color)
             .transition(.opacity)

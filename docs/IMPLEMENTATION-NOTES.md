@@ -23,7 +23,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Reward | Merged | `feat/reward-v2` |
 | XP system | Merged | `feat/xp-system` |
 | Journey | Merged | `feat/journey-constellations` |
-| Character | In review | `feat/character-v2` |
+| Character | Merged | `feat/character-v2` |
+| Cloak layers | In review | `feat/cloak-layers` |
 | Settings | Not started | — |
 
 ## Navigation
@@ -69,7 +70,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 
 ## Build Your Identity
 - **Onboarding answers:** `OnboardingProfile` is created in `RootView` and read from the environment. It holds the name, color and aspiration in memory, so they reset on relaunch. Your Character adds the archetype, and Home reads all of it in its own step.
-- **Character colors:** `characterNovice*` are generated from Figma's green novice by swapping its tunic base, shade (base × 0.678) and tint. Figma has no novice variants for the other five colors. At the developer's request, Snow (`#F5F7FF`) replaced Figma's orange, and Midnight, Oxblood and Plum replaced cyan, red and purple.
+- **Character colors:** the tunics and details are generated from Figma's green novice by swapping its tunic base, shade (base × 0.678) and tint. Figma has no novice variants for the other five colors. At the developer's request, Snow (`#F5F7FF`) replaced Figma's orange, and Midnight, Oxblood and Plum replaced cyan, red and purple.
 - **Dark colors:** Midnight (`#16264F`, tint `#7FA6FF`), Oxblood (`#4A0F1C`, tint `#FF7A8A`) and Plum (`#2F1650`, tint `#B58CFF`) use a brighter tint, because 50% white would dull the eyes, smile and crest.
 - **Details on pale colors:** tint details disappear on the pale tunics and items, so Snow and Yellow use a dark crest (`#12141A`, center `#5A6172`) and dark lines on the orb and book. Their eyes and smile stay pale.
 - **Book lines on dark colors:** Oxblood, Midnight and Plum books have a tint cover, so their lines are white.
@@ -178,43 +179,39 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. They're worn from the Character screen.
 
 ## Your Character
-- **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
+- **Character art:** `CharacterArt` draws each color and archetype from layers, with the hands in front of the item, and without an archetype it shows the character empty-handed. See Cloak art. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
 - **Item colors:** items use the tunic's base and shade. Oxblood, Midnight and Plum use their bright tint instead, because dark items disappear against the cloak and background.
 - **Selection:** tapping the selected card deselects it, as on Identity. With nothing selected, the title reads "WHO WILL YOU BECOME?" and BEGIN shows "Choose an archetype."
 
 ## Character
 - **Data:** the name, archetype, aspiration, level, XP and attributes come from `OnboardingProfile` and `QuestStore`, in memory like the rest of the app. Changing color here also changes it on Home.
-- **Cloaks:** chosen from a CLOAKS row, which Figma doesn't have. Locked ones shake and explain themselves, and the worn cloak shows on Character and Home. A cloak unlocks when a quest is completed at its level, as on Reward.
+- **Cloaks:** chosen from a CLOAKS grid, which Figma doesn't have. Locked ones shake and explain themselves, and the worn cloak shows on Character and Home. A cloak unlocks when a quest is completed at its level, as on Reward.
 - **Attribute bars:** attributes have no maximum, so each bar fills towards the next multiple of 25. This matches Figma's main frame, where 10 fills 40% and 15 fills 60%. Figma's new user frame shows 10 as empty, so that frame doesn't match.
 - **Achievements:** our rules, since Figma only names them. First Quest: complete one quest. Level 2: reach level 2. Consistency: complete quests on 3 different days. Scholar: 25 Knowledge. Builder: 25 Problem Solving. Master: reach level 5. They're checked when a quest is completed and stay earned, like cloaks. Tapping a badge shows its rule in a toast.
 - **Earned icons:** Figma only has icons for the first three badges. Scholar and Builder use their attribute's icon, and Master uses the crown.
 
 ## Cloak art
-Midnight, Oxblood and Plum cloaks are the starter character's look plus a tinted cloak, for every color and item: `characterNovice{Color}{Archetype}Cloak{Cloak}`, 90 images generated from the novice art. Only the cloak's gradient and the hand change, so crests and items stay as they were. The cloak values are:
-
-| Cloak | Cloak top | Cloak bottom |
-|---|---|---|
-| Midnight | `#22386F` | `#0E1730` |
-| Oxblood | `#5A1A28` | `#2A0A12` |
-| Plum | `#3F2268` | `#1D0F33` |
-
-In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The hand color `#3A3F4C` becomes the cloak top × 1.25.
+- **Layers:** `CharacterArt` builds every character from 40 images: shared base, cloak and hand layers, 6 tunics and 30 sets of details. This replaces 120 whole images, and the app uses it everywhere, including onboarding. Each rebuilt starter matched its original at 252pt.
+- **Adding a cloak:** add its colors to `CharacterCloak`, with no new art. Only the cloak and hands are tinted, so crests and items don't change.
+- **Hands:** the cloak's top color × 1.25.
+- **Coming soon:** Green, Yellow, Snow and Teal show as locked until the store exists, with their colors still to be checked on screen.
+- **Redesign planned:** the character art will be redesigned. Nothing is decided yet. New art should keep the same layers (base, cloak back, tunic, cloak front, details, hands), so `CharacterArt` and the cloak colors keep working.
 
 ## Store and inventory (planned)
-Agreed on 3 Nov 2026. Nothing is built yet. The order is: merge Character, rework the cloak art and add the three new cloaks, build Settings, add saving on the device, then build the currency, Store and Inventory. Real money waits until after the backend.
+Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new cloaks are done. The order from here is: build Settings, add saving on the device, then build the currency, Store and Inventory. Real money waits until after the backend.
 - **Store:** cosmetics only, bought with a separate currency earned from quests, never with XP. The name isn't final; Embers is the suggestion.
 - **Earning:** paid when a quest is completed, not per step, and limited like full rewards, so it can't be farmed by ticking steps and deleting a quest.
 - **Level cloaks:** Midnight, Oxblood and Plum stay earned by level and aren't for sale.
-- **New cloaks:** Green, Yellow and Snow are the first store items, and show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
+- **New cloaks:** Green, Yellow, Snow and Teal are the first store items, and show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
 
 | Cloak | Cloak top | Cloak bottom |
 |---|---|---|
 | Green | `#14532B` | `#07210F` |
 | Yellow | `#6B5314` | `#2B2108` |
 | Snow | `#8B90A3` | `#3A3D4A` |
+| Teal | `#12565E` | `#06252A` |
 
 - **Inventory:** a full screen of what's owned and what's locked, opened from "View all" on Character. The CLOAKS row stays as a shortcut.
-- **Art:** split the character art so one cloak layer is tinted in code, replacing the 90 cloak images, before adding more cloaks.
 
 ## Figma updates for later
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
@@ -253,8 +250,9 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 
 ### Character
 - Replace the six old swatches under CUSTOMIZE with the app's six character colors.
-- Add the CLOAKS row with Starter, Midnight, Oxblood and Plum, in unlocked, locked and worn states, and the locked cloak toast.
+- Add the CLOAKS grid with Starter, Midnight, Oxblood, Plum, Green, Yellow, Snow and Teal, in unlocked, locked, Coming soon and worn states, and the locked cloak toasts.
 - Show the character wearing each cloak.
+- Redesign the character art when that work starts, keeping its layers.
 - Make the character tappable through its moods.
 - Add earned icons for Scholar, Builder and Master, and the toast with a badge's rule.
 - Fill the new user frame's attribute bars so 10 shows 40%, matching the main frame.

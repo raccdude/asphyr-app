@@ -13,10 +13,6 @@ struct ArchetypeSelectionView: View {
 
     @State private var showsArchetypeError = false
 
-    private var imageName: String {
-        profile.color.noviceImageName(holdingItemOf: profile.archetype)
-    }
-
     var body: some View {
         AuthScreen(onboardingStep: 2) {
             VStack(spacing: 0) {
@@ -27,11 +23,9 @@ struct ArchetypeSelectionView: View {
                     .accessibilityAddTraits(.isHeader)
                     .padding(.top, 22)
 
-                Image(imageName)
-                    .resizable()
-                    .scaledToFit()
+                CharacterArt(color: profile.color, archetype: profile.archetype)
                     .frame(width: 126, height: 126)
-                    .id(imageName)
+                    .id(profile.archetype)
                     .transition(.opacity)
                     .accessibilityHidden(true)
                     .padding(.top, 11)
