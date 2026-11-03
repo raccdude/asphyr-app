@@ -33,6 +33,7 @@ struct CharacterPortrait: View {
     let imageName: String
     let color: CharacterColor
     var mood: Mood = .idle
+    var size: CGFloat = 126
 
     var body: some View {
         ZStack {
@@ -52,7 +53,7 @@ struct CharacterPortrait: View {
                     .transition(.opacity)
             }
         }
-        .frame(width: 126, height: 126)
+        .frame(width: size, height: size)
         .animation(.easeInOut(duration: 0.2), value: mood)
     }
 

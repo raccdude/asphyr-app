@@ -25,6 +25,11 @@ private enum MainTab: String, CaseIterable, Identifiable {
     }
 }
 
+extension EnvironmentValues {
+    /// Switches to the Character tab, for screens that link to it.
+    @Entry var openCharacter: () -> Void = {}
+}
+
 struct MainTabView: View {
     @State private var selection: MainTab = .home
     @Environment(OnboardingProfile.self) private var profile
@@ -60,6 +65,7 @@ struct MainTabView: View {
             }
         }
         .environment(questStore)
+        .environment(\.openCharacter) { selection = .character }
         .onAppear(perform: refreshDailyQuest)
         // A new day can start while the app is in the background
         .onChange(of: scenePhase) {

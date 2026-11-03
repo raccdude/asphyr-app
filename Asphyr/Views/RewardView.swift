@@ -13,6 +13,7 @@ struct RewardView: View {
 
     @Environment(OnboardingProfile.self) private var profile
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openCharacter) private var openCharacter
 
     @State private var isRevealed = false
     @State private var isShowingUnlockedReward = false
@@ -79,6 +80,16 @@ struct RewardView: View {
                 if !completion.newCloaks.isEmpty {
                     unlockedReward
                         .padding(.top, 20)
+
+                    if isShowingUnlockedReward {
+                        Button("VIEW IN CHARACTER") {
+                            openCharacter()
+                            dismiss()
+                        }
+                        .font(AppTypography.captionMedium)
+                        .foregroundStyle(Color.asphyrAccentPrimary)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                    }
                 }
             }
             .padding(.horizontal, 20)
@@ -266,8 +277,7 @@ struct RewardView: View {
         }
     }
 
-    /// Expands in place, with no separate screen. "View in Character" comes with
-    /// that screen.
+    /// Expands in place, with no separate screen.
     private var unlockedReward: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.2)) {

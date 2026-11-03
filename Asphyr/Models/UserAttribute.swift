@@ -19,4 +19,10 @@ struct UserAttribute {
         (name: "CREATIVITY", iconName: "iconAttributeCreativity"),
         (name: "PROBLEM SOLVING", iconName: "iconAttributeProblemSolving")
     ]
+
+    /// How full an attribute's bar is. Attributes have no maximum, so the bar
+    /// fills towards the next multiple of 25.
+    static func barProgress(forValue value: Int) -> Double {
+        Double(value) / Double((value / 25 + 1) * 25)
+    }
 }

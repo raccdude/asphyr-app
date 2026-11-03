@@ -15,4 +15,6 @@ final class OnboardingProfile {
     var color: CharacterColor = .green
     var aspiration: String?
     var archetype: Archetype?
+    /// The cloak being worn, or nil for the starter look.
+    var cloak: CharacterCloak?
 }

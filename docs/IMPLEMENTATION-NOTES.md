@@ -22,8 +22,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Quest Details | Merged | `feat/quest-details-v2` |
 | Reward | Merged | `feat/reward-v2` |
 | XP system | Merged | `feat/xp-system` |
-| Journey | In review | `feat/journey-v2` |
-| Character | Next | — |
+| Journey | Merged | `feat/journey-constellations` |
+| Character | In review | `feat/character-v2` |
 | Settings | Not started | — |
 
 ## Navigation
@@ -124,7 +124,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Data:** `QuestStore.complete` returns a `QuestCompletion`, which holds the quest, time taken, levels and XP at that moment.
 - **Loot cards:** XP in the middle, with up to two attributes tilted beside it. A quest with no attribute rewards shows XP alone. They fade and pop in one by one when the screen opens, XP first, then left, then right, with a success haptic.
 - **Level up:** the banner appears when a completion finds a level Reward hasn't shown yet, including one reached earlier by ticking steps. Each level is announced once.
-- **New Reward Unlocked:** appears only when a cloak unlocks, and expands in place, as in DESIGN-DECISIONS.md. "View in Character" comes with that screen.
+- **New Reward Unlocked:** appears only when a cloak unlocks, and expands in place, as in DESIGN-DECISIONS.md. "View in Character" sits under the expanded card and opens the Character tab.
 - **Spirit line:** timed quests show the time taken; main quests show their step count, because they have no timer.
 
 ## Character moods
@@ -175,15 +175,22 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Code:** `RewardRules` holds XP, attributes, the level curve and cloaks. `DifficultyEstimator` is the only place that decides difficulty.
 - **Difficulty:** keywords for now, from the title and description. Add words to its lists as new quests get misjudged. Hard wins over Easy, and no match means Moderate.
 - **On-device AI trial (3 Nov 2026):** couldn't run, because Apple Intelligence isn't enabled on this Mac, so it's still unproven. Enable it to retry; the titles are in the plan.
-- **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. Wearing them comes with the Character screen.
+- **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. They're worn from the Character screen.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
 - **Item colors:** items use the tunic's base and shade. Oxblood, Midnight and Plum use their bright tint instead, because dark items disappear against the cloak and background.
 - **Selection:** tapping the selected card deselects it, as on Identity. With nothing selected, the title reads "WHO WILL YOU BECOME?" and BEGIN shows "Choose an archetype."
 
-## Unlockable cloaks (future)
-Midnight, Oxblood and Plum are planned as unlockable cloaks: the starter character's look plus a tinted cloak. The unlock rules aren't decided, and nothing is built yet. Use the same tunic and tint as the starter color, and these cloak values:
+## Character
+- **Data:** the name, archetype, aspiration, level, XP and attributes come from `OnboardingProfile` and `QuestStore`, in memory like the rest of the app. Changing color here also changes it on Home.
+- **Cloaks:** chosen from a CLOAKS row, which Figma doesn't have. Locked ones shake and explain themselves, and the worn cloak shows on Character and Home. A cloak unlocks when a quest is completed at its level, as on Reward.
+- **Attribute bars:** attributes have no maximum, so each bar fills towards the next multiple of 25. This matches Figma's main frame, where 10 fills 40% and 15 fills 60%. Figma's new user frame shows 10 as empty, so that frame doesn't match.
+- **Achievements:** our rules, since Figma only names them. First Quest: complete one quest. Level 2: reach level 2. Consistency: complete quests on 3 different days. Scholar: 25 Knowledge. Builder: 25 Problem Solving. Master: reach level 5. They're checked when a quest is completed and stay earned, like cloaks. Tapping a badge shows its rule in a toast.
+- **Earned icons:** Figma only has icons for the first three badges. Scholar and Builder use their attribute's icon, and Master uses the crown.
+
+## Cloak art
+Midnight, Oxblood and Plum cloaks are the starter character's look plus a tinted cloak, for every color and item: `characterNovice{Color}{Archetype}Cloak{Cloak}`, 90 images generated from the novice art. Only the cloak's gradient and the hand change, so crests and items stay as they were. The cloak values are:
 
 | Cloak | Cloak top | Cloak bottom |
 |---|---|---|
@@ -192,6 +199,22 @@ Midnight, Oxblood and Plum are planned as unlockable cloaks: the starter charact
 | Plum | `#3F2268` | `#1D0F33` |
 
 In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The hand color `#3A3F4C` becomes the cloak top × 1.25.
+
+## Store and inventory (planned)
+Agreed on 3 Nov 2026. Nothing is built yet. The order is: merge Character, rework the cloak art and add the three new cloaks, build Settings, add saving on the device, then build the currency, Store and Inventory. Real money waits until after the backend.
+- **Store:** cosmetics only, bought with a separate currency earned from quests, never with XP. The name isn't final; Embers is the suggestion.
+- **Earning:** paid when a quest is completed, not per step, and limited like full rewards, so it can't be farmed by ticking steps and deleting a quest.
+- **Level cloaks:** Midnight, Oxblood and Plum stay earned by level and aren't for sale.
+- **New cloaks:** Green, Yellow and Snow are the first store items, and show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
+
+| Cloak | Cloak top | Cloak bottom |
+|---|---|---|
+| Green | `#14532B` | `#07210F` |
+| Yellow | `#6B5314` | `#2B2108` |
+| Snow | `#8B90A3` | `#3A3D4A` |
+
+- **Inventory:** a full screen of what's owned and what's locked, opened from "View all" on Character. The CLOAKS row stays as a shortcut.
+- **Art:** split the character art so one cloak layer is tinted in code, replacing the 90 cloak images, before adding more cloaks.
 
 ## Figma updates for later
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
@@ -227,6 +250,17 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 
 ### Your Character
 - Add the unselected state and the "Choose an archetype." error, and move the content down 14pt.
+
+### Character
+- Replace the six old swatches under CUSTOMIZE with the app's six character colors.
+- Add the CLOAKS row with Starter, Midnight, Oxblood and Plum, in unlocked, locked and worn states, and the locked cloak toast.
+- Show the character wearing each cloak.
+- Make the character tappable through its moods.
+- Add earned icons for Scholar, Builder and Master, and the toast with a badge's rule.
+- Fill the new user frame's attribute bars so 10 shows 40%, matching the main frame.
+
+### Reward: View in Character
+- Add "VIEW IN CHARACTER" under the expanded New Reward Unlocked card.
 
 ### Character art
 - Add the novice holding the book, brush and lantern, with each item in all six colors, the dark details on Snow and Yellow, and the white book lines on the dark colors.
@@ -293,7 +327,7 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **Medium:** Character and Settings are bare placeholders that follow the device appearance, so they can show white with the tab bar's dark fade. Fix in their steps.
+- **Medium:** Settings is a bare placeholder that follows the device appearance, so it can show white. Fix in its step.
 - **Medium:** the app follows the device appearance instead of defaulting to dark, and the color sets have no Light values.
 - **Low:** Figma's "Already have an account? LOG IN" row on Welcome sits about 5pt right of center. The code centers it deliberately; update Figma to match if that's agreed.
 - **Medium:** Home has no back control and no log out. Fix with the Settings step.

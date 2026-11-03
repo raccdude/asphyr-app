@@ -45,7 +45,28 @@ enum CharacterColor: String, CaseIterable, Identifiable {
     var noviceImageName: String { "characterNovice\(rawValue)" }
 
     /// The novice holding the archetype's item, or empty-handed without one.
-    func noviceImageName(holdingItemOf archetype: Archetype?) -> String {
-        noviceImageName + (archetype?.rawValue ?? "")
+    func noviceImageName(holdingItemOf archetype: Archetype?, wearing cloak: CharacterCloak? = nil) -> String {
+        noviceImageName + (archetype?.rawValue ?? "") + (cloak.map { "Cloak\($0.rawValue)" } ?? "")
+    }
+}
+
+/// The cloaks earned by leveling up, which go over any character color.
+enum CharacterCloak: String, CaseIterable, Identifiable {
+    case midnight = "Midnight"
+    case oxblood = "Oxblood"
+    case plum = "Plum"
+
+    var id: Self { self }
+
+    var swatch: Color {
+        switch self {
+        case .midnight: Color(red: 34 / 255, green: 56 / 255, blue: 111 / 255)  // #22386F
+        case .oxblood: Color(red: 90 / 255, green: 26 / 255, blue: 40 / 255)    // #5A1A28
+        case .plum: Color(red: 63 / 255, green: 34 / 255, blue: 104 / 255)      // #3F2268
+        }
+    }
+
+    var reward: CloakReward? {
+        RewardRules.cloaks.first { $0.name == "\(rawValue) cloak" }
     }
 }

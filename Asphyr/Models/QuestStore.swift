@@ -15,6 +15,7 @@ final class QuestStore {
     var quests: [Quest]
     private(set) var earnedXP = 0
     private(set) var unlockedCloaks: [CloakReward] = []
+    private(set) var earnedAchievements: Set<Achievement> = []
     /// How many Journey stars have been announced, so each shows once.
     var seenLitStarCount = 0
     /// The highest level Reward has shown, so each level is announced once.
@@ -214,6 +215,13 @@ final class QuestStore {
         // isn't lost if that main quest is later deleted
         let newCloaks = RewardRules.cloaks.filter { $0.level <= level && !unlockedCloaks.contains($0) }
         unlockedCloaks += newCloaks
+
+        earnedAchievements.formUnion(Achievement.earned(
+            completionDates: completedQuests.compactMap(\.completedAt),
+            level: level,
+            knowledge: attributeValue(named: "KNOWLEDGE"),
+            problemSolving: attributeValue(named: "PROBLEM SOLVING")
+        ))
 
         let levelBefore = announcedLevel
         announcedLevel = max(announcedLevel, level)

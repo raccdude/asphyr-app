@@ -71,7 +71,7 @@ struct HomeView: View {
                         characterMood = characterMood.next
                     } label: {
                         CharacterPortrait(
-                            imageName: profile.color.noviceImageName(holdingItemOf: profile.archetype),
+                            imageName: profile.color.noviceImageName(holdingItemOf: profile.archetype, wearing: profile.cloak),
                             color: profile.color,
                             mood: characterMood
                         )
