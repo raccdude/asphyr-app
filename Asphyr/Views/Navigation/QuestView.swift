@@ -8,83 +8,277 @@
 import SwiftUI
 
 struct QuestView: View {
-
     enum QuestFilter: String, CaseIterable {
         case all = "ALL"
-        case available = "AVAILABLE"
         case active = "ACTIVE"
+        case available = "AVAILABLE"
         case completed = "COMPLETED"
+
+        var status: QuestStatusType? {
+            switch self {
+            case .all: nil
+            case .active: .active
+            case .available: .available
+            case .completed: .completed
+            }
+        }
+
+        var emptyIconName: String {
+            switch self {
+            case .all: "iconQuestsEmptyAll"
+            case .active: "iconQuestsEmptyActive"
+            case .available: "iconQuestsEmptyAvailable"
+            case .completed: "iconQuestsEmptyCompleted"
+            }
+        }
+
+        var emptyTitle: String {
+            switch self {
+            case .all: "Your journey awaits."
+            case .active: "No active quests."
+            case .available: "You’re all caught up."
+            case .completed: "No completed quests yet."
+            }
+        }
+
+        var emptyMessage: String {
+            switch self {
+            case .all: "Nothing here yet — tap + to start a new quest."
+            case .active: "Accept an available quest to start earning XP."
+            case .available: "No quests waiting. Tap + to create your next one."
+            case .completed: "Finish a quest and it will be recorded here."
+            }
+        }
     }
-    
+
+    @Environment(QuestStore.self) private var questStore
+
     @State private var selectedFilter: QuestFilter = .all
     @Namespace private var filterNamespace
-    
+
+    private var filteredQuests: [Quest] {
+        guard let status = selectedFilter.status else { return questStore.quests }
+        return questStore.quests.filter { $0.status == status }
+    }
+
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.asphyrBackground
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        
-                        HStack {
-                            Text("QUEST LOG")
-                                .font(.system(size: 14, weight: .bold))
-                                .tracking(1.5)
-                                .foregroundStyle(Color.asphyrTextSecondary)
-                            Spacer()
-                        }
-                        
-                        Text("QUESTS")
-                            .font(.system(size: 28, weight: .black))
-                            .foregroundStyle(Color.asphyrTextPrimary)
-                            
-                        questFilterBar
-                
-                        Text("Showing \(selectedFilter.rawValue.capitalized) Quests")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                            .padding(.top, 8)
+        ZStack {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+
+            ScrollView {
+                if filteredQuests.isEmpty {
+                    emptyState
+                } else {
+                    questSections
+                }
+            }
+            .scrollIndicators(.hidden)
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            header
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .overlay(alignment: .bottomTrailing) {
+            createQuestButton
+                .padding(.trailing, 20)
+                // Sits 16pt above the tab bar
+                .padding(.bottom, 4)
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("QUEST LOG")
+                .font(AppTypography.captionMedium)
+                .foregroundStyle(Color.asphyrTextSecondary)
+
+            Text("QUESTS")
+                .font(AppTypography.screenTitle)
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .accessibilityAddTraits(.isHeader)
+                .padding(.top, 4)
+
+            filterBar
+                .padding(.top, 18)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+        // Lines up with the header on Home
+        .padding(.top, 14)
+        .padding(.bottom, 12)
+        // Solid, so content scrolling up doesn't show behind the title
+        .background(Color.asphyrBackground.ignoresSafeArea(edges: .top))
+    }
+
+    private var filterBar: some View {
+        HStack(spacing: 2) {
+            ForEach(QuestFilter.allCases, id: \.self) { filter in
+                filterButton(filter)
+            }
+        }
+        // 4pt plus Figma's 1pt border
+        .padding(5)
+        .frame(height: 44)
+        .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 13))
+        .overlay {
+            RoundedRectangle(cornerRadius: 13)
+                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
+    }
+
+    private func filterButton(_ filter: QuestFilter) -> some View {
+        let isSelected = selectedFilter == filter
+
+        return Button {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                selectedFilter = filter
+            }
+        } label: {
+            Text(filter.rawValue)
+                .font(AppTypography.captionMedium)
+                .foregroundStyle(isSelected ? Color.asphyrTextPrimary : Color.asphyrTextSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    if isSelected {
+                        RoundedRectangle(cornerRadius: 9)
+                            .fill(Color.asphyrSurfaceElevated)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 9)
+                                    .strokeBorder(
+                                        LinearGradient(
+                                            colors: [.white.opacity(0.05), .clear],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        ),
+                                        lineWidth: 1
+                                    )
+                            }
+                            .shadow(color: .black.opacity(0.4), radius: 0.5, x: 0, y: 1)
+                            .matchedGeometryEffect(id: "selectedFilter", in: filterNamespace)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var questSections: some View {
+        VStack(spacing: 24) {
+            ForEach(QuestType.allCases, id: \.self) { type in
+                let quests = filteredQuests.filter { $0.type == type }
+
+                if !quests.isEmpty {
+                    VStack(spacing: 12) {
+                        SectionDivider(sectionTitle: type.sectionTitle)
+
+                        ForEach(quests) { quest in
+                            QuestLogCard(quest: quest)
+                        }
+                    }
                 }
             }
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        // Lets the last card scroll clear of the create button
+        .padding(.bottom, 85)
     }
-    
-    private var questFilterBar: some View {
-        HStack(spacing: 2) {
-            ForEach(QuestFilter.allCases, id: \.self) { filter in
-                let isSelected = selectedFilter == filter
-                
-                Text(filter.rawValue)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(isSelected ? Color.asphyrTextPrimary : Color.asphyrTextSecondary)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity)
-                    .background {
-                        if isSelected {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.asphyrSurfaceElevated)
-                                .matchedGeometryEffect(id: "activeFilterTab", in: filterNamespace)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                            selectedFilter = filter
-                        }
-                    }
-            }
+
+    private var emptyState: some View {
+        VStack(spacing: 0) {
+            Image(selectedFilter.emptyIconName)
+                .foregroundStyle(Color.asphyrAccentPrimary)
+                .frame(width: 78, height: 78)
+                .background(Color.asphyrAccentPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: 24))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(Color.asphyrAccentPrimary.opacity(0.35), lineWidth: 1)
+                }
+                .accessibilityHidden(true)
+
+            Text(selectedFilter.emptyTitle)
+                .font(AppTypography.sectionTitle)
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .padding(.top, 18)
+
+            Text(selectedFilter.emptyMessage)
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextSecondary)
+                .frame(maxWidth: 250)
+                .padding(.top, 8)
         }
-        .padding(4)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color.asphyrSurface))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.asphyrBorder, lineWidth: 1))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .padding(.top, 128)
+        .padding(.bottom, 85)
+    }
+
+    /// Display only until Create Quest is rebuilt.
+    private var createQuestButton: some View {
+        Button {
+        } label: {
+            Image("iconQuestCreate")
+                .foregroundStyle(Color(red: 3 / 255, green: 20 / 255, blue: 10 / 255))
+                .frame(width: 56, height: 56)
+                .background {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(red: 125 / 255, green: 1, blue: 155 / 255), Color(red: 0, green: 230 / 255, blue: 59 / 255)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .overlay(alignment: .top) {
+                            RoundedRectangle(cornerRadius: 18)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [.white.opacity(0.45), .clear],
+                                        startPoint: .top,
+                                        endPoint: .center
+                                    ),
+                                    lineWidth: 1
+                                )
+                        }
+                        .shadow(color: Color(red: 47 / 255, green: 175 / 255, blue: 79 / 255), radius: 1, x: 0, y: 2)
+                }
+                .contentShape(RoundedRectangle(cornerRadius: 18))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Create quest")
     }
 }
 
-#Preview {
+#Preview("Default") {
     QuestView()
+        .environment(QuestStore())
+}
+
+#Preview("All quest types") {
+    QuestView()
+        .environment(QuestStore(quests: Quest.samples))
+}
+
+#Preview("No quests") {
+    QuestView()
+        .environment(QuestStore(quests: []))
+}
+
+#Preview("Completed quest") {
+    QuestView()
+        .environment(QuestStore(quests: [
+            Quest(
+                type: .dailyQuest,
+                title: "BUILD A SMALL MECHANIC",
+                description: "Turn a simple idea into a working feature.",
+                iconName: "iconQuestGamepad",
+                xpReward: 100,
+                status: .completed
+            )
+        ]))
 }

@@ -27,6 +27,7 @@ private enum MainTab: String, CaseIterable, Identifiable {
 
 struct MainTabView: View {
     @State private var selection: MainTab = .home
+    @State private var questStore = QuestStore()
 
     var body: some View {
         TabView(selection: $selection) {
@@ -39,8 +40,10 @@ struct MainTabView: View {
             }
 
             Tab(value: MainTab.quests) {
-                QuestView()
-                    .mainTabBar(selection: $selection)
+                NavigationStack {
+                    QuestView()
+                        .mainTabBar(selection: $selection)
+                }
             }
 
             Tab(value: MainTab.journey) {
@@ -53,6 +56,7 @@ struct MainTabView: View {
                     .mainTabBar(selection: $selection)
             }
         }
+        .environment(questStore)
     }
 }
 

@@ -8,31 +8,40 @@
 import SwiftUI
 
 struct QuestStatus: View {
-    enum QuestStatusType: String, CaseIterable {
-        case available = "AVAILABLE"
-        case inProgress = "IN PROGRESS"
-        case completed = "COMPLETED"
-    }
-    
     let status: QuestStatusType
-    
+
+    private var isTinted: Bool {
+        status != .available
+    }
+
     var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(Color.asphyrAccentPrimary)
-                .frame(width: 6, height: 6)
+        HStack(spacing: status == .completed ? 5 : 6) {
+            if status == .completed {
+                Image("iconQuestStatusCheck")
+                    .accessibilityHidden(true)
+            } else {
+                Circle()
+                    .fill(Color.asphyrAccentPrimary)
+                    .frame(width: 6, height: 6)
+            }
 
             Text(status.rawValue)
                 .font(AppTypography.captionRegular)
-                .foregroundStyle(Color.asphyrTextPrimary)
                 .lineLimit(1)
         }
+        .foregroundStyle(isTinted ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
         .padding(.horizontal, 11)
         .frame(height: 24)
-        .background(Color.asphyrSurfaceElevated, in: Capsule())
+        .background(
+            isTinted ? Color.asphyrAccentPrimary.opacity(0.12) : Color.asphyrSurfaceElevated,
+            in: Capsule()
+        )
         .overlay {
             Capsule()
-                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+                .strokeBorder(
+                    isTinted ? Color.asphyrAccentPrimary.opacity(0.35) : Color.asphyrBorder,
+                    lineWidth: 1
+                )
         }
     }
 }
@@ -40,7 +49,7 @@ struct QuestStatus: View {
 #Preview {
     VStack(spacing: 16) {
         QuestStatus(status: .available)
-        QuestStatus(status: .inProgress)
+        QuestStatus(status: .active)
         QuestStatus(status: .completed)
     }
     .padding()

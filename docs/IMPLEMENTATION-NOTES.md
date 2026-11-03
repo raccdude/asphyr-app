@@ -16,15 +16,18 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Account Recovery and Recovery Success | Merged | `feat/account-recovery-v2` |
 | Build Your Identity and Create Aspiration | Merged | `feat/identity-v2` |
 | Your Character | Merged | `feat/archetype-selection-v2` |
-| Tab bar and Home | In review | `feat/home-v2` |
-| Quests, Quest Details, Create Quest, Reward | Next | — |
+| Tab bar and Home | Merged | `feat/home-v2` |
+| Quests list | In review | `feat/quests-v2` |
+| Create Quest | Next | — |
+| Quest Details | Not started | — |
+| Reward | Not started | — |
 | Journey, Character, Settings | Not started | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
 - **On the router:** Splash, Welcome, Create Account, Login, Recover, Recovery Success, Identity, Archetype. Each `AuthRoute` case maps to one screen in `RootView`.
 - **Entering the app:** `router.enterApp()` swaps the root to `MainTabView` and clears the path, so nothing can swipe back to auth or onboarding. Log out in the Settings step needs the reverse.
-- **Tabs:** Home sits in its own `NavigationStack` and reaches Settings with `.navigationDestination(isPresented:)`. Quests, Journey and Character still create their own stacks.
+- **Tabs:** Home and Quests each sit in their own `NavigationStack`, created in `MainTabView`. Home reaches Settings with `.navigationDestination(isPresented:)`. Journey and Character still create their own stacks.
 - Any `#Preview` of a screen that reads the router needs `.environment(AppRouter())`, or the preview crashes.
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
   - Do not add a `NavigationStack` to a pushed screen. It sends the app back to the root screen. Changing `[AuthRoute]` to `NavigationPath` does not help.
@@ -74,9 +77,23 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## Tab bar and Home
 - **Tab bar:** `MainTabBar` is custom because iOS's bar can't match Figma's shape. `TabView` still keeps each tab's state, with its own bar hidden. `.mainTabBar()` is applied inside each tab's root so pushed screens cover the bar.
 - **Home data:** the name, color, archetype and aspiration come from `OnboardingProfile`. Login skips onboarding until real accounts exist, so it shows "Traveler" and a green character with no item, and hides the archetype and aspiration.
-- **Placeholders:** Level 1, 0 / 500 XP, attributes of 10 and the sample quest are fixed until quests exist. The quest card isn't tappable yet, because Quest Details still pushes a new Home.
+- **Placeholders:** Level 1, 0 / 500 XP and attributes of 10 are fixed until quests exist. The quest card isn't tappable yet, because Quest Details still pushes a new Home.
+- **Today's quest:** the first daily quest in `QuestStore`. New and ongoing users start on the available card. `QuestCard` also has the active style from `9.1 - Home Screen (Active Quest)`, without the elapsed-time row, which waits for the Quest Details timer. Nothing can start a quest until Quest Details is rebuilt.
 - **Streak chip:** built and checked, but hidden while `streakDays` is 0. Nothing counts streaks yet.
 - **Unused now:** the `Character` component is left over from the old Home and Your Character. Delete it in a cleanup.
+
+## Quests list
+- **Who creates each quest type:**
+  - **Daily:** system generated. It renews every 24 hours and is based on the user's aspiration and archetype. This isn't built yet; `Quest.sampleDaily` is a fixed placeholder.
+  - **Main and personal:** user generated, through Create Quest. Neither appears by default. The developer stated this for main quests; personal is treated the same because it's also offered on Create Quest.
+- **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
+- **Filters:** ALL shows everything, and the others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
+- **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
+- **Not connected yet:** the + button does nothing until Create Quest is rebuilt. Cards and steps aren't tappable; Quest Details comes in its own step.
+- **Unused now:** `iconGamepad` is left over from the old card. Delete it in a cleanup.
+
+## Create Quest (planned)
+- **Quest type selection:** choose Main or Personal. Daily isn't offered because the system creates it. Figma has no design for this yet, so the app gets its own version first, with default states, and Figma follows later.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -100,6 +117,11 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Create Aspiration:** add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
 - **Identity frames and `13.4 - Colours`:** replace orange (`#FF9F40`) with snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`).
 - **Home:** move the header down 14pt to match the auth screens.
+- **Quests frames:** move the content down 14pt to line up with Home's header.
+- **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
+- **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
+- **Create Quest frames:** add the quest type selection (Main and Personal), once the app's version is settled.
+- **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 - **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
 - **Character:** add the novice holding the book, brush and lantern, and each item in all six colors. Include the dark details on Snow and Yellow, and the white book lines on the dark colors.
 - **Character:** the five non-green novice characters are generated outside Figma, including Snow's dark crest. Add them to Figma if you want it to stay the source of truth.

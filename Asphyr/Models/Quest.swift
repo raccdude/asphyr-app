@@ -7,29 +7,51 @@
 
 import Foundation
 
-struct Quest {
-    let questType: QuestType
+struct Quest: Identifiable {
+    let id = UUID()
+    let type: QuestType
     let title: String
-    let description: String
-    let objective: String
-    let catergory: String
-    let duration: Int
+    var description: String?
+    let iconName: String
+    var category: String?
+    var durationMinutes: Int?
     let xpReward: Int
-    let attributeReward: Int
-    //let status: QuestStatus
+    var attributeReward: String?
+    var status: QuestStatusType
+    var steps: [QuestStep] = []
+
+    var completedStepCount: Int {
+        steps.filter(\.isDone).count
+    }
 }
 
-enum QuestType {
+struct QuestStep: Identifiable {
+    let id = UUID()
+    let title: String
+    var isDone = false
+}
+
+/// The order here is the section order in the quest log.
+enum QuestType: CaseIterable {
+    case mainQuest
     case dailyQuest
     case personalQuest
-    case mainQuest
+
+    var title: String {
+        switch self {
+        case .mainQuest: "MAIN QUEST"
+        case .dailyQuest: "DAILY QUEST"
+        case .personalQuest: "PERSONAL QUEST"
+        }
+    }
+
+    var sectionTitle: String {
+        "\(title)S"
+    }
 }
 
-
- enum QuestStatusType {
-     case available
-     case inProgress
-     case completed
- }
- 
- 
+enum QuestStatusType: String {
+    case available = "AVAILABLE"
+    case active = "ACTIVE"
+    case completed = "COMPLETED"
+}

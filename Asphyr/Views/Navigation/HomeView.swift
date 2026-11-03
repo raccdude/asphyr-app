@@ -24,6 +24,7 @@ struct HomeView: View {
     private let streakDays = 0
 
     @Environment(OnboardingProfile.self) private var profile
+    @Environment(QuestStore.self) private var questStore
 
     @State private var isShowingSettings = false
 
@@ -81,11 +82,13 @@ struct HomeView: View {
                     xpProgress
                         .padding(.top, 22)
 
-                    SectionDivider(sectionTitle: "TODAY’S QUEST")
-                        .padding(.top, 30)
+                    if let quest = questStore.todaysQuest {
+                        SectionDivider(sectionTitle: "TODAY’S QUEST")
+                            .padding(.top, 30)
 
-                    QuestCard()
-                        .padding(.top, 14)
+                        QuestCard(quest: quest)
+                            .padding(.top, 14)
+                    }
 
                     SectionDivider(sectionTitle: "ATTRIBUTES")
                         .padding(.top, 30)
@@ -204,4 +207,5 @@ struct HomeView: View {
         HomeView()
     }
     .environment(OnboardingProfile())
+    .environment(QuestStore())
 }
