@@ -60,8 +60,15 @@ enum QuestType: CaseIterable {
 
 /// A placeholder until rewards are inferred from the duration and difficulty.
 enum QuestReward {
+    static let xpPerStep = 100
+
     static func xp(forMinutes minutes: Int) -> Int {
         minutes * 5 / 3
+    }
+
+    /// Main quests have no duration, so their steps make up the total.
+    static func xp(forStepCount stepCount: Int) -> Int {
+        stepCount * xpPerStep
     }
 }
 

@@ -56,6 +56,7 @@ struct QuestView: View {
 
     @State private var selectedFilter: QuestFilter = .all
     @State private var isShowingCreateQuest = false
+    @State private var questToDelete: Quest?
     @Namespace private var filterNamespace
 
     private var filteredQuests: [Quest] {
@@ -68,14 +69,14 @@ struct QuestView: View {
             Color.asphyrBackground
                 .ignoresSafeArea()
 
-            ScrollView {
-                if filteredQuests.isEmpty {
+            if filteredQuests.isEmpty {
+                ScrollView {
                     emptyState
-                } else {
-                    questSections
                 }
+                .scrollIndicators(.hidden)
+            } else {
+                questSections
             }
-            .scrollIndicators(.hidden)
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             header
@@ -89,6 +90,23 @@ struct QuestView: View {
         }
         .sheet(isPresented: $isShowingCreateQuest) {
             CreateQuestView()
+        }
+        .alert(
+            "Delete this quest?",
+            isPresented: Binding(
+                get: { questToDelete != nil },
+                set: { if !$0 { questToDelete = nil } }
+            ),
+            presenting: questToDelete
+        ) { quest in
+            Button("Delete", role: .destructive) {
+                withAnimation {
+                    questStore.delete(quest)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { quest in
+            Text("\(quest.title) and its progress will be removed. This can’t be undone.")
         }
     }
 
@@ -111,7 +129,7 @@ struct QuestView: View {
         .padding(.horizontal, 20)
         // Lines up with the header on Home
         .padding(.top, 14)
-        .padding(.bottom, 12)
+        .padding(.bottom, 6)
         // Solid, so content scrolling up doesn't show behind the title
         .background(Color.asphyrBackground.ignoresSafeArea(edges: .top))
     }
@@ -186,26 +204,37 @@ struct QuestView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    /// A `List`, because swipe actions only work on its rows.
     private var questSections: some View {
-        VStack(spacing: 24) {
+        List {
             ForEach(QuestType.allCases, id: \.self) { type in
                 let quests = filteredQuests.filter { $0.type == type }
 
                 if !quests.isEmpty {
-                    VStack(spacing: 12) {
-                        SectionDivider(sectionTitle: type.sectionTitle)
+                    SectionDivider(sectionTitle: type.sectionTitle)
+                        .questLogRow(top: 18)
 
-                        ForEach(quests) { quest in
-                            QuestLogCard(quest: quest)
-                        }
+                    ForEach(quests) { quest in
+                        QuestLogCard(quest: quest)
+                            .questLogRow(top: 6)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                if questStore.canDelete(quest) {
+                                    Button("Delete", systemImage: "trash") {
+                                        questToDelete = quest
+                                    }
+                                    .tint(.asphyrError)
+                                }
+                            }
                     }
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .scrollIndicators(.hidden)
+        .environment(\.defaultMinListRowHeight, 0)
         // Lets the last card scroll clear of the create button
-        .padding(.bottom, 85)
+        .contentMargins(.bottom, 79, for: .scrollContent)
     }
 
     private var emptyState: some View {
@@ -234,7 +263,7 @@ struct QuestView: View {
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
-        .padding(.top, 128)
+        .padding(.top, 134)
         .padding(.bottom, 85)
     }
 
@@ -271,6 +300,14 @@ struct QuestView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Create quest")
+    }
+}
+
+private extension View {
+    func questLogRow(top: CGFloat) -> some View {
+        listRowInsets(EdgeInsets(top: top, leading: 20, bottom: 6, trailing: 20))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
     }
 }
 

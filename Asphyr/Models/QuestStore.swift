@@ -10,6 +10,8 @@ import Foundation
 /// daily quest, because main and personal quests are created by the user.
 @Observable
 final class QuestStore {
+    static let maxOpenPersonalQuests = 5
+
     var quests: [Quest]
 
     init(quests: [Quest] = [Quest.sampleDaily]) {
@@ -21,15 +23,24 @@ final class QuestStore {
     }
 
     /// Whether another quest of this type can be created. One main quest and
-    /// five personal quests can be open at a time.
+    /// a limited number of personal quests can be open at a time.
     func canCreate(_ type: QuestType) -> Bool {
         let openCount = quests.filter { $0.type == type && $0.status != .completed }.count
 
         switch type {
         case .mainQuest: return openCount < 1
-        case .personalQuest: return openCount < 5
+        case .personalQuest: return openCount < Self.maxOpenPersonalQuests
         case .dailyQuest: return false
         }
+    }
+
+    /// Daily quests renew on their own, and completed quests stay as a record.
+    func canDelete(_ quest: Quest) -> Bool {
+        quest.type != .dailyQuest && quest.status != .completed
+    }
+
+    func delete(_ quest: Quest) {
+        quests.removeAll { $0.id == quest.id }
     }
 }
 

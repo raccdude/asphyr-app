@@ -86,7 +86,10 @@ struct QuestLogCard: View {
 
                 Spacer(minLength: 8)
 
-                xpReward
+                VStack(alignment: .trailing, spacing: 8) {
+                    xpReward
+                    QuestStatus(status: quest.status)
+                }
             }
 
             XPBar(
@@ -102,12 +105,6 @@ struct QuestLogCard: View {
                 }
             }
             .padding(.top, 14)
-
-            // Figma only has the active main quest, which shows no status
-            if !isActive {
-                QuestStatus(status: quest.status)
-                    .padding(.top, 14)
-            }
         }
     }
 

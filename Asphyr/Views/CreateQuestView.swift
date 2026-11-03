@@ -60,11 +60,15 @@ struct CreateQuestView: View {
     @State private var newStep = ""
     @State private var showsTitleError = false
     @State private var showsStepsError = false
+    @State private var toastMessage: String?
+    @State private var toastCount = 0
 
     @FocusState private var focus: Field?
 
     private var xpReward: Int {
-        QuestReward.xp(forMinutes: duration.minutes)
+        questType == .mainQuest
+            ? QuestReward.xp(forStepCount: steps.count)
+            : QuestReward.xp(forMinutes: duration.minutes)
     }
 
     private var canCreateAnyType: Bool {
@@ -93,6 +97,21 @@ struct CreateQuestView: View {
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(28)
         .presentationBackground(Color.asphyrSurface)
+        .overlay(alignment: .top) {
+            if let toastMessage {
+                AsphyrToast(icon: "iconAlert", message: toastMessage)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .onTapGesture {
+                        self.toastMessage = nil
+                    }
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: toastMessage)
+        .task(id: toastCount) {
+            await hideToastAfterDelay()
+        }
         .animation(.easeInOut(duration: 0.2), value: showsTitleError)
         .animation(.easeInOut(duration: 0.2), value: showsStepsError)
         .animation(.easeInOut(duration: 0.2), value: questType)
@@ -172,15 +191,18 @@ struct CreateQuestView: View {
                     .padding(.top, 22)
             }
 
-            sectionLabel("ESTIMATED DURATION")
-                .padding(.top, 22)
+            // Main quests go at the user's own pace
+            if questType != .mainQuest {
+                sectionLabel("ESTIMATED DURATION")
+                    .padding(.top, 22)
 
-            HStack(spacing: 8) {
-                ForEach(Duration.allCases, id: \.self) { option in
-                    durationButton(option)
+                HStack(spacing: 8) {
+                    ForEach(Duration.allCases, id: \.self) { option in
+                        durationButton(option)
+                    }
                 }
+                .padding(.top, 10)
             }
-            .padding(.top, 10)
 
             sectionLabel("CATEGORY")
                 .padding(.top, 22)
@@ -364,7 +386,7 @@ struct CreateQuestView: View {
                     .font(AppTypography.captionMedium)
                     .foregroundStyle(Color.asphyrTextPrimary)
 
-                Text("Earned upon quest completion")
+                Text(questType == .mainQuest ? "\(QuestReward.xpPerStep) XP for each step" : "Earned upon quest completion")
                     .font(AppTypography.bodySecondary)
                     .foregroundStyle(Color.asphyrTextSecondary)
             }
@@ -403,7 +425,13 @@ struct CreateQuestView: View {
         let isSelected = questType == type && !isUnavailable
 
         return Button {
-            questType = type
+            if isUnavailable {
+                showToast(type == .mainQuest
+                    ? "Only one main quest can be open at a time."
+                    : "You can have up to \(QuestStore.maxOpenPersonalQuests) open personal quests.")
+            } else {
+                questType = type
+            }
         } label: {
             HStack(spacing: 10) {
                 Image(type.iconName)
@@ -429,7 +457,6 @@ struct CreateQuestView: View {
             .opacity(isUnavailable ? 0.5 : 1)
         }
         .buttonStyle(.plain)
-        .disabled(isUnavailable)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
@@ -488,6 +515,22 @@ struct CreateQuestView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    private func showToast(_ message: String) {
+        toastMessage = message
+        toastCount += 1
+    }
+
+    private func hideToastAfterDelay() async {
+        guard toastMessage != nil else { return }
+
+        do {
+            try await Task.sleep(for: .seconds(3))
+            toastMessage = nil
+        } catch {
+            // A newer toast restarted the delay
+        }
+    }
+
     private func addStep() {
         guard !trimmedNewStep.isEmpty, steps.count < Self.maxStepCount else { return }
 
@@ -519,7 +562,7 @@ struct CreateQuestView: View {
                 description: trimmedDescription.isEmpty ? nil : trimmedDescription,
                 iconName: questType.iconName,
                 category: category.uppercased(),
-                durationMinutes: duration.minutes,
+                durationMinutes: questType == .mainQuest ? nil : duration.minutes,
                 xpReward: xpReward,
                 status: .available,
                 steps: questType == .mainQuest ? steps : []

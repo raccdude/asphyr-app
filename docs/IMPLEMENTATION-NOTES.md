@@ -98,19 +98,22 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Default state:** Personal, 30m and Development (the first category) are selected, with an empty title and description. Type, duration and category always keep a selection.
 - **Validation:** on submit only. The title is required and the description is optional. Main quests also need at least one step. Each error clears on edit.
 - **Main quest steps:** our own version. A STEPS section appears on this screen when Main is selected, with 1 to 10 steps that can be removed before saving. Text left in the step field is added on submit. Checking steps off comes with Quest Details.
-- **Quest limits:** one open main quest and five open personal quests at a time; completed quests don't count. A card at its limit is disabled and reads "Already created" or "Limit reached". If Personal is at its limit, Main is selected instead. If both are, "Finish a quest to create a new one." appears and Create Quest does nothing.
+- **Quest limits:** one open main quest and five open personal quests at a time; completed quests don't count. A card at its limit is dimmed and reads "Already created" or "Limit reached", and tapping it shows a toast explaining the limit. If Personal is at its limit, Main is selected instead. If both are, "Finish a quest to create a new one." appears and Create Quest does nothing.
+- **Main quests have no time limit:** Estimated Duration is hidden when Main is selected, and they save with no duration. Users go at their own pace.
 - **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
 - **Placeholders:** main quests use the book icon and personal quests the hammer.
 - **Unused now:** nothing calls `AsphyrTextField` anymore. Delete it in a cleanup.
-- **Available main quests:** the checklist card shows an AVAILABLE pill. Figma only has the active main quest, which shows no pill.
+- **Main quest card:** the status pill sits in the header, under the XP reward, in every state.
 
 ## Quest rules
 - **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforce this when Quest Details adds starting a quest.
 - **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
+- **Deleting quests:** swipe left on a main or personal quest in the quest log, tap Delete, then confirm. Daily quests can't be deleted because the system renews them, and completed quests stay as a record. The cards are `List` rows, because swipe actions need one. Deleting gives no XP back or penalty yet; decide this when XP is real.
 
 ## XP and progression (future)
 - **Rewards are system inferred** from the estimated duration and how difficult the task is. Users don't set them. This may need AI to judge difficulty; not decided.
 - **Placeholder:** `QuestReward.xp(forMinutes:)` uses duration only: 15m is 25 XP, 30m is 50, 1h is 100 and 2h+ is 200. Replace it when the real system is designed. Sample and daily quests keep Figma's fixed values for now.
+- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Proposed: award each step's XP when it's ticked instead of all at the end, because a quest with no deadline can run for a long time. Not decided.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -138,7 +141,9 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
 - **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least one step." error. The sheet's content is taller as a result, so it can scroll.
-- **Main quest card:** add the available state, with its pill.
+- **Main quest card:** move the status pill to the header under the XP reward, on the active state too, and add the available state.
+- **Create Quest frames:** hide Estimated Duration for Main, with "100 XP for each step" in the reward card, and add the limit toasts.
+- **Quests frames:** add the swipe-to-delete action and its confirmation.
 - **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 - **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
 - **Character:** add the novice holding the book, brush and lantern, and each item in all six colors. Include the dark details on Snow and Yellow, and the white book lines on the dark colors.
