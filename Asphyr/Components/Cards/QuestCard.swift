@@ -2,87 +2,100 @@
 //  QuestCard.swift
 //  Asphyr
 //
-//  Created by Mac-LAB on 8/27/26.
+//  Created by Mac-LAB on 8/25/26.
 //
 
 import SwiftUI
 
+/// Shows Figma's sample quest until quest data exists.
 struct QuestCard: View {
-    //let questType: String
-    
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // HEADER
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
-                Image(systemName: "gamecontroller.fill")
-                    .font(.system(size: 22))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-
-                Text("Daily Quest".uppercased()) // questType
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-            
-                Spacer()
-                
-                Image(systemName: "chevron.forward.dotted.chevron.forward")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-            }
-            
-            // CONTENT
-            VStack(alignment: .leading, spacing: 8) {
-                Text("BUILD A SMALL MECHANIC")
-                    .font(.system(size: 16, weight: .medium))
-                    .fontWeight(.semibold)
+                Image("iconGamepad")
                     .foregroundStyle(Color.asphyrTextPrimary)
-                
-                Text("Turn a simple idea into a working feature.")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-            }
-            .padding(.bottom, 12)
+                    .frame(width: 44, height: 44)
+                    .background(Color.asphyrSurfaceElevated, in: RoundedRectangle(cornerRadius: 12))
+                    .accessibilityHidden(true)
 
-            // METADATA
-            HStack {
-                Text("DEVELOPMENT") // CATEGORY
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-                
-                Spacer()
-                
-                Text("30 MIN") // DURATION
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.asphyrTextSecondary)
-            }
-            
-            RectangleView(height: 1.5, color: Color.asphyrSurfaceElevated)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("DAILY QUEST")
+                        .font(AppTypography.captionMedium)
+                        .foregroundStyle(Color.asphyrTextSecondary)
 
-            // FOOTER
-            HStack(spacing: 14) {
-                Text("+100 XP")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.asphyrWarning) // change
-                
-                Text("+5 CREATIVITY")
-                    .font(.system(size: 12))
+                    Text("BUILD A SMALL MECHANIC")
+                        .font(AppTypography.subheading)
+                        .foregroundStyle(Color.asphyrTextPrimary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image("iconChevronRight")
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .accessibilityHidden(true)
+            }
+
+            Text("Turn a simple idea into a working feature.")
+                .font(AppTypography.bodySecondary)
+                .foregroundStyle(Color.asphyrTextSecondary)
+                .padding(.top, 14)
+
+            HStack(spacing: 8) {
+                tag {
+                    Text("DEVELOPMENT")
+                }
+
+                tag {
+                    Image("iconClockSmall")
+                        .accessibilityHidden(true)
+                    Text("30 MIN")
+                }
+            }
+            .padding(.top, 14)
+
+            Rectangle()
+                .fill(Color.asphyrBorder)
+                .frame(height: 1)
+                .padding(.top, 14)
+
+            HStack(spacing: 0) {
+                Image("iconLightning")
                     .foregroundStyle(Color.asphyrWarning)
-                
-                Spacer()
-                
+                    .accessibilityHidden(true)
+
+                Text("+100 XP")
+                    .padding(.leading, 4)
+
+                Text("+5 CREATIVITY")
+                    .padding(.leading, 12)
+
+                Spacer(minLength: 8)
+
                 QuestStatus(status: .available)
             }
+            .font(AppTypography.captionMedium)
+            .foregroundStyle(Color.asphyrWarning)
+            .padding(.top, 14)
         }
-        .padding(20)
-        
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.asphyrSurface)
-                .overlay(RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.asphyrBorder))
-        )
-        
-            //.shadow(color: Color.asphyrAccentPrimary, radius: 2, x: 0, y: 1))
+        .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
+    }
+
+    private func tag<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        HStack(spacing: 5) {
+            content()
+        }
+        .font(AppTypography.captionMedium)
+        .foregroundStyle(Color.asphyrTextSecondary)
+        .padding(.horizontal, 10)
+        .frame(height: 25)
+        .background(Color.asphyrSurfaceElevated, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 

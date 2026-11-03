@@ -17,20 +17,23 @@ struct QuestStatus: View {
     let status: QuestStatusType
     
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "circle.fill")
-                .font(.system(size: 6))
-                .foregroundStyle(Color.asphyrAccentPrimary)
-            
+        HStack(spacing: 6) {
+            Circle()
+                .fill(Color.asphyrAccentPrimary)
+                .frame(width: 6, height: 6)
+
             Text(status.rawValue)
-                .font(.system(size: 11, weight: .semibold))
+                .font(AppTypography.captionRegular)
                 .foregroundStyle(Color.asphyrTextPrimary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
         }
-        .frame(width: 120, height: 24)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color.asphyrSurfaceElevated))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.asphyrBorder, lineWidth: 1))
+        .padding(.horizontal, 11)
+        .frame(height: 24)
+        .background(Color.asphyrSurfaceElevated, in: Capsule())
+        .overlay {
+            Capsule()
+                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
     }
 }
 

@@ -9,15 +9,16 @@ import SwiftUI
 
 struct SectionDivider: View {
     let sectionTitle: String
-    
+
     var body: some View {
         HStack(spacing: 10) {
             Text(sectionTitle)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.asphyrTextPrimary)
-                
-            RectangleView(height: 1)
+                .font(AppTypography.captionMedium)
+                .foregroundStyle(Color.asphyrTextSecondary)
+
+            Rectangle()
+                .fill(Color.asphyrBorder)
+                .frame(height: 1)
         }
-        
     }
 }

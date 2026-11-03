@@ -7,36 +7,43 @@
 
 import SwiftUI
 
-/// The app's one root `NavigationStack`. Pushed screens should not create
-/// their own stack.
+/// The root `NavigationStack` for auth and onboarding, swapped for the tabs
+/// once they finish. Pushed screens should not create their own stack.
 struct RootView: View {
     @State private var router = AppRouter()
     @State private var profile = OnboardingProfile()
 
     var body: some View {
-        NavigationStack(path: $router.path) {
-            SplashView()
-                .navigationDestination(for: AuthRoute.self) { route in
-                    switch route {
-                    case .welcome:
-                        WelcomeView()
-                    case .createAccount:
-                        CreateAccountView()
-                    case .login:
-                        LoginView()
-                    case .recover:
-                        RecoverAccountView()
-                    case .recoverySuccess(let email):
-                        RecoverySuccessView(email: email)
-                    case .identity:
-                        IdentityCreationView()
-                    case .archetype:
-                        ArchetypeSelectionView()
-                    case .home:
-                        HomeView()
-                    }
+        Group {
+            if router.isInApp {
+                MainTabView()
+                    .transition(.opacity)
+            } else {
+                NavigationStack(path: $router.path) {
+                    SplashView()
+                        .navigationDestination(for: AuthRoute.self) { route in
+                            switch route {
+                            case .welcome:
+                                WelcomeView()
+                            case .createAccount:
+                                CreateAccountView()
+                            case .login:
+                                LoginView()
+                            case .recover:
+                                RecoverAccountView()
+                            case .recoverySuccess(let email):
+                                RecoverySuccessView(email: email)
+                            case .identity:
+                                IdentityCreationView()
+                            case .archetype:
+                                ArchetypeSelectionView()
+                            }
+                        }
                 }
+                .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.3), value: router.isInApp)
         .environment(router)
         .environment(profile)
     }

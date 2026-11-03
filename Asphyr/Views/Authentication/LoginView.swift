@@ -126,7 +126,7 @@ struct LoginView: View {
         focus = nil
 
         if email.isValidEmail && !password.isEmpty {
-            router.push(.home)
+            router.enterApp()
         } else {
             showsError = true
         }

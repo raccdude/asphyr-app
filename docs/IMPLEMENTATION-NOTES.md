@@ -15,20 +15,20 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Login | Merged | `feat/login-v2` |
 | Account Recovery and Recovery Success | Merged | `feat/account-recovery-v2` |
 | Build Your Identity and Create Aspiration | Merged | `feat/identity-v2` |
-| Your Character | In review | `feat/archetype-selection-v2` |
-| Tab bar and Home | Next | — |
-| Quests, Quest Details, Create Quest, Reward | Not started | — |
+| Your Character | Merged | `feat/archetype-selection-v2` |
+| Tab bar and Home | In review | `feat/home-v2` |
+| Quests, Quest Details, Create Quest, Reward | Next | — |
 | Journey, Character, Settings | Not started | — |
 
 ## Navigation
-- `RootView` owns the app's one `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
+- `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
 - **On the router:** Splash, Welcome, Create Account, Login, Recover, Recovery Success, Identity, Archetype. Each `AuthRoute` case maps to one screen in `RootView`.
-- Home is pushed onto the root stack for now. It reaches Settings with `.navigationDestination(isPresented:)`, which works inside the path-bound stack.
+- **Entering the app:** `router.enterApp()` swaps the root to `MainTabView` and clears the path, so nothing can swipe back to auth or onboarding. Log out in the Settings step needs the reverse.
+- **Tabs:** Home sits in its own `NavigationStack` and reaches Settings with `.navigationDestination(isPresented:)`. Quests, Journey and Character still create their own stacks.
 - Any `#Preview` of a screen that reads the router needs `.environment(AppRouter())`, or the preview crashes.
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
   - Do not add a `NavigationStack` to a pushed screen. It sends the app back to the root screen. Changing `[AuthRoute]` to `NavigationPath` does not help.
   - Do not use a view-destination `NavigationLink { SomeView() }`. It crashes with `AnyNavigationPath.Error.comparisonTypeMismatch`. Use a `Button` that calls the router.
-- **Before `MainTabView` is connected:** `HomeView` no longer has its own stack, so the Home tab must wrap it in a `NavigationStack`, or the Settings gear won't navigate. This also affects `MainTabView`'s preview today.
 - **Unreachable screens not converted yet:** `QuestDetailsView`, `RewardView` and `CreateQuestView` still push a new `HomeView`. Fix them when they are rebuilt.
 
 ## Platform scope
@@ -54,7 +54,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 
 ## Login
 - **Mock validation:** "Incorrect email or password" appears on submit for a malformed email or an empty field, and clears on edit. Any well-formed email with a password logs in. Replace this in `LoginView.submit()` when the backend arrives.
-- **After login:** still goes to the bare `HomeView`. Sign-up and login both connect to the tab bar in the Tab bar and Home step.
+- **After login:** goes to the tabs through `router.enterApp()`.
 
 ## Account Recovery
 - **Spirit:** `SpiritView` shows wave, focused, surprised or cheer, and crossfades between them. The assets are original-color SVGs in the catalog. Add other moods there when their screens are built.
@@ -71,11 +71,17 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Create Aspiration:** a system sheet. iOS floats it 8pt in from the screen edge, so its 12pt padding lines up with the 20pt screen margin. Saved text replaces "Something else" on the card, and choosing a listed card clears it. Tapping any selected card deselects it; the sheet keeps the last custom text if reopened.
 - **Top bar:** `AuthScreen(onboardingStep:)` shows the step indicator in place of the wordmark.
 
+## Tab bar and Home
+- **Tab bar:** `MainTabBar` is custom because iOS's bar can't match Figma's shape. `TabView` still keeps each tab's state, with its own bar hidden. `.mainTabBar()` is applied inside each tab's root so pushed screens cover the bar.
+- **Home data:** the name, color, archetype and aspiration come from `OnboardingProfile`. Login skips onboarding until real accounts exist, so it shows "Traveler" and a green character with no item, and hides the archetype and aspiration.
+- **Placeholders:** Level 1, 0 / 500 XP, attributes of 10 and the sample quest are fixed until quests exist. The quest card isn't tappable yet, because Quest Details still pushes a new Home.
+- **Streak chip:** built and checked, but hidden while `streakDays` is 0. Nothing counts streaks yet.
+- **Unused now:** the `Character` component is left over from the old Home and Your Character. Delete it in a cleanup.
+
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
 - **Item colors:** items use the tunic's base and shade. Oxblood, Midnight and Plum use their bright tint instead, because dark items disappear against the cloak and background.
 - **Selection:** tapping the selected card deselects it, as on Identity. With nothing selected, the title reads "WHO WILL YOU BECOME?" and BEGIN shows "Choose an archetype."
-- **After BEGIN:** still goes to the bare `HomeView`, which shows hardcoded data. Connect it in the Tab bar and Home step.
 
 ## Unlockable cloaks (future)
 Midnight, Oxblood and Plum are planned as unlockable cloaks: the starter character's look plus a tinted cloak. The unlock rules aren't decided, and nothing is built yet. Use the same tunic and tint as the starter color, and these cloak values:
@@ -93,6 +99,7 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Identity frames:** move the content down 14pt to match the lowered back button, and add the "Enter your name." and "Choose an aspiration." errors.
 - **Create Aspiration:** add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
 - **Identity frames and `13.4 - Colours`:** replace orange (`#FF9F40`) with snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`).
+- **Home:** move the header down 14pt to match the auth screens.
 - **Your Character:** add the unselected state and the "Choose an archetype." error, and move the content down 14pt to match the lowered back button.
 - **Character:** add the novice holding the book, brush and lantern, and each item in all six colors. Include the dark details on Snow and Yellow, and the white book lines on the dark colors.
 - **Character:** the five non-green novice characters are generated outside Figma, including Snow's dark crest. Add them to Figma if you want it to stay the source of truth.
@@ -113,8 +120,8 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** using the eye button while a password field is focused briefly drops focus, so "Passwords don't match" can appear while the user is still typing. The error clears on the next edit.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
-- **High:** `MainTabView` is unreachable, so sign-up and login end on a bare `HomeView`. Fix with the Tab bar and Home step.
-- **High:** onboarding input is discarded, and Home shows hardcoded data ("Lou").
+- **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
+- **Medium:** Journey, Character and Settings are bare placeholders that follow the device appearance, so they can show white with the tab bar's dark fade. Fix in their steps.
 - **Medium:** the app follows the device appearance instead of defaulting to dark, and the color sets have no Light values.
 - **Low:** Figma's "Already have an account? LOG IN" row on Welcome sits about 5pt right of center. The code centers it deliberately; update Figma to match if that's agreed.
 - **Medium:** Home has no back control and no log out. Fix with the Settings step.

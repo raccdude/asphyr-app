@@ -16,13 +16,14 @@ enum AuthRoute: Hashable {
     case recoverySuccess(email: String)
     case identity
     case archetype
-    case home
 }
 
 /// Owns the root stack's path, so every screen shares one source of truth.
 @Observable
 final class AppRouter {
     var path: [AuthRoute] = []
+    /// True once sign-up or login finishes, which swaps the root to the tabs.
+    private(set) var isInApp = false
 
     /// Ignored when `route` is already on top, so a double tap pushes once.
     func push(_ route: AuthRoute) {
@@ -35,6 +36,12 @@ final class AppRouter {
     func switchTo(_ route: AuthRoute) {
         _ = path.popLast()
         path.append(route)
+    }
+
+    /// Replaces the auth stack with the tabs, so there's no way back to it.
+    func enterApp() {
+        isInApp = true
+        path = []
     }
 
     /// Returns to the Login screen already on the stack.

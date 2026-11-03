@@ -84,7 +84,7 @@ struct ArchetypeSelectionView: View {
         showsArchetypeError = profile.archetype == nil
 
         if !showsArchetypeError {
-            router.push(.home)
+            router.enterApp()
         }
     }
 }

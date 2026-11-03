@@ -11,5 +11,5 @@ import Foundation
 struct UserAttribute {
     let name: String
     let value: String
-    
+    let iconName: String
 }
