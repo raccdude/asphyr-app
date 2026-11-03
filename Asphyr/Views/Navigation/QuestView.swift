@@ -57,10 +57,14 @@ struct QuestView: View {
     @State private var selectedFilter: QuestFilter = .all
     @State private var isShowingCreateQuest = false
     @State private var questToDelete: Quest?
+    @State private var selectedQuestID: UUID?
     @Namespace private var filterNamespace
 
     private var filteredQuests: [Quest] {
-        guard let status = selectedFilter.status else { return questStore.quests }
+        // ALL is everything still open, so finished quests don't pile up there
+        guard let status = selectedFilter.status else {
+            return questStore.quests.filter { $0.status != .completed }
+        }
         return questStore.quests.filter { $0.status == status }
     }
 
@@ -87,6 +91,9 @@ struct QuestView: View {
                 .padding(.trailing, 20)
                 // Sits 16pt above the tab bar
                 .padding(.bottom, 4)
+        }
+        .navigationDestination(item: $selectedQuestID) { questID in
+            QuestDetailsView(questID: questID)
         }
         .sheet(isPresented: $isShowingCreateQuest) {
             CreateQuestView()
@@ -215,8 +222,13 @@ struct QuestView: View {
                         .questLogRow(top: 18)
 
                     ForEach(quests) { quest in
-                        QuestLogCard(quest: quest)
-                            .questLogRow(top: 6)
+                        Button {
+                            selectedQuestID = quest.id
+                        } label: {
+                            QuestLogCard(quest: quest)
+                        }
+                        .buttonStyle(.plain)
+                        .questLogRow(top: 6)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 if questStore.canDelete(quest) {
                                     Button("Delete", systemImage: "trash") {

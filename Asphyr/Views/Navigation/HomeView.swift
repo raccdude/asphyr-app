@@ -8,12 +8,22 @@
 import SwiftUI
 
 struct HomeView: View {
-    private static let attributes = [
-        UserAttribute(name: "KNOWLEDGE", value: "10", iconName: "iconAttributeKnowledge"),
-        UserAttribute(name: "DISCIPLINE", value: "10", iconName: "iconAttributeDiscipline"),
-        UserAttribute(name: "CREATIVITY", value: "10", iconName: "iconAttributeCreativity"),
-        UserAttribute(name: "PROBLEM SOLVING", value: "10", iconName: "iconAttributeProblemSolving")
+    private static let attributeIcons = [
+        (name: "KNOWLEDGE", iconName: "iconAttributeKnowledge"),
+        (name: "DISCIPLINE", iconName: "iconAttributeDiscipline"),
+        (name: "CREATIVITY", iconName: "iconAttributeCreativity"),
+        (name: "PROBLEM SOLVING", iconName: "iconAttributeProblemSolving")
     ]
+
+    private var attributes: [UserAttribute] {
+        Self.attributeIcons.map { attribute in
+            UserAttribute(
+                name: attribute.name,
+                value: "\(questStore.attributeValue(named: attribute.name))",
+                iconName: attribute.iconName
+            )
+        }
+    }
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -27,6 +37,8 @@ struct HomeView: View {
     @Environment(QuestStore.self) private var questStore
 
     @State private var isShowingSettings = false
+    @State private var selectedQuestID: UUID?
+    @State private var isShowingCreateQuest = false
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: .now) {
@@ -71,7 +83,7 @@ struct HomeView: View {
                     identity
                         .padding(.top, 18)
 
-                    Text("LEVEL 1")
+                    Text("LEVEL \(questStore.level)")
                         .font(AppTypography.subheading)
                         .foregroundStyle(Color(red: 3 / 255, green: 20 / 255, blue: 10 / 255))
                         .padding(.horizontal, 14)
@@ -82,19 +94,35 @@ struct HomeView: View {
                     xpProgress
                         .padding(.top, 22)
 
-                    if let quest = questStore.todaysQuest {
-                        SectionDivider(sectionTitle: "TODAY’S QUEST")
+                    if let quest = questStore.homeQuest {
+                        SectionDivider(sectionTitle: questSectionTitle(for: quest))
                             .padding(.top, 30)
 
-                        QuestCard(quest: quest)
-                            .padding(.top, 14)
+                        Button {
+                            selectedQuestID = quest.id
+                        } label: {
+                            QuestCard(quest: quest)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 14)
+                    } else if !questStore.completedQuests.isEmpty {
+                        SectionDivider(sectionTitle: "TODAY’S PROGRESS")
+                            .padding(.top, 30)
+
+                        QuestCompletionCard(
+                            questCount: questStore.completedQuests.count,
+                            xp: questStore.completedQuests.reduce(0) { $0 + $1.xpReward }
+                        ) {
+                            isShowingCreateQuest = true
+                        }
+                        .padding(.top, 14)
                     }
 
                     SectionDivider(sectionTitle: "ATTRIBUTES")
                         .padding(.top, 30)
 
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(Self.attributes, id: \.name) { attribute in
+                        ForEach(attributes, id: \.name) { attribute in
                             AttributeCard(attribute: attribute)
                         }
                     }
@@ -112,6 +140,17 @@ struct HomeView: View {
         .navigationDestination(isPresented: $isShowingSettings) {
             SettingsView()
         }
+        .navigationDestination(item: $selectedQuestID) { questID in
+            QuestDetailsView(questID: questID)
+        }
+        .sheet(isPresented: $isShowingCreateQuest) {
+            CreateQuestView()
+        }
+    }
+
+    private func questSectionTitle(for quest: Quest) -> String {
+        if quest.status == .active { return "ACTIVE QUEST" }
+        return quest.type == .dailyQuest ? "TODAY’S QUEST" : "AVAILABLE QUEST"
     }
 
     private var header: some View {
@@ -187,17 +226,17 @@ struct HomeView: View {
     private var xpProgress: some View {
         VStack(spacing: 8) {
             HStack {
-                Text("0 / 500 XP")
+                Text("\(questStore.xpIntoLevel) / \(QuestStore.xpPerLevel) XP")
                     .foregroundStyle(Color.asphyrTextPrimary)
 
                 Spacer()
 
-                Text("500 XP TO LEVEL 2")
+                Text("\(QuestStore.xpPerLevel - questStore.xpIntoLevel) XP TO LEVEL \(questStore.level + 1)")
                     .foregroundStyle(Color.asphyrTextSecondary)
             }
             .font(AppTypography.captionMedium)
 
-            XPBar()
+            XPBar(progress: CGFloat(questStore.xpIntoLevel) / CGFloat(QuestStore.xpPerLevel))
         }
     }
 }

@@ -16,6 +16,8 @@ struct AuthTopBar: View {
     var showsBackButton: Bool = true
     /// Shows onboarding progress in place of the wordmark.
     var onboardingStep: Int?
+    /// Shows a screen title in place of the wordmark.
+    var title: String?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -24,6 +26,11 @@ struct AuthTopBar: View {
             if let onboardingStep {
                 OnboardingStepIndicator(step: onboardingStep)
                     .frame(maxWidth: .infinity, alignment: .trailing)
+            } else if let title {
+                Text(title)
+                    .font(AppTypography.subheading)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+                    .padding(.horizontal, 52)
             } else {
                 Text("ASPHYR")
                     .font(AppTypography.wordMark)
@@ -87,9 +94,9 @@ private struct OnboardingStepIndicator: View {
 
 extension View {
     /// Pins `AuthTopBar` above the screen in place of the system bar.
-    func authTopBar(showsBackButton: Bool = true, onboardingStep: Int? = nil) -> some View {
+    func authTopBar(showsBackButton: Bool = true, onboardingStep: Int? = nil, title: String? = nil) -> some View {
         safeAreaInset(edge: .top, spacing: 0) {
-            AuthTopBar(showsBackButton: showsBackButton, onboardingStep: onboardingStep)
+            AuthTopBar(showsBackButton: showsBackButton, onboardingStep: onboardingStep, title: title)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)

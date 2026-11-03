@@ -18,21 +18,21 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Your Character | Merged | `feat/archetype-selection-v2` |
 | Tab bar and Home | Merged | `feat/home-v2` |
 | Quests list | Merged | `feat/quests-v2` |
-| Create Quest | In review | `feat/create-quest-v2` |
-| Quest Details | Next | — |
-| Reward | Not started | — |
+| Create Quest | Merged | `feat/create-quest-v2` |
+| Quest Details | In review | `feat/quest-details-v2` |
+| Reward | Next | — |
 | Journey, Character, Settings | Not started | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
 - **On the router:** Splash, Welcome, Create Account, Login, Recover, Recovery Success, Identity, Archetype. Each `AuthRoute` case maps to one screen in `RootView`.
 - **Entering the app:** `router.enterApp()` swaps the root to `MainTabView` and clears the path, so nothing can swipe back to auth or onboarding. Log out in the Settings step needs the reverse.
-- **Tabs:** Home and Quests each sit in their own `NavigationStack`, created in `MainTabView`. Home reaches Settings with `.navigationDestination(isPresented:)`. Journey and Character still create their own stacks.
+- **Tabs:** Home and Quests each sit in their own `NavigationStack`, created in `MainTabView`. Home reaches Settings with `.navigationDestination(isPresented:)`, and both reach Quest Details with `.navigationDestination(item:)`. Journey and Character still create their own stacks.
 - Any `#Preview` of a screen that reads the router needs `.environment(AppRouter())`, or the preview crashes.
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
   - Do not add a `NavigationStack` to a pushed screen. It sends the app back to the root screen. Changing `[AuthRoute]` to `NavigationPath` does not help.
   - Do not use a view-destination `NavigationLink { SomeView() }`. It crashes with `AnyNavigationPath.Error.comparisonTypeMismatch`. Use a `Button` that calls the router.
-- **Unreachable screens not converted yet:** `QuestDetailsView` and `RewardView` still push a new `HomeView`. Fix them when they are rebuilt.
+- **Unreachable screens not converted yet:** `RewardView` still pushes a new `HomeView`. Fix them when they are rebuilt.
 
 ## Platform scope
 - **Current target:** iPhone only, portrait only.
@@ -77,8 +77,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 ## Tab bar and Home
 - **Tab bar:** `MainTabBar` is custom because iOS's bar can't match Figma's shape. `TabView` still keeps each tab's state, with its own bar hidden. `.mainTabBar()` is applied inside each tab's root so pushed screens cover the bar.
 - **Home data:** the name, color, archetype and aspiration come from `OnboardingProfile`. Login skips onboarding until real accounts exist, so it shows "Traveler" and a green character with no item, and hides the archetype and aspiration.
-- **Placeholders:** Level 1, 0 / 500 XP and attributes of 10 are fixed until quests exist. The quest card isn't tappable yet, because Quest Details still pushes a new Home.
-- **Today's quest:** the first daily quest in `QuestStore`. New and ongoing users start on the available card. `QuestCard` also has the active style from `9.1 - Home Screen (Active Quest)`, without the elapsed-time row, which waits for the Quest Details timer. Nothing can start a quest until Quest Details is rebuilt.
+- **Placeholders:** the level and XP bar use a flat 500 XP per level from `QuestStore.earnedXP`. Attributes start at 10 and rise by a quest's attribute rewards when it's completed. Only the daily quest has attribute rewards so far; user-created quests get them when rewards are system inferred.
+- **Home's quest (`QuestStore.homeQuest`):** the active daily or personal quest first, then today's daily if it isn't finished, then the active main quest, then any available quest. The section reads "ACTIVE QUEST" for any active quest, "TODAY'S QUEST" for an available daily and "AVAILABLE QUEST" for any other available quest. Which quest was accepted first doesn't matter: a daily or personal quest always shows ahead of an active main quest, because its timer is running and the main quest has no deadline.
+- **Completion card:** from `9.2 - Home Screen (Completion)`, shown under "TODAY'S PROGRESS" once nothing is active or available. It counts every completed quest and totals their XP, and its button opens Create Quest. The count should become today's only when daily quests renew. The copy for more than one quest is ours. New and ongoing users start on the available card. Once started, it uses the active style and elapsed-time row from `9.1 - Home Screen (Active Quest)`.
 - **Streak chip:** built and checked, but hidden while `streakDays` is 0. Nothing counts streaks yet.
 - **Unused now:** the `Character` component is left over from the old Home and Your Character. Delete it in a cleanup.
 
@@ -87,9 +88,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
   - **Daily:** system generated. It renews every 24 hours and is based on the user's aspiration and archetype. This isn't built yet; `Quest.sampleDaily` is a fixed placeholder.
   - **Main and personal:** user generated, through Create Quest. Neither appears by default. The developer stated this for main quests; personal is treated the same because it's also offered on Create Quest.
 - **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
-- **Filters:** ALL shows everything, and the others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
+- **Filters:** ALL shows every open quest, available or active, and completed quests appear only under Completed so they don't pile up. The others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
 - **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
-- **Not connected yet:** cards and steps aren't tappable; Quest Details comes in its own step.
 - **Unused now:** `iconGamepad` is left over from the old card. Delete it in a cleanup.
 
 ## Create Quest
@@ -103,17 +103,26 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
 - **Placeholders:** main quests use the book icon and personal quests the hammer.
 - **Unused now:** nothing calls `AsphyrTextField` anymore. Delete it in a cleanup.
-- **Main quest card:** the status pill sits in the header, under the XP reward, in every state.
+- **Main quest card:** the status pill sits in the header, under the XP reward, when available or completed. The active card has no pill, as in Figma, because its green edge shows the state.
+
+## Quest Details
+- **Data:** opened with a quest's id and read from `QuestStore`, so the timer and status stay live on Home and in the log.
+- **Timer:** daily and personal quests time themselves from Accept, using `Quest.startedAt`, `pausedAt` and `pausedDuration`, so it keeps counting in the background. It doesn't stop at the duration: the bar stays full and the time left reads "Time's up", and the quest can be completed at any time.
+- **Complete Quest:** marks the quest completed, awards its XP and goes back. Reward comes in its own step.
+- **Abandon quest:** asks for confirmation and returns the quest to available, resetting the timer. A main quest keeps its ticked steps and their XP.
+- **Main quests (our own version):** no timer. A STEPS section with a progress bar replaces the timer card, and steps can be ticked once the quest is accepted. Completing needs every step ticked, otherwise "Finish every step to complete this quest." appears.
+- **Hidden when empty:** quests created by users have no objective, difficulty or attribute rewards yet, so those rows are hidden. Difficulty comes with the XP system.
+- **Completed quests:** open read-only, with no buttons.
 
 ## Quest rules
-- **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforce this when Quest Details adds starting a quest.
+- **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept shows a toast.
 - **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
 - **Deleting quests:** swipe left on a main or personal quest in the quest log, tap Delete, then confirm. Daily quests can't be deleted because the system renews them, and completed quests stay as a record. The cards are `List` rows, because swipe actions need one. Deleting gives no XP back or penalty yet; decide this when XP is real.
 
 ## XP and progression (future)
 - **Rewards are system inferred** from the estimated duration and how difficult the task is. Users don't set them. This may need AI to judge difficulty; not decided.
 - **Placeholder:** `QuestReward.xp(forMinutes:)` uses duration only: 15m is 25 XP, 30m is 50, 1h is 100 and 2h+ is 200. Replace it when the real system is designed. Sample and daily quests keep Figma's fixed values for now.
-- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Each step's XP is awarded when it's ticked, not all at the end, because a quest with no deadline can run for a long time. Build this with Quest Details.
+- **Main quests:** the total comes from the steps. The placeholder is 100 XP per step, which matches Figma's 5 steps and +500 XP. Each step's XP is awarded when it's ticked and taken back if it's unticked, not all at the end, because a quest with no deadline can run for a long time.
 
 ## Your Character
 - **Character art:** `characterNovice{Color}{Archetype}` holds the 24 combinations, one image each, so the hand stays in front of the item. `CharacterColor.noviceImageName(holdingItemOf:)` picks the image, and without an archetype it returns the empty-handed novice. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
@@ -139,9 +148,12 @@ In the character art, these replace `#2B303D` (top) and `#12141A` (bottom). The 
 - **Home:** move the header down 14pt to match the auth screens.
 - **Quests frames:** move the content down 14pt to line up with Home's header.
 - **`8 - Quests (All)`, `(Active)` and `(Available)`:** the default state has only the daily quest, marked available. Main and personal quests appear only after the user creates them. The Active frame's daily card and the "no logs" frames also need revisiting, because the daily quest means ALL and Available are never empty by default.
+- **Quest Details frames:** move the content down 14pt to match the lowered back button, and add a main quest version with steps and no timer, the paused state, "Time's up", the abandon confirmation and a completed state.
+- **Home:** change the section title by state ("ACTIVE QUEST", "TODAY'S QUEST", "AVAILABLE QUEST"), add the available state for any quest type, and `9.2`'s copy for more than one completed quest.
+- **`8 - Quests (All)`:** completed quests don't appear under ALL.
 - **Home:** make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started.
 - **Create Quest frames:** add the quest type selection (Main and Personal, Personal selected by default, the disabled states and the "Finish a quest to create a new one." error), Development selected by default, the XP changing with duration, and the steps section with its "Add at least one step." error. The sheet's content is taller as a result, so it can scroll.
-- **Main quest card:** move the status pill to the header under the XP reward, on the active state too, and add the available state.
+- **Main quest card:** add the available state, with the status pill in the header under the XP reward.
 - **Create Quest frames:** hide Estimated Duration for Main, with "100 XP for each step" in the reward card, and add the limit toasts.
 - **Quests frames:** add the swipe-to-delete action and its confirmation.
 - **`DESIGN-DECISIONS.md` or active quest cards:** the doc says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.

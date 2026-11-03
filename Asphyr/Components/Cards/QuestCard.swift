@@ -7,8 +7,7 @@
 
 import SwiftUI
 
-/// Home's quest card. The active state's elapsed-time row waits for the Quest
-/// Details timer.
+/// Home's quest card.
 struct QuestCard: View {
     let quest: Quest
 
@@ -68,6 +67,20 @@ struct QuestCard: View {
             }
             .padding(.top, 14)
 
+            if quest.hasTimer {
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    HStack(spacing: 8) {
+                        Image("iconQuestTimerSmall")
+                            .accessibilityHidden(true)
+
+                        Text("\(quest.elapsed(at: context.date).timerText) elapsed · \(quest.timeLeftText(at: context.date))")
+                            .font(AppTypography.captionMedium)
+                    }
+                    .foregroundStyle(Color.asphyrAccentPrimary)
+                }
+                .padding(.top, 14)
+            }
+
             Rectangle()
                 .fill(Color.asphyrBorder)
                 .frame(height: 1)
@@ -103,8 +116,8 @@ struct QuestCard: View {
             Text("+\(quest.xpReward) XP")
                 .padding(.leading, 4)
 
-            if let attributeReward = quest.attributeReward {
-                Text(attributeReward)
+            if let attributeReward = quest.attributeRewards.first {
+                Text("+\(attributeReward.value) \(attributeReward.name)")
                     .padding(.leading, 12)
             }
         }

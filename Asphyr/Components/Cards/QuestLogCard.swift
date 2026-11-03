@@ -88,7 +88,11 @@ struct QuestLogCard: View {
 
                 VStack(alignment: .trailing, spacing: 8) {
                     xpReward
-                    QuestStatus(status: quest.status)
+
+                    // The green edge already says this card is active
+                    if !isActive {
+                        QuestStatus(status: quest.status)
+                    }
                 }
             }
 
@@ -101,7 +105,7 @@ struct QuestLogCard: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(quest.steps) { step in
-                    stepRow(step)
+                    QuestStepRow(step: step)
                 }
             }
             .padding(.top, 14)
@@ -123,8 +127,12 @@ struct QuestLogCard: View {
             .lineLimit(1)
             .fixedSize()
     }
+}
 
-    private func stepRow(_ step: QuestStep) -> some View {
+struct QuestStepRow: View {
+    let step: QuestStep
+
+    var body: some View {
         HStack(spacing: 10) {
             Group {
                 if step.isDone {
@@ -143,6 +151,7 @@ struct QuestLogCard: View {
             Text(step.title)
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(step.isDone ? Color.asphyrTextSecondary : Color.asphyrTextPrimary)
+                .multilineTextAlignment(.leading)
         }
         .accessibilityElement(children: .combine)
         .accessibilityValue(step.isDone ? "Done" : "Not done")
