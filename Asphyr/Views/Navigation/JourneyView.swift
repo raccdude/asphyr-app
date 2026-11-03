@@ -205,7 +205,7 @@ struct JourneyView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             header
         }
-        .sensoryFeedback(.warning, trigger: lockedTapCount)
+        .hapticFeedback(.warning, trigger: lockedTapCount)
         .task(id: selectionCount) {
             guard selectedStar != nil else { return }
 
@@ -308,7 +308,7 @@ struct JourneyView: View {
                 .shadow(color: Color.asphyrAccentPrimary.opacity(0.6), radius: 4)
 
             ConstellationLines(constellation: constellation) { !(isReached($0.0) && isReached($0.1)) }
-                .stroke(Color.asphyrTextSecondary.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [3, 5]))
+                .stroke(Color.asphyrTextSecondary.opacity(0.55), style: StrokeStyle(lineWidth: 1, dash: [3, 5]))
         }
         .frame(width: JourneyLayout.shapeSize, height: JourneyLayout.shapeSize)
         .offset(x: JourneyLayout.origin.x, y: JourneyLayout.origin.y)
@@ -397,7 +397,7 @@ struct JourneyView: View {
                 .background(Color.asphyrSurfaceElevated, in: Circle())
                 .overlay {
                     Circle()
-                        .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+                        .strokeBorder(Color.asphyrTextSecondary.opacity(0.6), lineWidth: 1)
                 }
                 // A larger target that still leaves close neighbors tappable
                 .frame(width: 36, height: 36)

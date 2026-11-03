@@ -39,6 +39,17 @@ final class QuestStore {
         RewardRules.progress(totalXP: earnedXP).xpForLevel
     }
 
+    /// Clears everything earned. The account, name and identity stay.
+    func resetProgress() {
+        quests = []
+        earnedXP = 0
+        unlockedCloaks = []
+        earnedAchievements = []
+        seenLitStarCount = 0
+        announcedLevel = 1
+        attributeGains = [:]
+    }
+
     /// The quest on Home: what the user is working on, then today's daily quest,
     /// then the active main quest, then anything available. Nil once everything
     /// is finished, when Home shows its completion card.
@@ -66,6 +77,22 @@ final class QuestStore {
         }
         let hasActive = quests.contains { $0.type == .dailyQuest && $0.status == .active }
         guard !hasToday, !hasActive else { return }
+
+        quests.removeAll { $0.type == .dailyQuest && $0.status == .available }
+        quests.append(DailyQuests.quest(aspiration: aspiration, archetype: archetype, on: date))
+    }
+
+    /// Swaps today's daily quest after the aspiration or archetype changes. One
+    /// that's been started or finished today stays, so changing them can't earn
+    /// a second daily quest.
+    func renewDailyQuest(aspiration: String?, archetype: Archetype?, on date: Date = .now) {
+        let calendar = Calendar.current
+        let isTaken = quests.contains { quest in
+            guard quest.type == .dailyQuest else { return false }
+            let isToday = quest.generatedOn.map { calendar.isDate($0, inSameDayAs: date) } ?? false
+            return quest.status == .active || (quest.status == .completed && isToday)
+        }
+        guard !isTaken else { return }
 
         quests.removeAll { $0.type == .dailyQuest && $0.status == .available }
         quests.append(DailyQuests.quest(aspiration: aspiration, archetype: archetype, on: date))

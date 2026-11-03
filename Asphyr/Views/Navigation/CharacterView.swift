@@ -46,7 +46,7 @@ struct CharacterView: View {
                         )
                     }
                     .buttonStyle(PressableButtonStyle())
-                    .sensoryFeedback(.selection, trigger: mood)
+                    .hapticFeedback(.selection, trigger: mood)
                     .accessibilityLabel("Character")
                     .accessibilityHint("Changes the character’s expression")
                     .padding(.top, 8)
@@ -104,7 +104,7 @@ struct CharacterView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: toast)
-        .sensoryFeedback(.warning, trigger: lockedTapCount)
+        .hapticFeedback(.warning, trigger: lockedTapCount)
         .task(id: toastCount) {
             guard toast != nil else { return }
 

@@ -12,6 +12,7 @@ import SwiftUI
 struct RootView: View {
     @State private var router = AppRouter()
     @State private var profile = OnboardingProfile()
+    @State private var settings = AppSettings()
 
     var body: some View {
         Group {
@@ -46,6 +47,9 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.3), value: router.isInApp)
         .environment(router)
         .environment(profile)
+        .environment(settings)
+        .environment(\.hapticsEnabled, settings.soundsAndHaptics)
+        .preferredColorScheme(settings.appearance.colorScheme)
     }
 }
 

@@ -78,7 +78,7 @@ struct HomeView: View {
                         )
                     }
                     .buttonStyle(PressableButtonStyle())
-                    .sensoryFeedback(.selection, trigger: characterMood)
+                    .hapticFeedback(.selection, trigger: characterMood)
                     .accessibilityLabel("Character")
                     .accessibilityHint("Changes the character’s expression")
                     .padding(.top, -6)

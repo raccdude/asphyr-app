@@ -353,7 +353,7 @@ struct QuestDetailsView: View {
     private func blockerNotice(_ message: String) -> some View {
         notice(message)
             .modifier(ShakeEffect(shakes: CGFloat(blockedTapCount)))
-            .sensoryFeedback(.warning, trigger: blockedTapCount)
+            .hapticFeedback(.warning, trigger: blockedTapCount)
     }
 
     private func nudgeBlocker() {

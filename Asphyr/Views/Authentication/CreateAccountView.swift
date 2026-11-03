@@ -13,6 +13,7 @@ struct CreateAccountView: View {
     }
 
     @Environment(AppRouter.self) private var router
+    @Environment(OnboardingProfile.self) private var profile
 
     @State private var email: String = ""
     @State private var password: String = ""
@@ -173,6 +174,7 @@ struct CreateAccountView: View {
         showsMismatchError = !doPasswordsMatch
 
         if isEmailValid && PasswordChecklist.isValid(password) && doPasswordsMatch {
+            profile.email = email
             router.push(.identity)
         }
     }
@@ -183,4 +185,5 @@ struct CreateAccountView: View {
         CreateAccountView()
     }
     .environment(AppRouter())
+        .environment(OnboardingProfile())
 }

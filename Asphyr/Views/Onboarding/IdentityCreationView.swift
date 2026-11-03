@@ -12,7 +12,7 @@ struct IdentityCreationView: View {
         case name
     }
 
-    private static let aspirations = [
+    static let aspirations = [
         Aspiration(iconName: "iconLaptop", title: "Game Developer", description: "Build interactive games"),
         Aspiration(iconName: "iconWrench", title: "Mechanical Engineer", description: "Design & build systems"),
         Aspiration(iconName: "iconBulb", title: "Psychologist", description: "Understand the mind"),

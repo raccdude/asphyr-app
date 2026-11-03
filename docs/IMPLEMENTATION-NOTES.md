@@ -24,13 +24,15 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | XP system | Merged | `feat/xp-system` |
 | Journey | Merged | `feat/journey-constellations` |
 | Character | Merged | `feat/character-v2` |
-| Cloak layers | In review | `feat/cloak-layers` |
-| Settings | Not started | — |
+| Cloak layers | Merged | `feat/cloak-layers` |
+| Settings | In review | `feat/settings-v2` |
+| Streaks | Next | — |
+| Figma revisions | After every Figma screen is built | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
 - **On the router:** Splash, Welcome, Create Account, Login, Recover, Recovery Success, Identity, Archetype. Each `AuthRoute` case maps to one screen in `RootView`.
-- **Entering the app:** `router.enterApp()` swaps the root to `MainTabView` and clears the path, so nothing can swipe back to auth or onboarding. Log out in the Settings step needs the reverse.
+- **Entering the app:** `router.enterApp()` swaps the root to `MainTabView` and clears the path, so nothing can swipe back to auth or onboarding. `router.logOut()` is the reverse, returning to Welcome.
 - **Tabs:** Home and Quests each sit in their own `NavigationStack`, created in `MainTabView`. Home reaches Settings with `.navigationDestination(isPresented:)`, and both reach Quest Details with `.navigationDestination(item:)`. Journey and Character still create their own stacks.
 - Any `#Preview` of a screen that reads the router needs `.environment(AppRouter())`, or the preview crashes.
 - **Rules for a path-bound root stack (tested on the iOS 27.0 Simulator, 2 Nov 2026):**
@@ -213,6 +215,41 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 
 - **Inventory:** a full screen of what's owned and what's locked, opened from "View all" on Character. The CLOAKS row stays as a shortcut.
 
+## Settings
+- **Screens:** Settings, Profile & Identity and Notifications are pushed from Home, with the system back button. Appearance, Reset Progress, Profile Photo and Reminder Time are sheets.
+- **Preferences:** `AppSettings` holds them in memory, so they reset on relaunch until saving exists. They survive logging out and resetting progress.
+- **Appearance:** dark by default. Light and System work through the color sets, using Figma's Light values. Warning and the second accent keep one value, as Figma's Light frames don't define them.
+- **Notifications:** the daily quest reminder is a real local notification, scheduled by `ReminderNotifications` from the time and days chosen. Push starts Off, not On as in Figma, until iOS has been asked. If it's refused, the toggle stays off and a toast explains.
+- **Stored only:** Streak alerts need streaks, the Streaks toggle has no chip to hide until streaks are counted, and the Weekly progress summary needs the backend to send email.
+- **Sounds & haptics:** turns off all haptics through `hapticFeedback`, and the reminder's sound. The app has no other sounds yet.
+- **Reset Progress:** also clears cloaks and badges, and returns to the Starter cloak, because they're tied to XP and levels. Identity and preferences stay. A new daily quest appears straight away.
+- **Log out:** returns to Welcome and clears the profile. A sheet in the Reset Progress style warns that progress will be lost, since nothing is saved yet.
+- **Profile & Identity:** name, aspiration and archetype apply on Save Changes. The photo applies immediately, with a toast, because Save Changes only covers the fields below it. Email is read-only until real accounts exist. Changing aspiration changes Journey's constellations right away, keeping quest progress. Changing aspiration or archetype also swaps a daily quest that hasn't been started. One that's started or finished today stays, so it can't earn a second daily quest.
+- **Sheets:** partial-height sheets float with side margins on iOS 26, which is the system's own style, so they don't reach the screen's edges as in Figma.
+- **Photo:** Take photo is hidden where there's no camera, such as the simulator. Remove photo only shows when there's a photo. The photo is in memory only.
+
+## Character evolution (later)
+The character should change as the user levels up, as in Figma's section 11 (`13.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
+
+| Stage | Levels | Figma's description |
+|---|---|---|
+| Novice | 1–4 | Trim and sash |
+| Apprentice | 5–9 | Mantle and core |
+| Adept | 10–19 | |
+| Ascended | 20+ | Hood off and circlet |
+
+Plan this together with the character art redesign, and keep the layers so cloaks still work. Ascended's hood off will need the cloak layers rethought.
+
+## Gender (idea)
+Whether users can choose a gender is undecided, and nothing is built. The character is hooded and reads as neutral today, so this would mostly affect the art. Decide with the character art redesign. If it's added, it should be optional.
+
+## Light mode (later)
+Light mode works but needs its own design pass. Nothing here is built yet.
+- **Components:** review every screen's components and designs in Light.
+- **Settings icon:** the gear on Home looks off.
+- **Outlines:** many are hard to see. The Light border `#DCDFE6` is very close to the Light background `#F3F4F7`.
+- **Colors in screens:** colors written directly into screens, like the character art and star fields, don't change with the mode.
+
 ## Figma updates for later
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
@@ -259,6 +296,20 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 
 ### Reward: View in Character
 - Add "VIEW IN CHARACTER" under the expanded New Reward Unlocked card.
+
+### Contrast
+- Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.
+- Raise Journey's unlit lines, locked stars, and the sky map's path and locked shapes.
+
+### Settings
+- Add "Cloaks and badges" to Reset Progress's list, and make the sheet taller to fit.
+- Add the Log out sheet, Push notifications off by default, and the permission refused toast.
+- Add a success toast to `12.3 - Settings (progress reset)`, which has none.
+- Pin the version line to the bottom of Settings, 30pt above the screen's edge.
+- Show Save Changes as the green button at 40% when there's nothing to save, replacing the gray one.
+- Show sheets with iOS 26's side margins.
+- Add "Changes saved." on Profile & Identity, and show Remove photo only when there's a photo.
+- Replace the Light accent `#00C934` on the Appearance preview only if it should match the Light token `#00A82E`.
 
 ### Character art
 - Add the novice holding the book, brush and lantern, with each item in all six colors, the dark details on Snow and Yellow, and the white book lines on the dark colors.
@@ -325,7 +376,5 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **Medium:** Settings is a bare placeholder that follows the device appearance, so it can show white. Fix in its step.
-- **Medium:** the app follows the device appearance instead of defaulting to dark, and the color sets have no Light values.
+- **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.
 - **Low:** Figma's "Already have an account? LOG IN" row on Welcome sits about 5pt right of center. The code centers it deliberately; update Figma to match if that's agreed.
-- **Medium:** Home has no back control and no log out. Fix with the Settings step.

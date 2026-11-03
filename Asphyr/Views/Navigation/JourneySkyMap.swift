@@ -32,7 +32,7 @@ struct JourneySkyMap: View {
                 Path { path in
                     path.addLines(points)
                 }
-                .stroke(Color.asphyrTextSecondary.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [3, 6]))
+                .stroke(Color.asphyrTextSecondary.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [3, 6]))
                 .accessibilityHidden(true)
 
                 ForEach(chapters.indices, id: \.self) { index in
@@ -49,7 +49,7 @@ struct JourneySkyMap: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: showsToast)
-        .sensoryFeedback(.warning, trigger: toastCount)
+        .hapticFeedback(.warning, trigger: toastCount)
         .task(id: toastCount) {
             guard showsToast else { return }
 
@@ -82,7 +82,7 @@ struct JourneySkyMap: View {
                 toastCount += 1
             } label: {
                 ConstellationLines(constellation: chapters[index])
-                    .stroke(Color.asphyrTextSecondary.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [3, 4]))
+                    .stroke(Color.asphyrTextSecondary.opacity(0.65), style: StrokeStyle(lineWidth: 1, dash: [3, 4]))
                     .frame(width: Self.shapeSize, height: Self.shapeSize)
                     .contentShape(Rectangle())
                     .modifier(ShakeEffect(shakes: CGFloat(shakes[index])))

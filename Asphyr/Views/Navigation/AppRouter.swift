@@ -44,6 +44,12 @@ final class AppRouter {
         path = []
     }
 
+    /// Returns to Welcome. Swapping the root also clears the tabs' state.
+    func logOut() {
+        path = [.welcome]
+        isInApp = false
+    }
+
     /// Returns to the Login screen already on the stack.
     func popToLogin() {
         guard let index = path.lastIndex(of: .login) else { return }

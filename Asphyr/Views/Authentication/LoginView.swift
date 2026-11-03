@@ -13,6 +13,7 @@ struct LoginView: View {
     }
 
     @Environment(AppRouter.self) private var router
+    @Environment(OnboardingProfile.self) private var profile
 
     @State private var email: String = ""
     @State private var password: String = ""
@@ -126,6 +127,7 @@ struct LoginView: View {
         focus = nil
 
         if email.isValidEmail && !password.isEmpty {
+            profile.email = email
             router.enterApp()
         } else {
             showsError = true
@@ -138,4 +140,5 @@ struct LoginView: View {
         LoginView()
     }
     .environment(AppRouter())
+        .environment(OnboardingProfile())
 }

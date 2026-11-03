@@ -108,7 +108,7 @@ struct RewardView: View {
             .background(Color.asphyrBackground)
         }
         .background(Color.asphyrBackground.ignoresSafeArea())
-        .sensoryFeedback(.success, trigger: isRevealed)
+        .hapticFeedback(.success, trigger: isRevealed)
         .onAppear {
             isRevealed = true
         }
