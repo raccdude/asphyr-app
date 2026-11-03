@@ -8,9 +8,32 @@ import UserNotifications
 /// Schedules the daily quest reminder on the device, so it needs no backend.
 enum ReminderNotifications {
     private static let idPrefix = "dailyQuestReminder"
+    private static let streakAlertID = "streakAlert"
 
     static func requestPermission() async -> Bool {
         (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) ?? false
+    }
+
+    /// Replaces the streak alert. Finishing a quest moves it to the next day.
+    static func updateStreakAlert(from settings: AppSettings, completions: [Date]) {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [streakAlertID])
+
+        guard settings.pushNotifications, settings.streakAlerts, settings.showsStreaks,
+              let date = StreakRules.alertDate(completions: completions)
+        else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "ASPHYR"
+        content.body = "Your flame is still burning. Finish any quest today to keep your streak."
+        content.sound = settings.soundsAndHaptics ? .default : nil
+
+        let time = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        center.add(UNNotificationRequest(
+            identifier: streakAlertID,
+            content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: time, repeats: false)
+        ))
     }
 
     /// Replaces any scheduled reminders with what the settings now say.

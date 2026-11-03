@@ -28,11 +28,14 @@ private enum MainTab: String, CaseIterable, Identifiable {
 extension EnvironmentValues {
     /// Switches to the Character tab, for screens that link to it.
     @Entry var openCharacter: () -> Void = {}
+    /// Switches to the Quests tab.
+    @Entry var openQuests: () -> Void = {}
 }
 
 struct MainTabView: View {
     @State private var selection: MainTab = .home
     @Environment(OnboardingProfile.self) private var profile
+    @Environment(AppSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var questStore = QuestStore(quests: [])
@@ -66,13 +69,24 @@ struct MainTabView: View {
         }
         .environment(questStore)
         .environment(\.openCharacter) { selection = .character }
+        .environment(\.openQuests) { selection = .quests }
         .onAppear(perform: refreshDailyQuest)
+        .onAppear(perform: updateStreakAlert)
+        .onChange(of: questStore.completionDates) { updateStreakAlert() }
+        .onChange(of: settings.pushNotifications) { updateStreakAlert() }
+        .onChange(of: settings.streakAlerts) { updateStreakAlert() }
+        .onChange(of: settings.showsStreaks) { updateStreakAlert() }
         // A new day can start while the app is in the background
         .onChange(of: scenePhase) {
             if scenePhase == .active {
                 refreshDailyQuest()
+                updateStreakAlert()
             }
         }
+    }
+
+    private func updateStreakAlert() {
+        ReminderNotifications.updateStreakAlert(from: settings, completions: questStore.completionDates)
     }
 
     private func refreshDailyQuest() {
@@ -152,4 +166,5 @@ private extension View {
 #Preview {
     MainTabView()
         .environment(OnboardingProfile())
+        .environment(AppSettings())
 }

@@ -14,6 +14,7 @@ struct SpiritView: View {
         case focused = "spiritFocused"
         case surprised = "spiritSurprised"
         case cheer = "spiritCheer"
+        case happy = "spiritHappy"
         case sleepy = "spiritSleepy"
     }
 

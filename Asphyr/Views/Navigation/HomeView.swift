@@ -23,16 +23,24 @@ struct HomeView: View {
         GridItem(.flexible(), spacing: 12)
     ]
 
-    /// Nothing counts streaks yet. The chip stays hidden at 0.
-    private let streakDays = 0
-
     @Environment(OnboardingProfile.self) private var profile
     @Environment(QuestStore.self) private var questStore
+    @Environment(AppSettings.self) private var settings
 
     @State private var isShowingSettings = false
+    @State private var isShowingStreak = false
     @State private var selectedQuestID: UUID?
     @State private var isShowingCreateQuest = false
     @State private var characterMood: CharacterPortrait.Mood = .idle
+
+    private var streak: StreakStatus {
+        StreakRules.status(completions: questStore.completionDates)
+    }
+
+    /// The character sleeps along with the flame, unless streaks are hidden.
+    private var isResting: Bool {
+        settings.showsStreaks && streak.state == .resting
+    }
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: .now) {
@@ -140,6 +148,17 @@ struct HomeView: View {
             header
         }
         .toolbar(.hidden, for: .navigationBar)
+        .sheet(isPresented: $isShowingStreak) {
+            StreakSheet(status: streak)
+        }
+        .onAppear {
+            if isResting {
+                characterMood = .sleepy
+            }
+        }
+        .onChange(of: isResting) {
+            characterMood = isResting ? .sleepy : .idle
+        }
         .navigationDestination(isPresented: $isShowingSettings) {
             SettingsView()
         }
@@ -166,8 +185,17 @@ struct HomeView: View {
 
             Spacer(minLength: 0)
 
-            if streakDays > 0 {
-                streakChip
+            if settings.showsStreaks, streak.state != .none {
+                Button {
+                    isShowingStreak = true
+                } label: {
+                    if streak.state == .resting {
+                        restingChip
+                    } else {
+                        streakChip
+                    }
+                }
+                .buttonStyle(.plain)
             }
 
             Button {
@@ -193,7 +221,7 @@ struct HomeView: View {
     private var streakChip: some View {
         HStack(spacing: 6) {
             Image("iconFlame")
-            Text("\(streakDays)")
+            Text("\(streak.days)")
                 .font(AppTypography.subheading)
         }
         .foregroundStyle(Color.asphyrAccentPrimary)
@@ -205,7 +233,25 @@ struct HomeView: View {
                 .strokeBorder(Color.asphyrAccentPrimary.opacity(0.4), lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(streakDays)-day streak")
+        .accessibilityLabel("\(streak.days)-day streak")
+    }
+
+    private var restingChip: some View {
+        HStack(spacing: 6) {
+            Image("iconFlame")
+            Text("Rest")
+                .font(AppTypography.bodySecondary)
+        }
+        .foregroundStyle(Color.asphyrTextSecondary)
+        .padding(.horizontal, 10)
+        .frame(height: 36)
+        .background(Color.asphyrSurface, in: Capsule())
+        .overlay {
+            Capsule()
+                .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Your flame is resting")
     }
 
     @ViewBuilder
@@ -250,4 +296,33 @@ struct HomeView: View {
     }
     .environment(OnboardingProfile())
     .environment(QuestStore())
+    .environment(AppSettings())
+}
+
+/// A store with a quest finished on each of these days ago.
+private func storeWithQuests(finishedDaysAgo days: [Double]) -> QuestStore {
+    QuestStore(quests: days.map { daysAgo in
+        var quest = Quest.sampleDaily
+        quest.status = .completed
+        quest.completedAt = .now.addingTimeInterval(-daysAgo * 86_400)
+        return quest
+    })
+}
+
+#Preview("Streak active") {
+    NavigationStack {
+        HomeView()
+    }
+    .environment(OnboardingProfile())
+    .environment(storeWithQuests(finishedDaysAgo: [1, 2, 3]))
+    .environment(AppSettings())
+}
+
+#Preview("Streak resting") {
+    NavigationStack {
+        HomeView()
+    }
+    .environment(OnboardingProfile())
+    .environment(storeWithQuests(finishedDaysAgo: [2, 3]))
+    .environment(AppSettings())
 }

@@ -64,6 +64,11 @@ final class QuestStore {
         quests.filter { $0.status == .completed }
     }
 
+    /// When each finished quest was finished, which is what streaks count.
+    var completionDates: [Date] {
+        completedQuests.compactMap(\.completedAt)
+    }
+
     func attributeValue(named name: String) -> Int {
         10 + attributeGains[name, default: 0]
     }
@@ -244,7 +249,7 @@ final class QuestStore {
         unlockedCloaks += newCloaks
 
         earnedAchievements.formUnion(Achievement.earned(
-            completionDates: completedQuests.compactMap(\.completedAt),
+            completionDates: completionDates,
             level: level,
             knowledge: attributeValue(named: "KNOWLEDGE"),
             problemSolving: attributeValue(named: "PROBLEM SOLVING")

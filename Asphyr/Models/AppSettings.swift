@@ -28,7 +28,7 @@ final class AppSettings {
     }
 
     var appearance: Appearance = .dark
-    /// Nothing counts streaks yet, so Home has no chip to hide.
+    /// Whether Home shows the streak. Streaks are still counted when it's off.
     var showsStreaks = true
     var soundsAndHaptics = true
 
@@ -38,7 +38,6 @@ final class AppSettings {
     var reminderHour = 8
     var reminderMinute = 0
     var reminderDays: Set<Int> = [0, 1, 2, 3, 4]
-    /// Stored for when streaks exist.
     var streakAlerts = false
     /// Stored for when the backend can send email.
     var weeklySummary = false

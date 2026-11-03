@@ -26,7 +26,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Character | Merged | `feat/character-v2` |
 | Cloak layers | Merged | `feat/cloak-layers` |
 | Settings | In review | `feat/settings-v2` |
-| Streaks | Next | — |
+| Streaks | In review | `feat/streaks-v2` |
 | Figma revisions | After every Figma screen is built | — |
 
 ## Navigation
@@ -220,13 +220,22 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Preferences:** `AppSettings` holds them in memory, so they reset on relaunch until saving exists. They survive logging out and resetting progress.
 - **Appearance:** dark by default. Light and System work through the color sets, using Figma's Light values. Warning and the second accent keep one value, as Figma's Light frames don't define them.
 - **Notifications:** the daily quest reminder is a real local notification, scheduled by `ReminderNotifications` from the time and days chosen. Push starts Off, not On as in Figma, until iOS has been asked. If it's refused, the toggle stays off and a toast explains.
-- **Stored only:** Streak alerts need streaks, the Streaks toggle has no chip to hide until streaks are counted, and the Weekly progress summary needs the backend to send email.
+- **Stored only:** the Weekly progress summary needs the backend to send email.
 - **Sounds & haptics:** turns off all haptics through `hapticFeedback`, and the reminder's sound. The app has no other sounds yet.
 - **Reset Progress:** also clears cloaks and badges, and returns to the Starter cloak, because they're tied to XP and levels. Identity and preferences stay. A new daily quest appears straight away.
 - **Log out:** returns to Welcome and clears the profile. A sheet in the Reset Progress style warns that progress will be lost, since nothing is saved yet.
 - **Profile & Identity:** name, aspiration and archetype apply on Save Changes. The photo applies immediately, with a toast, because Save Changes only covers the fields below it. Email is read-only until real accounts exist. Changing aspiration changes Journey's constellations right away, keeping quest progress. Changing aspiration or archetype also swaps a daily quest that hasn't been started. One that's started or finished today stays, so it can't earn a second daily quest.
 - **Sheets:** partial-height sheets float with side margins on iOS 26, which is the system's own style, so they don't reach the screen's edges as in Figma.
 - **Photo:** Take photo is hidden where there's no camera, such as the simulator. Remove photo only shows when there's a photo. The photo is in memory only.
+
+## Streaks
+- **What counts:** a day with any finished quest, including bonus-reward ones. Ticking a main quest's step doesn't count, as Figma says "Finish any quest". Rules are in `StreakRules`, counted from the finished quests, so resetting progress clears them.
+- **Active:** a streak stays alive until the end of the day after the last finished quest, so today shows as open until a quest is finished.
+- **Resting:** with nothing finished yesterday or today, Home shows the Rest chip and the sleeping character, and the sheet offers Find a Quest, which opens Quests. The next quest starts again from 1. Nothing is ever taken away.
+- **New users:** Home shows no chip until the first quest is finished, as there's nothing to count.
+- **Toggles:** Show streak on Home and the Settings toggle are the same setting. Off hides the chip and the sleeping character, and stops the alert.
+- **Streak alerts:** a real local notification at 8 PM on the last day that keeps the streak going. Finishing a quest moves it to the next day.
+- **Known limit:** streaks use the phone's clock and reset on relaunch until saving exists.
 
 ## Character evolution (later)
 The character should change as the user levels up, as in Figma's section 11 (`13.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
@@ -296,6 +305,10 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 
 ### Reward: View in Character
 - Add "VIEW IN CHARACTER" under the expanded New Reward Unlocked card.
+
+### Streaks
+- Hide the chip on Home until the first quest is finished.
+- Add a state for a one-day streak: "You took a step today." or "You took a step yesterday."
 
 ### Contrast
 - Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.
