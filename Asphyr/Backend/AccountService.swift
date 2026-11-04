@@ -31,6 +31,11 @@ enum AccountError: Error, Equatable {
     case unknown
 
     init(_ error: Error) {
+        if let error = error as? AccountError {
+            self = error
+            return
+        }
+
         if error is URLError {
             self = .noConnection
             return
@@ -77,13 +82,9 @@ enum AccountService {
     }
 
     /// Runs for as long as the app is open.
-    static func followEvents(onPasswordRecovery: () -> Void, onSignedOut: () -> Void) async {
-        for await (event, _) in Backend.client.auth.authStateChanges {
-            switch event {
-            case .passwordRecovery: onPasswordRecovery()
-            case .signedOut: onSignedOut()
-            default: break
-            }
+    static func followSignOuts(_ onSignedOut: () -> Void) async {
+        for await (event, _) in Backend.client.auth.authStateChanges where event == .signedOut {
+            onSignedOut()
         }
     }
 
@@ -116,9 +117,16 @@ enum AccountService {
         }
     }
 
-    /// Reset links open the app, which then sends a `.passwordRecovery` event.
-    static func handle(_ url: URL) {
-        Backend.client.auth.handle(url)
+    static func isPasswordResetLink(_ url: URL) -> Bool {
+        url.scheme == Backend.passwordResetURL.scheme && url.host == Backend.passwordResetURL.host
+    }
+
+    /// Signs in from a reset link. This kind of link doesn't send a password recovery
+    /// event, so the caller opens the new password screen when this succeeds.
+    static func openPasswordResetLink(_ url: URL) async throws {
+        try await perform {
+            try await Backend.client.auth.session(from: url)
+        }
     }
 
     private static func perform<T>(_ action: () async throws -> T) async throws {

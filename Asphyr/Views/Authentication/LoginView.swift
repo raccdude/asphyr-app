@@ -140,8 +140,8 @@ struct LoginView: View {
 
             do {
                 try await AccountService.logIn(email: email, password: password)
-                profile.email = email
-                router.enterApp()
+                try await ProfileService.load(into: profile)
+                router.showAccount(isOnboarded: profile.isComplete)
             } catch {
                 errorMessage = (error as? AccountError ?? .unknown).message
             }

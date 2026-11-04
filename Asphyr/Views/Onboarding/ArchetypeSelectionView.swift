@@ -12,6 +12,8 @@ struct ArchetypeSelectionView: View {
     @Environment(OnboardingProfile.self) private var profile
 
     @State private var showsArchetypeError = false
+    @State private var saveError: String?
+    @State private var isBusy = false
 
     var body: some View {
         AuthScreen(onboardingStep: 2) {
@@ -63,7 +65,12 @@ struct ArchetypeSelectionView: View {
 
                 Spacer(minLength: 24)
 
-                PrimaryButton(title: "BEGIN", action: begin)
+                if let saveError {
+                    FieldErrorRow(message: saveError)
+                        .padding(.bottom, 8)
+                }
+
+                PrimaryButton(title: "BEGIN", isBusy: isBusy, action: begin)
             }
             .padding(.horizontal, 20)
         }
@@ -77,8 +84,19 @@ struct ArchetypeSelectionView: View {
     private func begin() {
         showsArchetypeError = profile.archetype == nil
 
-        if !showsArchetypeError {
-            router.enterApp()
+        guard !showsArchetypeError else { return }
+
+        saveError = nil
+        isBusy = true
+        Task {
+            defer { isBusy = false }
+
+            do {
+                try await ProfileService.save(profile)
+                router.enterApp()
+            } catch {
+                saveError = (error as? AccountError ?? .unknown).message
+            }
         }
     }
 }

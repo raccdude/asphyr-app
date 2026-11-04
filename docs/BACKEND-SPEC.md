@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Step 2 is built, and waiting on the developer's check:** email accounts in the app.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are built, and waiting on the developer's check:** email accounts, and the profile saved to the account. Settings are saved on the device.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -95,6 +95,7 @@ Supabase's security and performance advisors reported nothing.
 ## Before release, not in these steps
 - Custom email sending for sign-up and reset emails, as Supabase's built-in sender is limited.
 - A privacy policy, from the developer.
+- Password AutoFill: Associated Domains with an `apple-app-site-association` file on a website the developer owns. It needs the paid Apple Developer account, and could also replace the `asphyr://` reset link.
 - Moving the existing Figma frames to any new states these steps add.
 
 ## Risks

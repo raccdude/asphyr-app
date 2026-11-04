@@ -56,6 +56,16 @@ final class AppRouter {
         isInApp = false
     }
 
+    /// After an account loads: the tabs, or back to onboarding if it wasn't finished.
+    func showAccount(isOnboarded: Bool) {
+        if isOnboarded {
+            enterApp()
+        } else {
+            path = [.welcome, .identity]
+            isInApp = false
+        }
+    }
+
     /// From a password reset link, wherever the app was.
     func showNewPassword() {
         path = [.welcome, .newPassword]

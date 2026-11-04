@@ -11,6 +11,10 @@ struct SplashView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(AppRouter.self) private var router
 
+    /// Set while a signed-in account loads: the prompt is hidden, because the app moves on by itself.
+    var isReturningUser = false
+    var onContinue: (() -> Void)?
+
     @State private var showLogo: Bool = false
     @State private var isPulsing: Bool = false
 
@@ -68,7 +72,7 @@ struct SplashView: View {
             VStack {
                 Spacer()
 
-                Text("TAP ANYWHERE TO BEGIN")
+                Text(isReturningUser ? "" : "TAP ANYWHERE TO BEGIN")
                     .font(AppTypography.captionMedium)
                     .foregroundStyle(Color.asphyrTextSecondary)
                     .multilineTextAlignment(.center)
@@ -89,7 +93,11 @@ struct SplashView: View {
         .ignoresSafeArea()
         .contentShape(Rectangle())
         .onTapGesture {
-            router.push(.welcome)
+            if let onContinue {
+                onContinue()
+            } else {
+                router.push(.welcome)
+            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Asphyr")

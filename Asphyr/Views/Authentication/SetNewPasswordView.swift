@@ -12,6 +12,7 @@ struct SetNewPasswordView: View {
     }
 
     @Environment(AppRouter.self) private var router
+    @Environment(OnboardingProfile.self) private var profile
 
     @State private var password = ""
     @State private var passwordConfirmation = ""
@@ -107,7 +108,8 @@ struct SetNewPasswordView: View {
 
             do {
                 try await AccountService.updatePassword(password)
-                router.enterApp()
+                try await ProfileService.load(into: profile)
+                router.showAccount(isOnboarded: profile.isComplete)
             } catch {
                 errorMessage = (error as? AccountError ?? .unknown).message
             }
@@ -120,4 +122,5 @@ struct SetNewPasswordView: View {
         SetNewPasswordView()
     }
     .environment(AppRouter())
+    .environment(OnboardingProfile())
 }

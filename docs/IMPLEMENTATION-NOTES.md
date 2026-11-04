@@ -41,8 +41,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
-| Backend step 2: email accounts | Built, not merged | `feat/backend-accounts` |
-| Backend steps 3 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
+| Backend steps 2 and 3: email accounts and profile | Built, not merged | `feat/backend-accounts` |
+| Backend steps 4 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -74,18 +74,21 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Validation:** errors appear when leaving a field and on submit, and clear when that field is edited. A weak password blocks submit and keeps the checklist visible, a state Figma has no frame for.
 - **Header (all auth screens):** Create Account, Login, Account Recovery and Recovery Success share `AuthScreen` and `AuthHeader`, so change spacing there and it applies everywhere. Welcome also uses `AuthScreen`, with `showsBackButton: false`, so its wordmark sits in the same position. Home has its own wordmark; line it up in the Home step. `AuthTopBar` draws a custom glass back button and hides the system bar, an exception recorded in DESIGN-DECISIONS.md. Swipe-back is turned on only while that screen is visible, so Welcome and Home stay unaffected. The back button starts at 76pt on iPhone 18 Pro.
 - **Backend choice:** Supabase, chosen on 4 Nov 2026 over Firebase. ASPHYR's data is connected and suits tables, Edge Functions can check rewards on the server, and standard Postgres avoids lock-in. The first release doesn't need to work fully offline, as decided on the same day, so it won't build offline sync. It still needs clear loading and no-connection states.
+- **Opening the app:** a signed-in user sees Splash without its prompt while the profile loads, for at least 1.2 seconds so the animation plays, then the tabs, or Build Your Identity if onboarding wasn't finished. Tapping moves on as soon as the profile is ready. There's no tap requirement, because this is an app people open daily. With no connection, `AccountLoadingView` offers Try again and Log out.
+- **Profile:** `ProfileService` saves it when onboarding finishes, and half a second after a change in the tabs. Settings are saved on the device.
 - **Email accounts are real:** sign-up, login, logout, password reset and staying signed in use Supabase, through `Backend/AccountService.swift`. The Apple and Google buttons stay display only until backend step 6.
 - **`StatusError`** is now `#FF5C5C`, Figma's Error value.
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
 ## Login
+- **Password suggestions:** the field types are set, but iOS only links saved passwords to the app with Associated Domains, which needs the paid Apple Developer account and a website the developer owns. Set this up before release.
 - **Errors:** a malformed email, an empty field or wrong details show "Incorrect email or password", and connection and rate-limit problems show their own message. All clear on edit.
 - **After login:** goes to the tabs through `router.enterApp()`.
 - **Save Password prompt:** iOS offers this after logging in, and it stays on purpose. It's standard, and the same field settings let password managers fill in the login.
 
 ## Account Recovery
 - **Spirit:** `SpiritView` shows wave, focused, surprised or cheer, and crossfades between them. The assets are original-color SVGs in the catalog. Add other moods there when their screens are built.
-- **Reset email:** Supabase sends the link, which opens `asphyr://reset-password` and then `SetNewPasswordView`. Resend starts a 30-second countdown. An unknown email still shows success, so the screen can't reveal who has an account. The link must be opened on the device that asked for it.
+- **Reset email:** Supabase sends the link, which opens `asphyr://reset-password` and then `SetNewPasswordView`. These links don't send a password recovery event, so `RootView` opens the screen itself. Each link works once, and an expired or used one shows a toast. Resend starts a 30-second countdown. An unknown email still shows success, so the screen can't reveal who has an account. The link must be opened on the device that asked for it.
 - **Keyboard:** the email field sits low, so Recovery scrolls it into view when focused. `AuthTopBar` has a solid background so scrolling content doesn't show behind the wordmark. Use the same scroll approach on any screen with a low field.
 - **`AsphyrToast`** is reusable, with a Reset Progress toast planned in DESIGN-DECISIONS.md.
 
@@ -339,6 +342,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 ### Accounts
 - Add a Set New Password frame, matching `SetNewPasswordView`, and the busy state on the primary button.
+- Add the no-connection screen, matching `AccountLoadingView`.
 - Add the new account errors on Create Account, Login and Account Recovery if they should have frames.
 
 ### Planned designs
@@ -375,6 +379,8 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **High, until backend steps 3 and 4:** accounts are real, but profile and progress still aren't saved. After a relaunch, a signed-in user goes to the tabs as "Traveler" with empty progress, and logging back in does the same.
+- **High, until backend step 4:** quests, XP, attributes, cloaks and badges aren't saved, so they reset on relaunch and after logging out. The name, color, aspiration and archetype are saved.
+- **Low, until backend step 5:** the profile photo isn't saved.
+- **Low:** if a profile change fails to save in the tabs, nothing tells the user. It saves with the next change.
 - **High, until backend step 5:** Delete Account only signs out and clears the device. The login stays on the server.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.

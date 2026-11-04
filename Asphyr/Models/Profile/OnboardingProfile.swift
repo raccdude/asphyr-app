@@ -8,8 +8,8 @@
 import Foundation
 import Observation
 
-/// The answers given during onboarding. Kept in memory until a backend exists,
-/// so they reset when the app relaunches.
+/// The answers given during onboarding, saved to the account by `ProfileService`.
+/// The photo and worn cloak stay in memory for now, so they reset on relaunch.
 @Observable
 final class OnboardingProfile {
     var name: String = ""
@@ -21,6 +21,11 @@ final class OnboardingProfile {
     var archetype: Archetype?
     /// The cloak being worn, or nil for the starter look.
     var cloak: CharacterCloak?
+
+    /// Whether onboarding was finished, so a returning user can skip it.
+    var isComplete: Bool {
+        !name.isEmpty && aspiration != nil && archetype != nil
+    }
 
     func clear() {
         name = ""
