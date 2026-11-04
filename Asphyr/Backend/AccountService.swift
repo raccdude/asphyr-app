@@ -90,13 +90,13 @@ enum AccountService {
 
     static func signUp(email: String, password: String) async throws {
         try await perform {
-            try await Backend.client.auth.signUp(email: email, password: password)
+            try await Backend.client.auth.signUp(email: cleaned(email), password: password)
         }
     }
 
     static func logIn(email: String, password: String) async throws {
         try await perform {
-            try await Backend.client.auth.signIn(email: email, password: password)
+            try await Backend.client.auth.signIn(email: cleaned(email), password: password)
         }
     }
 
@@ -107,7 +107,7 @@ enum AccountService {
 
     static func sendPasswordReset(email: String) async throws {
         try await perform {
-            try await Backend.client.auth.resetPasswordForEmail(email, redirectTo: Backend.passwordResetURL)
+            try await Backend.client.auth.resetPasswordForEmail(cleaned(email), redirectTo: Backend.passwordResetURL)
         }
     }
 
@@ -127,6 +127,12 @@ enum AccountService {
         try await perform {
             try await Backend.client.auth.session(from: url)
         }
+    }
+
+    /// Keyboard suggestions can leave a space after an email, which would stop it
+    /// matching an account.
+    private static func cleaned(_ email: String) -> String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     private static func perform<T>(_ action: () async throws -> T) async throws {

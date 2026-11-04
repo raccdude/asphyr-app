@@ -41,7 +41,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
-| Backend steps 2 and 3: email accounts and profile | Built, not merged | `feat/backend-accounts` |
+| Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
 | Backend steps 4 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 

@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are built, and waiting on the developer's check:** email accounts, and the profile saved to the account. Settings are saved on the device.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. Step 4 is next.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
