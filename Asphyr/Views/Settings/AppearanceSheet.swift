@@ -100,7 +100,7 @@ struct AppearanceSheet: View {
         case .light:
             miniScreen(
                 background: Self.lightBackground,
-                accent: Color(red: 0, green: 201 / 255, blue: 52 / 255),          // #00C934
+                accent: Color(red: 0, green: 168 / 255, blue: 46 / 255),          // #00A82E
                 card: Color(red: 217 / 255, green: 220 / 255, blue: 227 / 255)    // #D9DCE3
             )
         case .system:

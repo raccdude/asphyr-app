@@ -1,6 +1,6 @@
 # ASPHYR — Design decisions (Figma v2 refinement, 28 Oct 2026)
 
-These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should carry into the SwiftUI build.
+These decisions were made for Figma page **"05 — Hi-Fi v2 (Polished)"** and carried into the SwiftUI build. The current design is page **"06 — Hi-Fi v3 (App revisions)"**, and later changes are in `IMPLEMENTATION-NOTES.md`.
 
 ## Global
 - **Dark mode is the default.** Light and System are options in Settings › Appearance.
@@ -16,7 +16,7 @@ These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should 
   - the flame spirit.
 - **Typography:** every text layer uses one of the 10 Figma text styles (Word Mark, DISPLAY, Screen Title, Section, Heading, Body, Body Semi Bold, Secondary, Caption Medium, Caption Regular). No in-between sizes. These should map 1:1 to `AppTypography`.
 - **Primary button:** the original tight shadow (#2FAF4F, y 2, blur 4) and a Section (Space Grotesk Bold 20) label. No large green blur.
-- **Active quest card:** a subtle glow only (y 4, blur 12, 30% green).
+- **Active quest card:** a hard green edge (y 1, blur 2, 100% green), as in Figma. On Home, the active card also has the Comet border.
 - **Selected archetype/aspiration card:** the original style, Elevated Surface fill + green drop shadow (y 1, blur 2). No solid green border.
 - **Back button:** the iOS 26 **system** back button (round glass chevron). It keeps swipe-back working, so stop hiding it with `.navigationBarBackButtonHidden(true)`.
   - **Exception:** Welcome keeps it hidden, because going back to Splash gives the user nothing.
@@ -31,7 +31,7 @@ These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should 
 - **Resend email:** a toast ("Reset link sent again…") and a 30 s cooldown line.
 - **Reset Progress:** after confirming, return to Settings with a success toast. The Level resets to 1 and 0/500 XP; identity is unchanged.
 - **Quest Details timer:** a compact card with elapsed / total time, a linear progress bar, start time, time left and Pause.
-- **Reward:** XP, Creativity and Discipline rows top to bottom, then Level up, then "New reward unlocked".
+- **Reward:** the app now uses loot cards, and another redesign is planned. See `IMPLEMENTATION-NOTES.md`.
   - Tapping the reward card expands it in place (the achievement plus "View in Character"). There is no separate screen.
   - The spirit uses the cheer expression.
 - **Empty/default states:**

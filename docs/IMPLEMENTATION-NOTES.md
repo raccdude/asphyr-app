@@ -36,6 +36,10 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Settings | Merged | `feat/settings-v2` |
 | Streaks | Merged | `feat/streaks-v2` |
 | Figma revisions | Merged. Prototype and a few small items remain, listed under Figma updates | `docs/figma-revisions` |
+| Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
+| Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
+| Backend (Supabase) | Next | — |
+| Store, Inventory and currency | After the backend | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -61,7 +65,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Bundled weights:** only the ones in use: Inter Regular, Medium and SemiBold, and Space Grotesk Medium and Bold. To use another weight, add its file to `Fonts`, the project and `UIAppFonts`.
 
 ## Create Account
-- **Components for Figma v2 auth screens:** `AuthTopBar`, `AsphyrInputField`, `FieldErrorRow`, `PasswordChecklist`, `SocialSignInRow`, `OrDivider`, `AuthSwitchPrompt`. Login uses these too. Delete `AsphyrTextField` once the recovery and Identity screens move off it.
+- **Components for Figma v2 auth screens:** `AuthTopBar`, `AsphyrInputField`, `FieldErrorRow`, `PasswordChecklist`, `SocialSignInRow`, `OrDivider`, `AuthSwitchPrompt`. Login uses these too.
 - **Input field taps:** keep the focus tap gesture behind the text field. On top of it, iOS reads the tap as a second tap and selects the whole word, so the next key replaces the value.
 - **Validation:** errors appear when leaving a field and on submit, and clear when that field is edited. A weak password blocks submit and keeps the checklist visible, a state Figma has no frame for.
 - **Header (all auth screens):** Create Account, Login, Account Recovery and Recovery Success share `AuthScreen` and `AuthHeader`, so change spacing there and it applies everywhere. Welcome also uses `AuthScreen`, with `showsBackButton: false`, so its wordmark sits in the same position. Home has its own wordmark; line it up in the Home step. `AuthTopBar` draws a custom glass back button and hides the system bar, an exception recorded in DESIGN-DECISIONS.md. Swipe-back is turned on only while that screen is visible, so Welcome and Home stay unaffected. The back button starts at 76pt on iPhone 18 Pro.
@@ -202,11 +206,14 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Redesign planned:** the character art will be redesigned. Nothing is decided yet. New art should keep the same layers (base, cloak back, tunic, cloak front, details, hands), so `CharacterArt` and the cloak colors keep working.
 
 ## Store and inventory (planned)
-Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new cloaks are done. The order from here is: build Settings, add saving on the device, then build the currency, Store and Inventory. Real money waits until after the backend.
-- **Store:** cosmetics only, bought with a separate currency earned from quests, never with XP. The name isn't final; Embers is the suggestion.
+Agreed on 3 Nov 2026 and updated on 4 Nov 2026. Not built, and Figma has no frames yet. Build it after the backend, so what people earn is saved from the start. Device-only saving is dropped, because Supabase replaces it.
+- **Where it lives:** a store icon on Home, in the top row with Settings and the streak chip, or in the greeting row. Which row isn't decided; compare both when designing it.
+- **Layout:** the icon opens one screen with two tabs: **Store**, where cosmetics are bought, and **Inventory**, with what's owned and what's locked.
+- **Cloaks move here:** the developer prefers cloaks in Inventory rather than on Character, so the CLOAKS grid and its toasts leave Character when this is built. The character itself stays on Character, wearing what was chosen. Reward's "View in Character" link needs to point to Inventory too.
+- **Currency:** earned in the app only, and spent on cosmetics, never bought and never XP. No real money in the first release. Paid purchases can be added later if the app needs them, and should stay cosmetic. The name isn't final; Embers is the suggestion.
 - **Earning:** paid when a quest is completed, not per step, and limited like full rewards, so it can't be farmed by ticking steps and deleting a quest.
-- **Level cloaks:** Midnight, Oxblood and Plum stay earned by level and aren't for sale.
-- **New cloaks:** Green, Yellow, Snow and Teal are the first store items, and show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
+- **Level cloaks:** Midnight, Oxblood and Plum stay earned by level and aren't for sale. They show in Inventory.
+- **First store items:** Green, Yellow, Snow and Teal cloaks, which show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
 
 | Cloak | Cloak top | Cloak bottom |
 |---|---|---|
@@ -215,7 +222,8 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 | Snow | `#8B90A3` | `#3A3D4A` |
 | Teal | `#12565E` | `#06252A` |
 
-- **Inventory:** a full screen of what's owned and what's locked, opened from "View all" on Character. The CLOAKS row stays as a shortcut.
+## Reward redesign (planned)
+The developer still doesn't like the Reward screen, even after option B, so it needs another redesign. Nothing is decided and nothing is built. Start by asking what feels wrong, then propose options before changing Figma or the app.
 
 ## Settings
 - **Delete Account:** required by Apple for apps with accounts. It stops reminders, clears progress and the profile, and returns to Welcome. Nothing is stored outside the device yet, so `deleteAccount()` in `SettingsView` must also delete the account and its data on Supabase when accounts are real. A privacy policy is also needed before release, supplied by the developer.
@@ -242,7 +250,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Known limit:** streaks use the phone's clock and reset on relaunch until saving exists.
 
 ## UI polish
-- **Splash:** the flame pops in with a spring, then the name, then the tap prompt fades in.
+- **Splash:** the flame carries on from the launch screen and pops, then the name and tap prompt appear. See App icon and launch.
 - **Expressions on completion:** on Reward, the spirit starts surprised, then becomes cheerful, or happy for a small bonus. The character on Home and Character is happy for 4 seconds after a quest is finished.
 - **Character glow:** `CharacterArt` has a soft glow in the user's color, except in the Settings and Profile avatars.
 - **Character tap effect:** a small bounce and a ripple in the user's color, only when tapped.
@@ -310,13 +318,13 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 | 04 Identity & archetype | `6` to `6.3` Identity Creation, `7` to `7.2` Create Aspiration, `8` to `8.2` Archetype Selection |
 | 05 Home | `9` to `9.4` |
 | 06 Quests | `10` to `10.12` |
-| 07 Create Quest | `11` to `11.6` |
-| 08 Quest Details | `12` to `12.9` |
+| 07 Create Quest | `11` to `11.7` |
+| 08 Quest Details | `12` to `12.10` |
 | 09 Reward | `13` to `13.4` |
 | 10 Journey | `14` to `14.8` |
 | 11 Character | `15` to `15.5` |
 | 12 Streaks | `16` to `16.4` |
-| 13 Settings | `17` to `17.5` |
+| 13 Settings | `17` to `17.6` |
 | 14 Profile & Identity | `18` to `18.6` |
 | 15 Notifications | `19` to `19.2` |
 | 16 Character art | `20.1` to `20.8` |
@@ -324,19 +332,14 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 
-### All screens
-- **Toasts:** the frames that have one now use the app's style. Add the limit toasts on Create Quest and step limits if they should have their own frames.
+### Planned designs
+Figma doesn't have these yet, because the app doesn't either.
+- **Store and Inventory:** new frames, plus the store icon on Home's frames and moving the CLOAKS grid off Character (`15` to `15.5`). See Store and inventory.
+- **Reward:** new frames for `13` to `13.4` once a redesign is chosen. See Reward redesign.
+- **Character art:** new art and the level stages, when that work starts, keeping its layers. See Character evolution.
 
-### Character
-- Redesign the character art when that work starts, keeping its layers.
+**Full Figma checks:** the developer will ask for a pass over the whole file, probably after the backend. Don't run one before then, because it uses a lot of tokens.
 
-### Settings
-- Add the Delete account row to `17` and `17.1`, and a Delete account sheet like `17.5`.
-- Check any Create Quest frame showing attributes at a duration other than 30 minutes, and update `10.11`'s message for a main quest with ticked steps.
-- Replace the Light accent `#00C934` on the Appearance preview only if it should match the Light token `#00A82E`.
-
-### Design documents
-- `DESIGN-DECISIONS.md` says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
 
 ## App icon and launch
 - **App icon:** `AppIcon` comes from `Logo / Prism icon` on `03 — Design System`, rendered at 1024 with square corners and no transparency, because iOS rounds the corners itself. The diagonal line is part of that design. The dark and tinted slots use the same image for now.
@@ -364,4 +367,3 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.
-- **Low:** Figma's "Already have an account? LOG IN" row on Welcome sits about 5pt right of center. The code centers it deliberately; update Figma to match if that's agreed.
