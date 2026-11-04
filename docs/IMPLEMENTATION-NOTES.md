@@ -145,6 +145,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Welcome back can't appear in the app yet:** progress resets on relaunch. Check it in the preview.
 - **Sky:** `StarField` fills the screen with small stars that stay put, and the sky map adds more.
 - **Layout (`JourneyLayout`):** the constellation is 340pt across and centered in the space above the guide card, the header is pinned, and the rest scrolls. The flame spirit stays in a guide card under the constellation, replacing Figma's following spirit, speech bubble and banner. Its top line is the spirit's message, up to two lines, and its bottom line is the next star, or that star's goal right after one lights. Other goals appear when a star is tapped. The current star and destination always get a label; other labels only show if they have room.
+- **Figma:** frames `10` to `10.8` on `06` follow the app, with Lou's Game Developer path. Star field positions use the same seeds as the app. `10 - Journey (Light)` still shows the old design and waits for light mode. The star shake and sky map zoom are motion, so Figma can't show them.
 - **Data generator:** `ConstellationData.swift` came from a script outside the repo, with stars chosen by hand. Stars under 34pt apart on screen were merged, and Auriga's two small stars beside Capella were left out so it can end on Capella.
 
 ## Journey ideas (future)
@@ -279,7 +280,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Sample data:** every example must match the app's code for the sample user: Lou, The Strategist, Game Developer. The daily quest comes from `DailyQuests`, and rewards from `RewardRules` and `DifficultyEstimator`.
 
-**Sample data done on:** Home, Quests, Create Quest, Quest Details and Reward. Character still needs checking.
+**Sample data done on:** Home, Quests, Create Quest, Quest Details, Reward and Journey. Character still needs checking.
 
 **Main quest card:** the developer's `8.2` design is the layout everywhere: step count at the top right, then the same status and XP row as every other card, including ACTIVE. Long titles wrap.
 
@@ -315,7 +316,6 @@ A still frame can't show these, so write them as notes beside the screens.
 
 ### Contrast
 - Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.
-- Raise Journey's unlit lines, locked stars, and the sky map's path and locked shapes.
 
 ### Settings
 - Add "Cloaks and badges" to Reset Progress's list, and make the sheet taller to fit.
@@ -332,15 +332,18 @@ A still frame can't show these, so write them as notes beside the screens.
 - The five non-green novice characters were generated outside Figma, including Snow's dark crest. Add them if Figma should stay the source of truth.
 - Add the three character mood faces for every color, as Home now uses them.
 
-### Journey (`10`)
-- Move the content down 14pt, replace Swift samples with the 13 real constellations and aspiration paths, and add the meaning line under the chapter.
-- Replace the following spirit, speech bubble and banner with the guide card and its messages.
-- Add five chapters with their own stars for each aspiration, the chapter complete message and the all lit state.
-- Add the denser star field, the larger constellation, tap details on stars and the locked star shake.
-- Add the sky map with its button, with chapter 1 at the center and a path winding out around it, in a different layout for each aspiration, showing completed, current and locked chapters, with the locked chapter toast.
-
 ### Design documents
 - `DESIGN-DECISIONS.md` says the active card has a glow (y 4, blur 12, 30% green), but Figma has a hard green edge (y 1, blur 2, 100% green). The app follows Figma.
+
+## App icon and launch
+- **App icon:** `AppIcon` comes from `Logo / Prism icon` on `03 — Design System`, rendered at 1024 with square corners and no transparency, because iOS rounds the corners itself. The diagonal line is part of that design. The dark and tinted slots use the same image for now.
+- **Launch screen:** `LaunchScreen.storyboard` shows the Prism mark on a fixed dark background, `#0B0D12`. It's a storyboard because the `UILaunchScreen` color was ignored on the iPhone 18 Pro simulator, which showed white behind the logo. iOS draws it before the app runs, so it stays dark even if Light is chosen in Settings.
+- **If the flame moves in Splash, update the storyboard's centerY constant,** or the flame will jump on launch. The -95pt comes from Splash's -64 offset plus half of the 21pt gap and the name's line height.
+- **Splash:** the flame starts visible, to carry on from the launch screen, then pops. The halo, name and tap prompt then appear.
+- **Stale launch screens:** iOS caches them. If an old one shows, delete the app from the device and run it again.
+
+## Deploying to a phone (teach at the end)
+After the backend is implemented, Claude walks the user through putting the app on their own iPhone, step by step. Not before then.
 
 ## Known issues
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.

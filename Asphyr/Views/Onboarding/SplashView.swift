@@ -40,11 +40,19 @@ struct SplashView: View {
                             .fill(Color.asphyrAccentPrimary.opacity(0.16))
                             .frame(width: 113, height: 105)
                             .blur(radius: 40)
+                            .opacity(showLogo ? 1 : 0)
+                            .animation(.easeOut(duration: 0.4), value: showLogo)
                     }
-                    // The flame pops in, then the name follows
-                    .scaleEffect(showLogo || reduceMotion ? 1 : 0.6)
-                    .opacity(showLogo ? 1 : 0)
-                    .animation(.spring(response: 0.5, dampingFraction: 0.6), value: showLogo)
+                    // The launch screen shows this same flame in this same spot, so it starts
+                    // visible and pops from there. The name follows.
+                    .keyframeAnimator(initialValue: CGFloat(1), trigger: showLogo) { flame, scale in
+                        flame.scaleEffect(scale)
+                    } keyframes: { _ in
+                        KeyframeTrack(\.self) {
+                            SpringKeyframe(reduceMotion ? 1 : 1.12, duration: 0.2, spring: .snappy)
+                            SpringKeyframe(1, duration: 0.4, spring: .bouncy)
+                        }
+                    }
 
                 Text("ASPHYR")
                     .font(AppTypography.display)
