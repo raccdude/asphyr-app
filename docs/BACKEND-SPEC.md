@@ -84,7 +84,8 @@ Supabase's security and performance advisors reported nothing.
 ## Step 2 notes
 - **Supabase settings changed:** `asphyr://reset-password` is an allowed redirect, and Confirm email is off for development. Turn it back on before release. `signUp` then returns no session, so Create Account will need a check-your-email state.
 - **Library:** `supabase-swift`, up to the next major version from 2.55.6.
-- **Launch time:** adding the library took the simulator from 0.30s to about 1.17s to Splash, because it needs `AuthenticationServices`. Measure on a real iPhone before deciding what to do.
+- **Launch time:** adding the library took the simulator from 0.30s to about 1.17s to Splash, because it needs `AuthenticationServices`. Opened from the Home Screen on the developer's iPhone, launch felt fast with no still flame, so nothing needs changing.
+- **Unknown emails:** a reset request for an email with no account still returns success, sends nothing, and shows the same success screen, so the screen can't reveal who has an account.
 - **Email limits:** Supabase's built-in sender is limited, so a reset email may not arrive at every address until custom email sending is set up.
 
 ## Defaults, unless the developer says otherwise

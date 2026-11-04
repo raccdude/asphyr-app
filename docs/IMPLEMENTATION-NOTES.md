@@ -81,7 +81,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
 ## Login
-- **Password suggestions:** the field types are set, but iOS only links saved passwords to the app with Associated Domains, which needs the paid Apple Developer account and a website the developer owns. Set this up before release.
+- **Password suggestions:** on the developer's iPhone, they work on Create Account (4 Nov 2026). Linking saved passwords to the app fully needs Associated Domains, which needs the paid Apple Developer account and a website the developer owns. Check this before release.
 - **Errors:** a malformed email, an empty field or wrong details show "Incorrect email or password", and connection and rate-limit problems show their own message. All clear on edit.
 - **After login:** goes to the tabs through `router.enterApp()`.
 - **Save Password prompt:** iOS offers this after logging in, and it stays on purpose. It's standard, and the same field settings let password managers fill in the login.
@@ -359,7 +359,7 @@ Figma doesn't have these yet, because the app doesn't either.
 - **Launch screen:** `LaunchScreen.storyboard` shows the Prism mark on a fixed dark background, `#0B0D12`. It's a storyboard because the `UILaunchScreen` color was ignored on the iPhone 18 Pro simulator, which showed white behind the logo. iOS draws it before the app runs, so it stays dark even if Light is chosen in Settings.
 - **If the flame moves in Splash, update the storyboard's centerY constant,** or the flame will jump on launch. The -95pt comes from Splash's -64 offset plus half of the 21pt gap and the name's line height.
 - **Splash:** the flame starts visible, to carry on from the launch screen, then pops. The halo, name and tap prompt then appear.
-- **Launch speed:** on the simulator, `AuthenticationServices` alone takes an empty app from 0.20s to about 1.05s before its first line of code. Supabase's login library requires it, and Sign in with Apple would too, so the app is back to about 1.17s to Splash, in both Debug and Release. `PhotosUI` showed the same delay. Nothing has been measured on a real iPhone, which may be much faster, so measure there before working around it.
+- **Launch speed:** on the simulator, or when run from Xcode, the flame can sit still for about a second, because `AuthenticationServices`, which Supabase's login library needs, is slow to load there. Opened from the Home Screen on the developer's iPhone (4 Nov 2026), launch felt fast, with no still flame, so no workaround is needed. Judge launch speed on a real iPhone, opened from the Home Screen.
 - **Stale launch screens:** iOS caches them. If an old one shows, delete the app from the device and run it again.
 
 ## Deploying to a phone (teach at the end)
