@@ -6,6 +6,8 @@ Keep this file about **how we work**. Project details belong elsewhere:
 - **Design intent:** `DESIGN-DECISIONS.md`
 - **Progress, technical rules and known issues:** `IMPLEMENTATION-NOTES.md`
 
+For this project's current state and the developer's preferences, read `HANDOFF.md` first.
+
 ## Who does what
 
 | Developer | Claude |
