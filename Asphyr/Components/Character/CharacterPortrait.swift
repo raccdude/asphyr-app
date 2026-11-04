@@ -120,25 +120,68 @@ private struct AngryFlames: View {
             TimelineView(.animation(minimumInterval: 1 / 20)) { context in
                 let time = context.date.timeIntervalSinceReferenceDate
 
-                ForEach(Self.flames.indices, id: \.self) { index in
-                    let flame = Self.flames[index]
-                    let flicker = sin(time * 9 + Double(index) * 1.7)
+                // Without the ZStack, TimelineView stacks the flames vertically
+                ZStack {
+                    ForEach(Self.flames.indices, id: \.self) { index in
+                        let flame = Self.flames[index]
+                        let flicker = sin(time * 9 + Double(index) * 1.7)
+                        let side = proxy.size.width * flame.size
 
-                    Image(systemName: "flame.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(
-                            // Bright at the tip, so dark colors still show against the background
-                            LinearGradient(colors: [color.faceColor, color.swatch], startPoint: .top, endPoint: .bottom)
-                        )
-                        .frame(width: proxy.size.width * flame.size)
+                        ZStack {
+                            FlameShape(part: .outer)
+                                .fill(
+                                    // Bright at the tip, so dark colors still show against the background
+                                    LinearGradient(colors: [color.faceColor, color.swatch], startPoint: .top, endPoint: .bottom)
+                                )
+
+                            FlameShape(part: .inner)
+                                .stroke(color.flameOutline, style: StrokeStyle(lineWidth: side * 1.1 / 24, lineJoin: .round))
+                        }
+                        .frame(width: side, height: side)
                         .scaleEffect(1 + flicker * 0.14, anchor: .bottom)
                         .opacity(0.8 + flicker * 0.2)
                         .position(x: proxy.size.width * flame.x, y: proxy.size.height * flame.y)
+                    }
                 }
             }
         }
         .accessibilityHidden(true)
+    }
+}
+
+/// A flame drawn on a 24pt grid, matching Figma's `20.7` sheet.
+private struct FlameShape: Shape {
+    enum Part {
+        case outer
+        /// The outline inside the flame, for detail.
+        case inner
+    }
+
+    let part: Part
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let scale = min(rect.width, rect.height) / 24
+
+        switch part {
+        case .outer:
+            path.move(to: CGPoint(x: 12, y: 1.5))
+            path.addCurve(to: CGPoint(x: 18.5, y: 15.5), control1: CGPoint(x: 13, y: 6), control2: CGPoint(x: 18.5, y: 9))
+            path.addArc(center: CGPoint(x: 12, y: 15.5), radius: 6.5, startAngle: .degrees(0), endAngle: .degrees(180), clockwise: false)
+            path.addCurve(to: CGPoint(x: 8.5, y: 8.5), control1: CGPoint(x: 5.5, y: 12.5), control2: CGPoint(x: 7.5, y: 11.5))
+            path.addCurve(to: CGPoint(x: 12, y: 1.5), control1: CGPoint(x: 10, y: 10), control2: CGPoint(x: 11, y: 8))
+        case .inner:
+            path.move(to: CGPoint(x: 12, y: 8.5))
+            path.addCurve(to: CGPoint(x: 15.5, y: 16), control1: CGPoint(x: 12.6, y: 11), control2: CGPoint(x: 15.5, y: 12.8))
+            path.addArc(center: CGPoint(x: 12, y: 16), radius: 3.5, startAngle: .degrees(0), endAngle: .degrees(180), clockwise: false)
+            path.addCurve(to: CGPoint(x: 10, y: 12.5), control1: CGPoint(x: 8.5, y: 14.5), control2: CGPoint(x: 9.5, y: 13.8))
+            path.addCurve(to: CGPoint(x: 12, y: 8.5), control1: CGPoint(x: 10.8, y: 13.2), control2: CGPoint(x: 11.6, y: 11.8))
+        }
+        path.closeSubpath()
+
+        return path
+            .applying(CGAffineTransform(scaleX: scale, y: scale))
+            .offsetBy(dx: rect.minX, dy: rect.minY)
     }
 }
 

@@ -94,7 +94,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Home data:** the name, color, archetype and aspiration come from `OnboardingProfile`. Login skips onboarding until real accounts exist, so it shows "Traveler" and a green character with no item, and hides the archetype and aspiration.
 - **Progress:** the level and XP bar come from `QuestStore`, and attributes start at 10 and rise when a quest is completed.
 - **Home's quest (`QuestStore.homeQuest`):** the active daily or personal quest first, then today's daily if it isn't finished, then the active main quest, then any available quest. The section reads "ACTIVE QUEST" for any active quest, "TODAY'S QUEST" for an available daily and "AVAILABLE QUEST" for any other available quest. Which quest was accepted first doesn't matter: a daily or personal quest always shows ahead of an active main quest, because its timer is running and the main quest has no deadline.
-- **Completion card:** from `9.2 - Home Screen (Completion)`, shown under "TODAY'S PROGRESS" once nothing is active or available. It counts every completed quest and totals their XP, and its button opens Create Quest. The count should become today's only when daily quests renew. The copy for more than one quest is ours. New and ongoing users start on the available card. Once started, it uses the active style and elapsed-time row from `9.1 - Home Screen (Active Quest)`.
+- **Completion card:** from `9.2 - Home (completion)`, shown under "TODAY'S PROGRESS" once nothing is active or available. It counts every completed quest and totals their XP, and its button opens Create Quest. The count should become today's only when daily quests renew. The copy for more than one quest is ours. New and ongoing users start on the available card. Once started, it uses the active style and elapsed-time row from `9.1 - Home (active quest)`.
 - **Streak chip:** built and checked, but hidden while `streakDays` is 0. Nothing counts streaks yet.
 - **Unused now:** the `Character` component is left over from the old Home and Your Character. Delete it in a cleanup.
 
@@ -138,7 +138,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Spirit line:** timed quests show the time taken; main quests show their step count, because they have no timer.
 
 ## Character moods
-- **Home:** tapping the character cycles idle, happy, sleepy and focused, from `13.5 - Hooded traveler / Moods`. The mood resets when Home is recreated.
+- **Home:** tapping the character cycles idle, happy, sleepy and focused, from `20.5 - Hooded traveler / Moods`. The mood resets when Home is recreated.
 - **How it's drawn:** `CharacterPortrait` overlays a visor and the mood's face on the character image, so it works for all 30 color and archetype images without 90 more. The face uses `CharacterColor.faceColor`.
 - **Not used:** happy's sparkles in that frame belong to the Strategist's orb, so they aren't drawn.
 
@@ -153,7 +153,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Welcome back can't appear in the app yet:** progress resets on relaunch. Check it in the preview.
 - **Sky:** `StarField` fills the screen with small stars that stay put, and the sky map adds more.
 - **Layout (`JourneyLayout`):** the constellation is 340pt across and centered in the space above the guide card, the header is pinned, and the rest scrolls. The flame spirit stays in a guide card under the constellation, replacing Figma's following spirit, speech bubble and banner. Its top line is the spirit's message, up to two lines, and its bottom line is the next star, or that star's goal right after one lights. Other goals appear when a star is tapped. The current star and destination always get a label; other labels only show if they have room.
-- **Figma:** frames `10` to `10.8` on `06` follow the app, with Lou's Game Developer path. Star field positions use the same seeds as the app. `10 - Journey (Light)` still shows the old design and waits for light mode. The star shake and sky map zoom are motion, so Figma can't show them.
+- **Figma:** frames `14` to `14.8` on `06` follow the app, with Lou's Game Developer path. Star field positions use the same seeds as the app. `21.5 - Journey (Light)` still shows the old design and waits for light mode. The star shake and sky map zoom are motion, so Figma can't show them.
 - **Data generator:** `ConstellationData.swift` came from a script outside the repo, with stars chosen by hand. Stars under 34pt apart on screen were merged, and Auriga's two small stars beside Capella were left out so it can end on Capella.
 
 ## Journey ideas (future)
@@ -180,7 +180,7 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. They're worn from the Character screen.
 
 ## Your Character
-- **Character art:** `CharacterArt` draws each color and archetype from layers, with the hands in front of the item, and without an archetype it shows the character empty-handed. See Cloak art. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `13.3 - Archetypes`, scaled from 134pt to 126pt.
+- **Character art:** `CharacterArt` draws each color and archetype from layers, with the hands in front of the item, and without an archetype it shows the character empty-handed. See Cloak art. Figma only has the Strategist's orb on the novice, so the book, brush and lantern come from `20.3 - Hooded traveler / Archetypes`, scaled from 134pt to 126pt.
 - **Item colors:** items use the tunic's base and shade. Oxblood, Midnight and Plum use their bright tint instead, because dark items disappear against the cloak and background.
 - **Selection:** tapping the selected card deselects it, as on Identity. With nothing selected, the title reads "WHO WILL YOU BECOME?" and BEGIN shows "Choose an archetype."
 
@@ -242,7 +242,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Expressions on completion:** on Reward, the spirit starts surprised, then becomes cheerful, or happy for a small bonus. The character on Home and Character is happy for 4 seconds after a quest is finished.
 - **Character glow:** `CharacterArt` has a soft glow in the user's color, except in the Settings and Profile avatars.
 - **Character tap effect:** a small bounce and a ripple in the user's color, only when tapped.
-- **Angry character:** 5 taps within 2 seconds make the character angry for 3 seconds, with an angry face and flickering flames in the character's color, a shake and a heavy vibration. `CharacterTapCounter` holds the rule, and `CharacterButton` is shared by Home and Character.
+- **Angry character:** 5 taps within 2 seconds make the character angry for 3 seconds, with an angry face and flickering flames in the character's color, drawn by `FlameShape` to match Figma's `20.7` sheet, with an outline inside each flame, a shake and a heavy vibration. `CharacterTapCounter` holds the rule, and `CharacterButton` is shared by Home and Character.
 - **Create Quest:** QUEST TITLE and DESCRIPTION section titles, and the categories as two even rows that end at the same edges.
 - **Dropped:** the circle animation, as the comet covers it.
 - **Create Quest reward card:** a dropdown. XP and difficulty always show, and attributes appear when it's tapped.
@@ -260,7 +260,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Green bars:** every `XPBar` uses the primary button's gradient, `#00E63B` to `#7DFF9B`, with a rounded end. The comet uses the same two colors, so they read as one. Most bars flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm. A cyan version was tried and dropped.
 
 ## Character evolution (later)
-The character should change as the user levels up, as in Figma's section 11 (`13.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
+The character should change as the user levels up, as in Figma's section 11 (`20.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
 
 | Stage | Levels | Figma's description |
 |---|---|---|
@@ -290,28 +290,41 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Sample data done on:** Home, Quests, Create Quest, Quest Details, Reward, Journey and Character.
 
-**Main quest card:** the developer's `8.2` design is the layout everywhere: step count at the top right, then the same status and XP row as every other card, including ACTIVE. Long titles wrap.
+**Main quest card:** the developer's `10.9` design is the layout everywhere: step count at the top right, then the same status and XP row as every other card, including ACTIVE. Long titles wrap.
 
-**At the end, when the developer says so:** number and organize every screen on `06` in order, then build the interactive prototype.
+**Prototype later:** the screens are numbered and organized. Build the interactive prototype when the developer asks.
 
 **Copying a page:** Figma's page copy lost the opacity of colors bound to variables, so see-through fills turned solid and bright on 167 layers. These were restored from `05`, and a fingerprint of fills, strokes and effects then matched on every frame. Copying frames loses them too, and so does binding a new color to a variable, so set the opacity afterwards and check after any copy.
 
-**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Journey (`10` to `10.3`, plus new `10.4` to `10.8`) and Character (`11`, `11.1`, plus new `11.2` to `11.5`) are done too, with `Notes / Journey` and `Notes / Character`. Streaks are done as well, with new one-day sheets for today and yesterday, and `Notes / Streaks`. Settings is done too: every sheet has iOS 26's side margins, with a new `12.4` Log out sheet, `Profile photo (sheet · no photo)`, `Notifications (permission refused)`, `Profile & Identity (changes saved)` and `Notes / Settings`. Character art is done: `13.6` shows every color with every item, `13.7` every mood in every color, including angry, and `13.8` every cloak. They're built from the app's own SVG layers, with the glow. The angry flames are drawn to look like the app's `flame.fill`, because Figma can't use SF Symbols. Sections from `08 · Settings & sheets` down moved 300pt lower to make room. Also done: the simplified timer, the button's gradient on every bar, Reward as option B, and Create Quest's section titles, even category rows and reward dropdown, with a new reward expanded frame. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
+**Frame numbers on `06`:** organized in app-flow order, one row per section, with each section's notes at the end of its row.
+
+| Section | Frames |
+|---|---|
+| 01 Splash & Welcome | `1` Splash, `2` Welcome |
+| 02 Create Account | `3` to `3.7` |
+| 03 Log in & recovery | `4` to `4.2` Login, `5` to `5.2` Account Recovery, `5.3` and `5.4` Recovery Success |
+| 04 Identity & archetype | `6` to `6.3` Identity Creation, `7` to `7.2` Create Aspiration, `8` to `8.2` Archetype Selection |
+| 05 Home | `9` to `9.4` |
+| 06 Quests | `10` to `10.12` |
+| 07 Create Quest | `11` to `11.6` |
+| 08 Quest Details | `12` to `12.9` |
+| 09 Reward | `13` to `13.4` |
+| 10 Journey | `14` to `14.8` |
+| 11 Character | `15` to `15.5` |
+| 12 Streaks | `16` to `16.4` |
+| 13 Settings | `17` to `17.5` |
+| 14 Profile & Identity | `18` to `18.6` |
+| 15 Notifications | `19` to `19.2` |
+| 16 Character art | `20.1` to `20.8` |
+| 17 Light mode | `21.1` to `21.8`, which still show the old designs until light mode gets its pass |
+
+**Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 
 ### All screens
-- **Header position:** screens with a back button or top header sit 14pt lower than Figma (back button top 76pt, not 62pt). Move the content below down with it.
 - **Toasts:** the frames that have one now use the app's style. Add the limit toasts on Create Quest and step limits if they should have their own frames.
 
 ### Character
 - Redesign the character art when that work starts, keeping its layers.
-
-### Motion and character effects
-A still frame can't show these, so write them as notes beside the screens.
-- The Comet border on Home's active card, the flowing bars, the splash logo popping in, Reward's pop-ins and its surprised then cheerful expressions.
-- Note the character's tap bounce and ripple.
-
-### Contrast
-- Add a 1pt outline to every color swatch outside Character, so Snow and the dark colors stay visible.
 
 ### Settings
 - Replace the Light accent `#00C934` on the Appearance preview only if it should match the Light token `#00A82E`.

@@ -41,6 +41,16 @@ enum CharacterColor: String, CaseIterable, Identifiable {
         case .plum: Color(red: 181 / 255, green: 140 / 255, blue: 255 / 255)      // #B58CFF
         }
     }
+
+    /// The outline inside the angry flames: darker on pale flames, and brighter on dark ones.
+    var flameOutline: Color {
+        switch self {
+        case .green: Color(red: 0 / 255, green: 173 / 255, blue: 44 / 255)        // #00AD2C
+        case .yellow: Color(red: 173 / 255, green: 146 / 255, blue: 52 / 255)     // #AD9234
+        case .snow: Color(red: 166 / 255, green: 167 / 255, blue: 173 / 255)      // #A6A7AD
+        case .oxblood, .midnight, .plum: faceColor
+        }
+    }
 }
 
 /// The colors a cloak is drawn with.
