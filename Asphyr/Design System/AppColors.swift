@@ -20,6 +20,10 @@ extension Color {
     static let asphyrAccentPrimary = Color("AccentPrimary")
     static let asphyrAccentSecondary = Color("AccentSecondary")
 
+    /// The primary button's gradient, also used by bars and the comet.
+    static let asphyrGradientLight = Color(red: 125 / 255, green: 255 / 255, blue: 155 / 255)  // #7DFF9B
+    static let asphyrGradientDeep = Color(red: 0 / 255, green: 230 / 255, blue: 59 / 255)      // #00E63B
+
     static let asphyrWarning = Color("StatusWarning")
     static let asphyrError = Color("StatusError")
 }

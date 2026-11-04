@@ -134,10 +134,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **How it's drawn:** `CharacterPortrait` overlays a visor and the mood's face on the character image, so it works for all 30 color and archetype images without 90 more. The face uses `CharacterColor.faceColor`.
 - **Not used:** happy's sparkles in that frame belong to the Strategist's orb, so they aren't drawn.
 
-## UI polish for later
-Don't build these until asked.
-- **Circle animation:** the developer also suggested one for quest cards. Where it goes isn't decided.
-
 ## Journey
 - **Constellations:** each aspiration uses a real constellation, in [JOURNEY-CONSTELLATIONS-SPEC.md](JOURNEY-CONSTELLATIONS-SPEC.md). `ConstellationData.swift` is generated from the d3-celestial data, whose license is in `Resources`. Don't edit its positions by hand.
 - **Stars:** every constellation takes 20 quests, spread evenly across its 5 to 10 stars, and quests earning only the small bonus still count. Tapping a star shows its name, goal and progress in the guide card for 4 seconds, and a locked star also shakes with a warning vibration.
@@ -234,10 +230,15 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 
 ## UI polish
 - **Expressions on completion:** on Reward, the spirit starts surprised, then becomes cheerful, or happy for a small bonus. The character on Home and Character is happy for 4 seconds after a quest is finished.
-- **Character glow:** `CharacterArt` has a soft glow in the user's color, wherever the character appears.
-- **Character tap effect:** a small bounce and a fading ring each time the mood changes. It also plays when a mood changes on its own.
+- **Character glow:** `CharacterArt` has a soft glow in the user's color, except in the Settings and Profile avatars.
+- **Character tap effect:** a small bounce and a ripple in the user's color, only when tapped.
+- **Angry character:** 5 taps within 2 seconds make the character angry for 3 seconds, with an angry face and flickering flames in the character's color, a shake and a heavy vibration. `CharacterTapCounter` holds the rule, and `CharacterButton` is shared by Home and Character.
+- **Create Quest:** QUEST TITLE and DESCRIPTION section titles, and the categories as two even rows that end at the same edges.
+- **Dropped:** the circle animation, as the comet covers it.
 - **Create Quest reward card:** a dropdown. XP and difficulty always show, and attributes appear when it's tapped.
-- **Reward:** the spirit and its message pop in like the reward cards, and the content is centered above the button.
+- **Reward:** QUEST COMPLETE and the quest title are at the top, centered, with a larger spirit and its message below, then the cards and XP. The level up banner is now part of the XP row, with a pop, and the message says the level reached. The spirit and message pop in like the reward cards, and the content is centered above the button.
+- **Global accent:** `AccentColor` is the app's green, which also colors system alerts' buttons.
+- **Tab icons:** a tab's icon and label swap color instantly. Animating the color flashed purple for about half a second, measured at `116,8,151` in a simulator recording. After the change, a recording of the same quick taps showed none.
 
 ## Quest timer
 - **Timer bar:** `QuestTimerBar` shows a timed quest's progress on Quest Details and Home, with a glowing dot at its leading edge. It replaces the elapsed time and timer icon. A halfway tick and a "Complete in 3 min" status were tried and dropped, as they needed explaining and repeated the notice above the button.
@@ -246,8 +247,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 
 ## Animated cards and bars
 - **Comet border:** `CometBorder` sends a point of light clockwise around Home's active card every 5 seconds, over a faint green edge. The quest log keeps the solid green edge, as two comets were too much.
-- **Aurora bars:** every `XPBar` uses a green and cyan gradient, with a rounded end. Most flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm.
-- **Cyan:** `#3EE0F0` only appears inside bars, written in `XPBar` rather than as a color token.
+- **Green bars:** every `XPBar` uses the primary button's gradient, `#00E63B` to `#7DFF9B`, with a rounded end. The comet uses the same two colors, so they read as one. Most bars flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm. A cyan version was tried and dropped.
 
 ## Character evolution (later)
 The character should change as the user levels up, as in Figma's section 11 (`13.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
@@ -309,9 +309,11 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 ### Timer, cards and bars
 `06` still shows the earlier timer. Make these once Figma access is back.
 - On `6.1`, `6.2`, `6.5`, `6.6`, `6.7`, the Light `6.1` and Home `9.1`: remove the halfway tick and the "Complete in 3 min" text, keeping "Paused" and "Time's up".
-- Show the Aurora gradient with a rounded end on every bar, and note the Comet border's motion beside Home's active card. A still frame can't show either moving. The quest log keeps its green edge.
-- Center Reward's content above the button, and note the spirit and message popping in, with the surprised then cheerful expressions.
-- Add the character glow, and note the tap bounce and ring.
+- Show the button's gradient with a rounded end on every bar, and note the Comet border's motion beside Home's active card. A still frame can't show either moving. The quest log keeps its green edge.
+- Rebuild Reward as Option B: centered header on top, larger spirit and message, cards, then XP with the level. Remove the level up banner and speech bubble. Note the pop-ins and the surprised then cheerful expressions.
+- Add the character glow, and note the tap bounce and ripple.
+- Add the angry character with flames in each character color, and the two even rows of categories.
+- Add QUEST TITLE and DESCRIPTION section titles to Create Quest.
 - Make Create Quest's reward card a dropdown, collapsed and expanded, replacing the attributes line added earlier on `06`.
 
 ### Contrast

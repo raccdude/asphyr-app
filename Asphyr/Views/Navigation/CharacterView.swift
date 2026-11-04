@@ -34,21 +34,13 @@ struct CharacterView: View {
                 VStack(spacing: 0) {
                     header
 
-                    Button {
-                        mood = mood.next
-                    } label: {
-                        CharacterPortrait(
-                            color: profile.color,
-                            archetype: profile.archetype,
-                            cloak: profile.cloak,
-                            mood: mood,
-                            size: 184
-                        )
-                    }
-                    .buttonStyle(PressableButtonStyle())
-                    .hapticFeedback(.selection, trigger: mood)
-                    .accessibilityLabel("Character")
-                    .accessibilityHint("Changes the character’s expression")
+                    CharacterButton(
+                        color: profile.color,
+                        archetype: profile.archetype,
+                        cloak: profile.cloak,
+                        mood: $mood,
+                        size: 184
+                    )
                     .padding(.top, 8)
 
                     identity

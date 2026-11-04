@@ -113,6 +113,10 @@ private struct MainTabBar: View {
                             .minimumScaleFactor(0.8)
                     }
                     .foregroundStyle(selection == tab ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
+                    // Swaps instantly, as animating this color flashed purple on the icons
+                    .id(selection == tab)
+                    .transition(.identity)
+                    .transaction { $0.animation = nil }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                 }

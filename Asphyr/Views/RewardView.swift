@@ -70,23 +70,22 @@ struct RewardView: View {
 
     private var rewardContent: some View {
             VStack(alignment: .leading, spacing: 0) {
+                VStack(spacing: 3) {
+                    Text("QUEST COMPLETE")
+                        .font(AppTypography.screenTitle)
+                        .foregroundStyle(Color.asphyrAccentPrimary)
+                        .accessibilityAddTraits(.isHeader)
+
+                    Text(quest.title)
+                        .font(AppTypography.subheading)
+                        .foregroundStyle(Color.asphyrTextPrimary)
+                }
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+
                 spiritMessage
-
-                Text("QUEST COMPLETE")
-                    .font(AppTypography.screenTitle)
-                    .foregroundStyle(Color.asphyrAccentPrimary)
-                    .accessibilityAddTraits(.isHeader)
-                    .padding(.top, 16)
-
-                Text(quest.title)
-                    .font(AppTypography.subheading)
-                    .foregroundStyle(Color.asphyrTextPrimary)
-                    .padding(.top, 3)
-
-                Text("REWARDS")
-                    .font(AppTypography.captionMedium)
-                    .foregroundStyle(Color.asphyrTextSecondary)
-                    .padding(.top, 32)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 10)
 
                 lootCards
                     .frame(maxWidth: .infinity)
@@ -100,13 +99,8 @@ struct RewardView: View {
                         .padding(.top, 14)
                 }
 
-                if completion.didLevelUp {
-                    levelUpBanner
-                        .padding(.top, 29)
-                }
-
                 experience
-                    .padding(.top, completion.didLevelUp ? 14 : 29)
+                    .padding(.top, 29)
 
                 if !completion.newCloaks.isEmpty {
                     unlockedReward
@@ -129,40 +123,27 @@ struct RewardView: View {
     }
 
     private var spiritMessage: some View {
-        HStack(spacing: 2) {
-            SpiritView(mood: spiritMood, size: 104)
+        VStack(spacing: 2) {
+            SpiritView(mood: spiritMood, size: 120)
                 .scaleEffect(isRevealed ? 1 : 0.6)
                 .opacity(isRevealed ? 1 : 0)
                 .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isRevealed)
 
-            VStack(alignment: .leading, spacing: 4) {
+            // Pops in after the spirit, like the reward cards
+            VStack(spacing: 4) {
                 Text("Nice work, \(displayName)!")
                     .font(AppTypography.bodySemiBold)
                     .foregroundStyle(Color.asphyrTextPrimary)
 
-                Text(clearedText)
+                Text(completion.didLevelUp ? "You reached level \(completion.levelAfter)." : clearedText)
                     .font(AppTypography.captionMedium)
-                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .foregroundStyle(completion.didLevelUp ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                Color.asphyrSurfaceElevated,
-                in: UnevenRoundedRectangle(
-                    topLeadingRadius: 16,
-                    bottomLeadingRadius: 4,
-                    bottomTrailingRadius: 16,
-                    topTrailingRadius: 16
-                )
-            )
-            // Pops out from the spirit, like the reward cards
-            .scaleEffect(isRevealed ? 1 : 0.6, anchor: .leading)
+            .multilineTextAlignment(.center)
+            .scaleEffect(isRevealed ? 1 : 0.6)
             .opacity(isRevealed ? 1 : 0)
             .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(0.08), value: isRevealed)
         }
-        // The spirit's art has space around it, so it sits just past the margin
-        .padding(.leading, -6)
     }
 
     /// The XP card sits in the middle, with up to two attributes tilted beside it.
@@ -253,41 +234,15 @@ struct RewardView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(delay), value: isRevealed)
     }
 
-    private var levelUpBanner: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("LEVEL UP")
-                    .font(AppTypography.captionMedium)
-                    .foregroundStyle(Color.asphyrAccentPrimary)
-
-                Text("Level \(completion.levelBefore) → Level \(completion.levelAfter)")
-                    .font(AppTypography.bodySemiBold)
-                    .foregroundStyle(Color.asphyrTextPrimary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text("LV \(completion.levelAfter)")
-                .font(AppTypography.captionMedium)
-                .foregroundStyle(Color.asphyrBackground)
-                .fixedSize()
-                .padding(.horizontal, 12)
-                .frame(minWidth: 52, minHeight: 32)
-                .background(Color.asphyrAccentPrimary, in: Capsule())
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .frame(minHeight: 64)
-        .background(Color.asphyrAccentPrimary.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.asphyrAccentPrimary, lineWidth: 1)
-        }
-    }
-
     private var experience: some View {
         VStack(spacing: 5) {
             HStack {
-                Text("EXPERIENCE")
+                Text("LEVEL \(completion.levelAfter)")
+                    .foregroundStyle(completion.didLevelUp ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
+                    // A level up gets its own pop, after the reward cards
+                    .scaleEffect(completion.didLevelUp && isRevealed ? 1.25 : 1, anchor: .leading)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.5).delay(0.9), value: isRevealed)
+
                 Spacer()
                 Text("\(completion.xpIntoLevel) / \(completion.xpForLevel) XP")
             }

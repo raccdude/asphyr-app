@@ -42,6 +42,10 @@ struct CreateQuestView: View {
 
     private static let questTypes: [QuestType] = [.mainQuest, .personalQuest]
 
+    private static let categoryRows = [
+        ["Development", "Learning", "Health"],
+        ["Creative", "Career", "Social", "Other"]
+    ]
     private static let categories = [
         "Development", "Learning", "Health", "Creative", "Career", "Social", "Other"
     ]
@@ -154,6 +158,9 @@ struct CreateQuestView: View {
                 .accessibilityAddTraits(.isHeader)
                 .padding(.top, 30)
 
+            sectionLabel("QUEST TITLE")
+                .padding(.top, 20)
+
             AsphyrInputField(
                 placeholder: "Enter quest title",
                 icon: "iconQuestTitle",
@@ -165,15 +172,18 @@ struct CreateQuestView: View {
             )
             .submitLabel(.next)
             .onSubmit { focus = .description }
-            .padding(.top, 20)
+            .padding(.top, 10)
 
             if showsTitleError {
                 FieldErrorRow(message: "Give your quest a title to continue.")
                     .padding(.top, 8)
             }
 
+            sectionLabel("DESCRIPTION")
+                .padding(.top, 22)
+
             descriptionField
-                .padding(.top, 12)
+                .padding(.top, 10)
 
             completionReward
                 .padding(.top, 12)
@@ -219,9 +229,14 @@ struct CreateQuestView: View {
             sectionLabel("CATEGORY")
                 .padding(.top, 22)
 
-            FlowLayout(spacing: 8) {
-                ForEach(Self.categories, id: \.self) { option in
-                    categoryChip(option)
+            // Two even rows, so both end at the same edges
+            VStack(spacing: 8) {
+                ForEach(Self.categoryRows, id: \.self) { row in
+                    HStack(spacing: 8) {
+                        ForEach(row, id: \.self) { option in
+                            categoryChip(option)
+                        }
+                    }
                 }
             }
             .padding(.top, 10)
@@ -563,9 +578,13 @@ struct CreateQuestView: View {
             Text(option)
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(isSelected ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
-                .padding(.horizontal, 14)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .padding(.horizontal, 6)
                 .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
                 .selectionBackground(isSelected: isSelected, cornerRadius: 12)
+                .contentShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])

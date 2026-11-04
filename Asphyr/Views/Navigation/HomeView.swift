@@ -75,20 +75,13 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 26)
 
-                    Button {
-                        characterMood = characterMood.next
-                    } label: {
-                        CharacterPortrait(
-                            color: profile.color,
-                            archetype: profile.archetype,
-                            cloak: profile.cloak,
-                            mood: characterMood
-                        )
-                    }
-                    .buttonStyle(PressableButtonStyle())
-                    .hapticFeedback(.selection, trigger: characterMood)
-                    .accessibilityLabel("Character")
-                    .accessibilityHint("Changes the character’s expression")
+                    CharacterButton(
+                        color: profile.color,
+                        archetype: profile.archetype,
+                        cloak: profile.cloak,
+                        mood: $characterMood,
+                        restingMood: isResting ? .sleepy : .idle
+                    )
                     .padding(.top, -6)
 
                     identity

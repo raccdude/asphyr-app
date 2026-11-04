@@ -12,6 +12,7 @@ struct CharacterArt: View {
     let color: CharacterColor
     var archetype: Archetype?
     var cloak: CharacterCloak?
+    var showsGlow = true
 
     private var palette: CloakPalette {
         cloak?.palette ?? .starter
@@ -20,13 +21,15 @@ struct CharacterArt: View {
     var body: some View {
         ZStack {
             // A soft glow in the user's color
-            GeometryReader { proxy in
-                RadialGradient(
-                    colors: [color.faceColor.opacity(0.2), color.faceColor.opacity(0)],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: proxy.size.width / 2
-                )
+            if showsGlow {
+                GeometryReader { proxy in
+                    RadialGradient(
+                        colors: [color.faceColor.opacity(0.2), color.faceColor.opacity(0)],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: proxy.size.width / 2
+                    )
+                }
             }
 
             layer("characterLayerBase")

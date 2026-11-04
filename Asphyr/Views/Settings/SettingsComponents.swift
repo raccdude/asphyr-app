@@ -229,7 +229,7 @@ struct ProfileAvatar: View {
                         .scaledToFill()
                         .frame(width: size, height: size)
                 } else {
-                    CharacterArt(color: profile.color, archetype: profile.archetype, cloak: profile.cloak)
+                    CharacterArt(color: profile.color, archetype: profile.archetype, cloak: profile.cloak, showsGlow: false)
                         .frame(width: characterSize, height: characterSize)
                         .offset(y: characterOffsetY)
                 }

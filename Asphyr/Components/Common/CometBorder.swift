@@ -13,9 +13,9 @@ struct CometBorder: View {
     private static let secondsPerLap = 5.0
     private static let stops: [Gradient.Stop] = [
         .init(color: .clear, location: 0.72),
-        .init(color: .asphyrAccentPrimary.opacity(0.15), location: 0.8),
-        .init(color: .asphyrAccentPrimary, location: 0.97),
-        .init(color: Color(red: 216 / 255, green: 1, blue: 228 / 255), location: 1)  // #D8FFE4
+        .init(color: .asphyrGradientDeep.opacity(0.15), location: 0.8),
+        .init(color: .asphyrGradientDeep, location: 0.97),
+        .init(color: .asphyrGradientLight, location: 1)
     ]
 
     var body: some View {

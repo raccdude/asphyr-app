@@ -24,14 +24,8 @@ struct XPBar: View {
 
     private static let secondsPerLoop = 3.2
     /// Starts and ends on the same color, so the loop has no seam.
-    private static let aurora = LinearGradient(
-        colors: [
-            Color(red: 0, green: 201 / 255, blue: 52 / 255),   // #00C934
-            .asphyrAccentPrimary,
-            Color(red: 62 / 255, green: 224 / 255, blue: 240 / 255),  // #3EE0F0
-            .asphyrAccentPrimary,
-            Color(red: 0, green: 201 / 255, blue: 52 / 255)
-        ],
+    private static let gradient = LinearGradient(
+        colors: [.asphyrGradientDeep, .asphyrGradientLight, .asphyrGradientDeep],
         startPoint: .leading,
         endPoint: .trailing
     )
@@ -71,13 +65,13 @@ struct XPBar: View {
                     .truncatingRemainder(dividingBy: Self.secondsPerLoop) / Self.secondsPerLoop
 
                 HStack(spacing: 0) {
-                    Self.aurora.frame(width: trackWidth)
-                    Self.aurora.frame(width: trackWidth)
+                    Self.gradient.frame(width: trackWidth)
+                    Self.gradient.frame(width: trackWidth)
                 }
                 .offset(x: (loop - 1) * trackWidth)
             }
         } else {
-            Self.aurora.frame(width: trackWidth * 2)
+            Self.gradient.frame(width: trackWidth * 2)
         }
     }
 }
