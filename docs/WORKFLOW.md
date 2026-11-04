@@ -60,6 +60,39 @@ git log --oneline -3                   # confirm
 
 Commit messages follow Conventional Commits: `feat`, `fix`, `refactor`, `docs`, `chore`.
 
+## What each git command does
+
+**Saving work**
+
+| Command | Purpose | What it does |
+|---|---|---|
+| `git status` | See where things stand | Lists the current branch and which files are changed or staged. It changes nothing. |
+| `git diff` | Review changes | Shows the changed lines that aren't staged yet. Add `-w` to ignore re-indentation. |
+| `git add <files>` | Choose what to save | Stages those files for the next commit. Nothing is saved yet. |
+| `git commit -m "message"` | Save a snapshot | Saves the staged files on this Mac with a description. GitHub doesn't have it yet. |
+| `git push` | Upload | Sends new commits on this branch to GitHub. |
+| `git push -u origin <branch>` | Upload a new branch | Does the same for a branch's first push, and links it to GitHub so plain `git push` works afterwards. |
+
+**Branches**
+
+| Command | Purpose | What it does |
+|---|---|---|
+| `git switch <branch>` | Change branch | Moves to that branch and updates the files to match. Commits on other branches stay safe. |
+| `git switch -c <branch>` | Start a branch | Creates a new branch from the current one and moves to it. |
+| `git checkout <branch>` | Change branch, the older way | Does the same as `git switch <branch>`, but the command also restores files, so `git switch` is safer. |
+| `git pull` | Get the latest | Downloads new commits for this branch from GitHub and adds them to the local copy. |
+| `git merge <branch>` | Combine work | Brings that branch's commits into the current branch. |
+| `git merge --ff-only <branch>` | Combine work, only if simple | Does the same, but stops instead of creating a merge commit if the branches have diverged. |
+
+**Checking**
+
+| Command | Purpose | What it does |
+|---|---|---|
+| `git log --oneline -3` | See recent commits | Lists the last 3 commits, one line each. |
+| `git log origin/<branch>..HEAD --oneline` | Check what's not uploaded | Lists local commits that GitHub doesn't have. Nothing printed means everything is uploaded. |
+
+**If a push fails:** `Internal Server Error` from GitHub is on their side. The commit is still safe locally, so wait a minute and run `git push` again. Check githubstatus.com if it keeps failing.
+
 ## Lessons learned
 
 - **Test a staged migration before promising it.** A plan to convert screens one at a time failed because old and new navigation patterns could not coexist. A build that compiles can still crash at runtime.

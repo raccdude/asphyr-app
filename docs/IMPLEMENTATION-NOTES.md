@@ -35,7 +35,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Cloak layers | Merged | `feat/cloak-layers` |
 | Settings | Merged | `feat/settings-v2` |
 | Streaks | Merged | `feat/streaks-v2` |
-| Figma revisions | In progress: auth, onboarding, Home, Quests, Create Quest, Quest Details and Reward done | `docs/figma-revisions` |
+| Figma revisions | Merged. Prototype and a few small items remain, listed under Figma updates | `docs/figma-revisions` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -65,7 +65,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Input field taps:** keep the focus tap gesture behind the text field. On top of it, iOS reads the tap as a second tap and selects the whole word, so the next key replaces the value.
 - **Validation:** errors appear when leaving a field and on submit, and clear when that field is edited. A weak password blocks submit and keeps the checklist visible, a state Figma has no frame for.
 - **Header (all auth screens):** Create Account, Login, Account Recovery and Recovery Success share `AuthScreen` and `AuthHeader`, so change spacing there and it applies everywhere. Welcome also uses `AuthScreen`, with `showsBackButton: false`, so its wordmark sits in the same position. Home has its own wordmark; line it up in the Home step. `AuthTopBar` draws a custom glass back button and hides the system bar, an exception recorded in DESIGN-DECISIONS.md. Swipe-back is turned on only while that screen is visible, so Welcome and Home stay unaffected. The back button starts at 76pt on iPhone 18 Pro.
-- **Backend and sign-in are on hold.** Screens come first. Authentication stays mocked and the Apple and Google buttons stay display only until the Supabase or Firebase decision is made and the go-ahead given. Real sign-in is needed before release.
+- **Backend choice:** Supabase, chosen on 4 Nov 2026 over Firebase. ASPHYR's data is connected and suits tables, Edge Functions can check rewards on the server, and standard Postgres avoids lock-in. The first release doesn't need to work fully offline, as decided on the same day, so it won't build offline sync. It still needs clear loading and no-connection states.
+- **Backend and sign-in are on hold.** Screens come first. Authentication stays mocked and the Apple and Google buttons stay display only until the go-ahead is given. Real sign-in is needed before release.
 - **`StatusError`** is now `#FF5C5C`, Figma's Error value.
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
@@ -175,7 +176,9 @@ Not built, and needs a design first.
 ## XP and rewards
 The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Code:** `RewardRules` holds XP, attributes, the level curve and cloaks. `DifficultyEstimator` is the only place that decides difficulty.
-- **Difficulty:** keywords for now, from the title and description. Add words to its lists as new quests get misjudged. Hard wins over Easy, and no match means Moderate.
+- **Difficulty:** keywords for now. Only the title can make a quest Hard, and Easy words count in the title or description. Add words to its lists as new quests get misjudged. Hard wins over Easy, and no match means Moderate.
+- **Attributes:** scale with duration, with 30 minutes as the base: 15m ×0.5, 1h ×2 and 2h+ ×3, rounding up. Main and daily quests earn the base.
+- **Level rewards need their XP:** if unticking or deleting a main quest drops the level, cloaks and level badges above it go too, and a worn cloak returns to the starter look. The level is announced again when it's earned back. Other badges, like First Quest, stay.
 - **On-device AI trial (3 Nov 2026):** couldn't run, because Apple Intelligence isn't enabled on this Mac, so it's still unproven. Enable it to retry; the titles are in the plan.
 - **Cloaks:** recorded as unlocked, and listed on Reward. A cloak reached by ticking steps is awarded the next time any quest is completed. They're worn from the Character screen.
 
@@ -215,6 +218,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Inventory:** a full screen of what's owned and what's locked, opened from "View all" on Character. The CLOAKS row stays as a shortcut.
 
 ## Settings
+- **Delete Account:** required by Apple for apps with accounts. It stops reminders, clears progress and the profile, and returns to Welcome. Nothing is stored outside the device yet, so `deleteAccount()` in `SettingsView` must also delete the account and its data on Supabase when accounts are real. A privacy policy is also needed before release, supplied by the developer.
 - **Screens:** Settings, Profile & Identity and Notifications are pushed from Home, with the system back button. Appearance, Reset Progress, Profile Photo and Reminder Time are sheets.
 - **Preferences:** `AppSettings` holds them in memory, so they reset on relaunch until saving exists. They survive logging out and resetting progress.
 - **Appearance:** dark by default. Light and System work through the color sets, using Figma's Light values. Warning and the second accent keep one value, as Figma's Light frames don't define them.
@@ -327,6 +331,8 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 - Redesign the character art when that work starts, keeping its layers.
 
 ### Settings
+- Add the Delete account row to `17` and `17.1`, and a Delete account sheet like `17.5`.
+- Check any Create Quest frame showing attributes at a duration other than 30 minutes, and update `10.11`'s message for a main quest with ticked steps.
 - Replace the Light accent `#00C934` on the Appearance preview only if it should match the Light token `#00A82E`.
 
 ### Design documents
@@ -347,10 +353,8 @@ After the backend is implemented, Claude walks the user through putting the app 
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
 - **Low:** the data script that generates `ConstellationData.swift` isn't in the repo.
-- **Medium:** attribute points don't scale with duration, so 15m quests earn them eight times faster than 2h+ ones. The daily limit caps the total.
 - **Medium:** the minimum time and daily limits use the device clock, so changing the date gets around them until there's a backend. Read from the code; not tried.
-- **Low:** a keyword anywhere in the description makes a quest Hard, so any quest can be inflated.
-- **Low:** a level and cloak reached by ticking steps can be claimed by completing another quest, and the cloak stays after the main quest is deleted and its XP is taken back.
+- **Low:** a word in the title can still make a quest Hard, so a title can be inflated. The daily limits cap what that earns, and proper checking waits for better difficulty judging.
 - **Low:** typing immediately after pressing return in the step field can drop characters. Seen at automated typing speed only; a 2-second gap was fine.
 - **Low:** a newly added step field on Create Quest can be partly hidden behind the button.
 - **Low:** at large text sizes, words break mid-word on Home's attribute cards ("KNOWLED / GE", "CREATIVIT / Y"). Seen at Accessibility Large on 3 Nov 2026.

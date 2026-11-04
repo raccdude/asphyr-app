@@ -59,7 +59,20 @@ enum RewardRules {
         }
     }
 
-    static func attributes(category: String, difficulty: QuestDifficulty) -> [AttributeReward] {
+    /// Longer quests earn more, so short ones aren't the fastest way to grow. 30 minutes
+    /// and quests with no timer earn the base amounts, and 2h+ stops at three times them.
+    private static func attributeMultiplier(minutes: Int?) -> Double {
+        guard let minutes else { return 1 }
+
+        switch minutes {
+        case ...15: return 0.5
+        case ...30: return 1
+        case ...60: return 2
+        default: return 3
+        }
+    }
+
+    static func attributes(category: String, difficulty: QuestDifficulty, minutes: Int? = nil) -> [AttributeReward] {
         let names: [String]
 
         switch category.lowercased() {
@@ -79,7 +92,11 @@ enum RewardRules {
         case .hard: amounts = [8, 3]
         }
 
-        return zip(names, amounts).map { AttributeReward(name: $0, value: $1) }
+        let multiplier = attributeMultiplier(minutes: minutes)
+
+        return zip(names, amounts).map { name, amount in
+            AttributeReward(name: name, value: Int((Double(amount) * multiplier).rounded(.up)))
+        }
     }
 
     /// The XP needed to finish a level. Level 1 needs 500, and each one after

@@ -10,6 +10,11 @@ enum ReminderNotifications {
     private static let idPrefix = "dailyQuestReminder"
     private static let streakAlertID = "streakAlert"
 
+    /// Stops every reminder, for when the account is deleted.
+    static func cancelAll() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+
     static func requestPermission() async -> Bool {
         (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) ?? false
     }

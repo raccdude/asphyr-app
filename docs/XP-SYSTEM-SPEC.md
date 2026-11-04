@@ -14,7 +14,7 @@ Rewards are inferred by the system, so users can't choose how much a quest is wo
 
 The difficulty code is one swappable piece, with one input (title and description) and one output (a difficulty). Nothing else knows how it decides.
 
-1. **Keyword list:** always available. Words like "calculus", "thesis" and "marathon" mean Hard; words like "tidy" and "walk" mean Easy.
+1. **Keyword list:** always available. Words like "calculus", "thesis" and "marathon" in the title mean Hard; words like "tidy" and "walk" in the title or description mean Easy. Only the title can make a quest Hard, so a word added to the description can't raise its reward.
 2. **Apple's on-device model (Foundation Models):** used where available, falling back to keywords on iPhones without Apple Intelligence, when it's turned off, or on any failure. This depends on a trial first: run real quest titles through it and report the results. If it judges them poorly, ship keywords only.
 
 The same quest could score differently on different iPhones when both are in use. That's accepted for now.
@@ -38,13 +38,15 @@ Only 3 personal quests can earn full rewards per day, counted by calendar day. L
 Main quests need at least 3 steps, so at most one can be finished per day.
 
 ## Attributes
-Earned when a quest is completed, based on its category and difficulty. The amounts are for the main and second attribute:
+Earned when a quest is completed, based on its category, difficulty and duration. Added on 4 Nov 2026: the amounts scale with duration, so short quests aren't the fastest way to grow. The amounts are for the main and second attribute at 30 minutes, which is also what main quests and daily quests earn:
 
 | Difficulty | Main | Second |
 |---|---|---|
 | Easy | +2 | +1 |
 | Moderate | +5 | +2 |
 | Hard | +8 | +3 |
+
+Other durations multiply these, rounding up: 15m ×0.5, 1h ×2 and 2h+ ×3. A Moderate quest earns +3 and +1 at 15m, +10 and +4 at 1h, and +15 and +6 at 2h+.
 
 | Category | Main attribute | Second attribute |
 |---|---|---|

@@ -73,6 +73,7 @@ struct MainTabView: View {
         .onAppear(perform: refreshDailyQuest)
         .onAppear(perform: updateStreakAlert)
         .onChange(of: questStore.completionDates) { updateStreakAlert() }
+        .onChange(of: questStore.unlockedCloaks) { removeWornCloakIfLost() }
         .onChange(of: settings.pushNotifications) { updateStreakAlert() }
         .onChange(of: settings.streakAlerts) { updateStreakAlert() }
         .onChange(of: settings.showsStreaks) { updateStreakAlert() }
@@ -83,6 +84,12 @@ struct MainTabView: View {
                 updateStreakAlert()
             }
         }
+    }
+
+    /// Back to the starter look if the XP behind a worn cloak was removed.
+    private func removeWornCloakIfLost() {
+        guard let reward = profile.cloak?.reward, !questStore.unlockedCloaks.contains(reward) else { return }
+        profile.cloak = nil
     }
 
     private func updateStreakAlert() {

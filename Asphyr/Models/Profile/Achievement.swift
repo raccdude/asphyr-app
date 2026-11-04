@@ -36,6 +36,15 @@ enum Achievement: CaseIterable, Hashable {
         }
     }
 
+    /// The level this badge depends on, if any.
+    var requiredLevel: Int? {
+        switch self {
+        case .levelTwo: 2
+        case .master: 5
+        default: nil
+        }
+    }
+
     var iconName: String {
         switch self {
         case .firstQuest: "iconBadgeFlag"

@@ -114,7 +114,7 @@ struct QuestsView: View {
             Button("Cancel", role: .cancel) {}
         } message: { quest in
             Text(quest.completedStepCount > 0
-                ? "\(quest.title), its progress and the XP from its steps will be removed. This can’t be undone."
+                ? "\(quest.title), its progress and the XP from its steps will be removed, along with any level, cloak or badge that XP reached. This can’t be undone."
                 : "\(quest.title) and its progress will be removed. This can’t be undone.")
         }
     }

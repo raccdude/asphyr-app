@@ -128,6 +128,18 @@ final class QuestStore {
         }
 
         quests.removeAll { $0.id == quest.id }
+        removeRewardsAboveCurrentLevel()
+    }
+
+    /// Cloaks and level badges need the XP behind them. Without this, ticking steps,
+    /// completing any quest and then removing those steps would keep them for free.
+    private func removeRewardsAboveCurrentLevel() {
+        unlockedCloaks.removeAll { $0.level > level }
+        earnedAchievements = earnedAchievements.filter { achievement in
+            achievement.requiredLevel.map { $0 <= level } ?? true
+        }
+        // So the level is announced again when it's earned back
+        announcedLevel = min(announcedLevel, level)
     }
 
     /// At most two quests can be active: the main quest plus one other.
@@ -189,6 +201,7 @@ final class QuestStore {
             let stepXP = RewardRules.xpPerStep(difficulty: quest.difficulty ?? .moderate)
             earnedXP += quest.steps[index].isDone ? stepXP : -stepXP
         }
+        removeRewardsAboveCurrentLevel()
     }
 
     /// Personal quests past the daily limit earn the flat bonus instead.

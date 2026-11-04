@@ -406,7 +406,11 @@ struct CreateQuestView: View {
     private var completionReward: some View {
         let isBonus = questType == .personalQuest && !questStore.hasFullPersonalRewardsLeft
         let shownXP = isBonus ? RewardRules.bonusXP : xpReward
-        let attributes = RewardRules.attributes(category: category, difficulty: difficulty)
+        let attributes = RewardRules.attributes(
+            category: category,
+            difficulty: difficulty,
+            minutes: questType == .mainQuest ? nil : duration.minutes
+        )
         let shownAttributes = isBonus ? RewardRules.bonusAttributes(from: attributes) : attributes
 
         return Button {
@@ -640,7 +644,11 @@ struct CreateQuestView: View {
                 difficulty: difficulty,
                 durationMinutes: questType == .mainQuest ? nil : duration.minutes,
                 xpReward: xpReward,
-                attributeRewards: RewardRules.attributes(category: category, difficulty: difficulty),
+                attributeRewards: RewardRules.attributes(
+                    category: category,
+                    difficulty: difficulty,
+                    minutes: questType == .mainQuest ? nil : duration.minutes
+                ),
                 status: .available,
                 steps: questType == .mainQuest ? steps : []
             )

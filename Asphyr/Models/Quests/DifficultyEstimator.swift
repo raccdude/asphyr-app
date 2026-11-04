@@ -20,15 +20,14 @@ enum DifficultyEstimator {
     ]
 
     static func estimate(title: String, description: String) -> QuestDifficulty {
-        let words = Set(
-            "\(title) \(description)"
-                .lowercased()
-                .components(separatedBy: CharacterSet.letters.inverted)
-        )
-
-        // Hard wins, so "Tidy my calculus notes" isn't treated as easy
-        if !words.isDisjoint(with: hardWords) { return .hard }
-        if !words.isDisjoint(with: easyWords) { return .easy }
+        // Only the title can make a quest Hard, so a word added to the description
+        // can't raise its reward. Hard wins, so "Tidy my calculus notes" isn't easy.
+        if !words(in: title).isDisjoint(with: hardWords) { return .hard }
+        if !words(in: "\(title) \(description)").isDisjoint(with: easyWords) { return .easy }
         return .moderate
+    }
+
+    private static func words(in text: String) -> Set<String> {
+        Set(text.lowercased().components(separatedBy: CharacterSet.letters.inverted))
     }
 }

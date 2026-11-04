@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var isShowingAppearance = false
     @State private var isShowingReset = false
     @State private var isShowingLogOut = false
+    @State private var isShowingDeleteAccount = false
     @State private var toast: String?
 
     private var version: String {
@@ -108,13 +109,31 @@ struct SettingsView: View {
                             SettingsRow(icon: "iconSettingsLogOut", title: "Log out")
                         }
                         .buttonStyle(.plain)
+
+                        SettingsRowDivider()
+
+                        Button {
+                            isShowingDeleteAccount = true
+                        } label: {
+                            SettingsRow(
+                                icon: "iconSettingsTrash",
+                                title: "Delete account",
+                                tint: .asphyrError,
+                                titleColor: .asphyrError,
+                                tileColor: Color.asphyrError.opacity(0.15)
+                            ) {
+                                SettingsDisclosure()
+                            }
+                        }
+                        .buttonStyle(.plain)
                     }
                     .settingsCard()
                     .padding(.top, 12)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
-                .padding(.bottom, 40)
+                // Leaves room to scroll clear of the version line
+                .padding(.bottom, 64)
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
@@ -141,6 +160,9 @@ struct SettingsView: View {
                 profile.clear()
                 router.logOut()
             }
+        }
+        .sheet(isPresented: $isShowingDeleteAccount) {
+            DeleteAccountSheet(onDelete: deleteAccount)
         }
         .settingsToast($toast, icon: "iconCheck")
     }
@@ -213,6 +235,15 @@ struct SettingsView: View {
             .contentShape(RoundedRectangle(cornerRadius: 22))
         }
         .buttonStyle(.plain)
+    }
+
+    /// Nothing is stored outside this device yet. When accounts are real, this
+    /// must also delete the account and its data on the server.
+    private func deleteAccount() {
+        ReminderNotifications.cancelAll()
+        questStore.resetProgress()
+        profile.clear()
+        router.logOut()
     }
 
     private func resetProgress() {
