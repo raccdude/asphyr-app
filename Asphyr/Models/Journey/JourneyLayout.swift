@@ -17,11 +17,6 @@ struct JourneyLayout {
 
     /// The centers of the labels with room to show, by star.
     let labels: [Int: CGPoint]
-    private let labelWidths: [CGFloat]
-
-    func labelRect(_ index: Int) -> CGRect {
-        Self.rect(center: labels[index] ?? .zero, width: labelWidths[index])
-    }
 
     static func starPoint(_ constellation: Constellation, _ index: Int) -> CGPoint {
         CGPoint(
@@ -51,7 +46,6 @@ struct JourneyLayout {
             Self.starRect(constellation, index, size: Self.nodeSize(index, litCount: litCount, currentIndex: currentIndex, count: count))
         }
         let widths = names.map { CGFloat($0.count) * 6.6 + 4 }
-        labelWidths = widths
 
         // The current star and the destination always get a label, then lit
         // stars, then locked ones, which are named when tapped instead

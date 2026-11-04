@@ -7,27 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		83653EBB306520710084CB48 /* SpaceGrotesk-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */; };
-		83653EBD306520780084CB48 /* SpaceGrotesk-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */; };
 		83653EBF3065207E0084CB48 /* SpaceGrotesk-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */; };
 		83653EC1306520850084CB48 /* SpaceGrotesk-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */; };
 		83653EC3306521BD0084CB48 /* Inter-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC2306521BD0084CB48 /* Inter-Regular.otf */; };
 		83653EC5306521E90084CB48 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC4306521E90084CB48 /* Inter-Medium.otf */; };
 		83653EC7306521F20084CB48 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC6306521F20084CB48 /* Inter-SemiBold.otf */; };
-		83653EC9306521FD0084CB48 /* Inter-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 83653EC8306521FD0084CB48 /* Inter-Bold.otf */; };
-		83653ECB3065225F0084CB48 /* Inter-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 83653ECA3065225F0084CB48 /* Inter-Black.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Regular.ttf"; sourceTree = "<group>"; };
-		83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-SemiBold.ttf"; sourceTree = "<group>"; };
 		83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Bold.ttf"; sourceTree = "<group>"; };
 		83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Medium.ttf"; sourceTree = "<group>"; };
 		83653EC2306521BD0084CB48 /* Inter-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.otf"; sourceTree = "<group>"; };
 		83653EC4306521E90084CB48 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
 		83653EC6306521F20084CB48 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
-		83653EC8306521FD0084CB48 /* Inter-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.otf"; sourceTree = "<group>"; };
-		83653ECA3065225F0084CB48 /* Inter-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Black.otf"; sourceTree = "<group>"; };
 		83F11B21303D338A006A4B80 /* Asphyr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asphyr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -67,14 +59,10 @@
 			isa = PBXGroup;
 			children = (
 				83653EBE3065207E0084CB48 /* SpaceGrotesk-Bold.ttf */,
-				83653EBC306520780084CB48 /* SpaceGrotesk-SemiBold.ttf */,
 				83653EC0306520850084CB48 /* SpaceGrotesk-Medium.ttf */,
-				83653EBA306520710084CB48 /* SpaceGrotesk-Regular.ttf */,
 				83653EC2306521BD0084CB48 /* Inter-Regular.otf */,
 				83653EC4306521E90084CB48 /* Inter-Medium.otf */,
 				83653EC6306521F20084CB48 /* Inter-SemiBold.otf */,
-				83653EC8306521FD0084CB48 /* Inter-Bold.otf */,
-				83653ECA3065225F0084CB48 /* Inter-Black.otf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -160,15 +148,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83653EBD306520780084CB48 /* SpaceGrotesk-SemiBold.ttf in Resources */,
 				83653EC5306521E90084CB48 /* Inter-Medium.otf in Resources */,
-				83653ECB3065225F0084CB48 /* Inter-Black.otf in Resources */,
 				83653EC1306520850084CB48 /* SpaceGrotesk-Medium.ttf in Resources */,
 				83653EC3306521BD0084CB48 /* Inter-Regular.otf in Resources */,
 				83653EBF3065207E0084CB48 /* SpaceGrotesk-Bold.ttf in Resources */,
 				83653EC7306521F20084CB48 /* Inter-SemiBold.otf in Resources */,
-				83653EC9306521FD0084CB48 /* Inter-Bold.otf in Resources */,
-				83653EBB306520710084CB48 /* SpaceGrotesk-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

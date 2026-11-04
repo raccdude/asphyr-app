@@ -282,7 +282,7 @@ struct ProfileIdentityView: View {
     }
 
     private var saveButton: some View {
-        PrimaryButtonV2(title: "SAVE CHANGES", action: save)
+        PrimaryButton(title: "SAVE CHANGES", action: save)
             .disabled(!hasChanges)
             .opacity(hasChanges ? 1 : 0.4)
             .animation(.easeInOut(duration: 0.2), value: hasChanges)

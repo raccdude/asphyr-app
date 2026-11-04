@@ -58,6 +58,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Why this version:** Figma's Inter has Slant and Weight axes but no Optical Size, which points to Inter 3. Modern Inter's static cuts are narrower, so don't swap in Google Fonts' Inter.
 - **Measured on Welcome's first message line:** the 24pt cut was 320pt wide, the 18pt cut 329pt, and Inter 3.19 is 337pt, the same as Figma.
 - Space Grotesk matches Figma.
+- **Bundled weights:** only the ones in use: Inter Regular, Medium and SemiBold, and Space Grotesk Medium and Bold. To use another weight, add its file to `Fonts`, the project and `UIAppFonts`.
 
 ## Create Account
 - **Components for Figma v2 auth screens:** `AuthTopBar`, `AsphyrInputField`, `FieldErrorRow`, `PasswordChecklist`, `SocialSignInRow`, `OrDivider`, `AuthSwitchPrompt`. Login uses these too. Delete `AsphyrTextField` once the recovery and Identity screens move off it.
@@ -104,7 +105,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
 - **Filters:** ALL shows every open quest, available or active, and completed quests appear only under Completed so they don't pile up. The others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
 - **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestsView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
-- **Unused now:** `iconGamepad` is left over from the old card. Delete it in a cleanup.
 
 ## Create Quest
 - **Presentation:** a system sheet at the large detent, opened by the + button in the quest log. iOS shows this detent edge to edge, seen on the iPhone 17 simulator, so it uses a 20pt margin instead of the 12pt margin on Create Aspiration's floating sheet. The content is taller than the screen, so the reward card needs a scroll.
@@ -116,7 +116,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Main quests have no time limit:** Estimated Duration is hidden when Main is selected, and they save with no duration. Users go at their own pace.
 - **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
 - **Placeholders:** main quests use the book icon and personal quests the hammer.
-- **Unused now:** nothing calls `AsphyrTextField` anymore. Delete it in a cleanup.
 
 ## Quest Details
 - **Data:** opened with a quest's id and read from `QuestStore`, so the timer and status stay live on Home and in the log.

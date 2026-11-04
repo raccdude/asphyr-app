@@ -95,7 +95,7 @@ struct RecoverAccountView: View {
 
             Spacer(minLength: 24)
 
-            PrimaryButtonV2(title: "SEND RESET LINK", action: submit)
+            PrimaryButton(title: "SEND RESET LINK", action: submit)
         }
         .padding(.horizontal, 20)
         // Tapping empty space dismisses the keyboard

@@ -49,7 +49,7 @@ struct RewardView: View {
             .scrollIndicators(.hidden)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            PrimaryButtonV2(title: "CONTINUE") {
+            PrimaryButton(title: "CONTINUE") {
                 dismiss()
             }
             .padding(.horizontal, 20)

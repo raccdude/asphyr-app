@@ -44,7 +44,7 @@ struct WelcomeView: View {
                     .lineSpacing(1)
                     .padding(.top, 14)
 
-                PrimaryButtonV2(title: "BEGIN JOURNEY") {
+                PrimaryButton(title: "BEGIN JOURNEY") {
                     router.push(.createAccount)
                 }
                 .padding(.top, 37)

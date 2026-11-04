@@ -128,7 +128,7 @@ struct CreateAccountView: View {
             }
             .padding(.top, 36)
 
-            PrimaryButtonV2(title: "CREATE ACCOUNT", action: submit)
+            PrimaryButton(title: "CREATE ACCOUNT", action: submit)
                 .padding(.top, 28)
 
             OrDivider()

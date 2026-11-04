@@ -81,7 +81,7 @@ struct LoginView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.top, 12)
 
-            PrimaryButtonV2(title: "LOG IN", action: submit)
+            PrimaryButton(title: "LOG IN", action: submit)
                 .padding(.top, 24)
 
             OrDivider()

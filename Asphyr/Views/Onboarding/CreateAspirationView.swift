@@ -110,7 +110,7 @@ struct CreateAspirationView: View {
             }
             .padding(.top, 11)
 
-            PrimaryButtonV2(title: "SAVE ASPIRATION", action: save)
+            PrimaryButton(title: "SAVE ASPIRATION", action: save)
                 .padding(.top, 73)
                 .padding(.bottom, 16)
         }

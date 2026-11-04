@@ -32,7 +32,7 @@ struct AppearanceSheet: View {
 
             Spacer(minLength: 16)
 
-            PrimaryButtonV2(title: "DONE") {
+            PrimaryButton(title: "DONE") {
                 settings.appearance = selection
                 dismiss()
             }

@@ -36,11 +36,6 @@ enum AppTypography {
         size: 16,
     )
     
-    static let bodyMedium = Font.custom(
-        "Inter-Medium",
-        size: 16
-    )
-    
     static let body = Font.custom(
         "Inter-Regular",
         size: 16

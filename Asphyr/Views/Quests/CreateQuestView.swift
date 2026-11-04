@@ -99,7 +99,7 @@ struct CreateQuestView: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            PrimaryButtonV2(title: "CREATE QUEST", action: create)
+            PrimaryButton(title: "CREATE QUEST", action: create)
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .padding(.bottom, 16)

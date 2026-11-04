@@ -8,8 +8,6 @@
 import SwiftUI
 
 /// The input field from Figma "05 — Hi-Fi v2".
-/// Screens move to this one at a time; once every screen uses it,
-/// it replaces `AsphyrTextField` and `AsphyrSecureField`.
 struct AsphyrInputField<Field: Hashable>: View {
     let placeholder: String
     let icon: String

@@ -296,7 +296,7 @@ struct QuestDetailsView: View {
                     blockerNotice("Finish or abandon your active quest first.")
                 }
 
-                PrimaryButtonV2(title: "ACCEPT QUEST") {
+                PrimaryButton(title: "ACCEPT QUEST") {
                     if canStart {
                         questStore.start(quest)
                     } else {
@@ -313,7 +313,7 @@ struct QuestDetailsView: View {
                             blockerNotice(blocker)
                         }
 
-                        PrimaryButtonV2(title: "COMPLETE QUEST") {
+                        PrimaryButton(title: "COMPLETE QUEST") {
                             if blocker == nil {
                                 completion = questStore.complete(quest)
                             } else {

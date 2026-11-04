@@ -63,7 +63,7 @@ struct ArchetypeSelectionView: View {
 
                 Spacer(minLength: 24)
 
-                PrimaryButtonV2(title: "BEGIN", action: begin)
+                PrimaryButton(title: "BEGIN", action: begin)
             }
             .padding(.horizontal, 20)
         }

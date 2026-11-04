@@ -68,7 +68,7 @@ struct RecoverySuccessView: View {
 
             Spacer(minLength: 24)
 
-            PrimaryButtonV2(title: "BACK TO LOGIN") {
+            PrimaryButton(title: "BACK TO LOGIN") {
                 router.popToLogin()
             }
 

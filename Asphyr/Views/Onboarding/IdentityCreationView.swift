@@ -95,7 +95,7 @@ struct IdentityCreationView: View {
                         .padding(.top, 8)
                 }
 
-                PrimaryButtonV2(title: "CONTINUE", action: submit)
+                PrimaryButton(title: "CONTINUE", action: submit)
                     .padding(.top, 24)
 
                 Spacer(minLength: 16)

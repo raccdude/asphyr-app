@@ -82,7 +82,7 @@ struct StreakSheet: View {
 
             Spacer(minLength: 16)
 
-            PrimaryButtonV2(title: isResting ? "FIND A QUEST" : "GOT IT") {
+            PrimaryButton(title: isResting ? "FIND A QUEST" : "GOT IT") {
                 dismiss()
                 if isResting {
                     openQuests()

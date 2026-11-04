@@ -48,7 +48,7 @@ struct ReminderTimeSheet: View {
 
             Spacer(minLength: 16)
 
-            PrimaryButtonV2(title: "SAVE") {
+            PrimaryButton(title: "SAVE") {
                 settings.reminderTime = time
                 settings.reminderDays = days
                 ReminderNotifications.update(from: settings)
