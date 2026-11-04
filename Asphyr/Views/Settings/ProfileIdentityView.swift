@@ -3,7 +3,6 @@
 //  Asphyr
 //
 
-import PhotosUI
 import SwiftUI
 
 struct ProfileIdentityView: View {
@@ -18,7 +17,6 @@ struct ProfileIdentityView: View {
     @State private var isShowingCamera = false
     @State private var isShowingLibrary = false
     @State private var pendingPhotoChoice: ProfilePhotoSheet.Choice?
-    @State private var libraryItem: PhotosPickerItem?
     @State private var toast: String?
 
     @FocusState private var isNameFocused: Bool
@@ -114,21 +112,16 @@ struct ProfileIdentityView: View {
             }
         }
         .fullScreenCover(isPresented: $isShowingCamera) {
-            CameraPicker { image in
+            ImagePicker(source: .camera) { image in
                 profile.photoData = image.jpegData(compressionQuality: 0.8)
             }
             .ignoresSafeArea()
         }
-        .photosPicker(isPresented: $isShowingLibrary, selection: $libraryItem, matching: .images)
-        .onChange(of: libraryItem) {
-            guard let libraryItem else { return }
-
-            Task {
-                if let data = try? await libraryItem.loadTransferable(type: Data.self) {
-                    profile.photoData = data
-                }
-                self.libraryItem = nil
+        .sheet(isPresented: $isShowingLibrary) {
+            ImagePicker(source: .photoLibrary) { image in
+                profile.photoData = image.jpegData(compressionQuality: 0.8)
             }
+            .ignoresSafeArea()
         }
         // The photo applies straight away, without Save Changes
         .onChange(of: profile.photoData) {

@@ -1,24 +1,28 @@
 //
-//  CameraPicker.swift
+//  ImagePicker.swift
 //  Asphyr
 //
 
 import SwiftUI
 
-/// iOS's camera, as SwiftUI has no view for it.
-struct CameraPicker: UIViewControllerRepresentable {
-    let onCapture: (UIImage) -> Void
+/// iOS's camera and photo library. The library deliberately doesn't use PhotosPicker: linking
+/// PhotosUI adds about 0.85s before the app's first line of code runs, on every launch.
+struct ImagePicker: UIViewControllerRepresentable {
+    let source: UIImagePickerController.SourceType
+    let onPick: (UIImage) -> Void
 
     @Environment(\.dismiss) private var dismiss
 
-    static var isAvailable: Bool {
+    static var isCameraAvailable: Bool {
         UIImagePickerController.isSourceTypeAvailable(.camera)
     }
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.cameraDevice = .front
+        picker.sourceType = source
+        if source == .camera {
+            picker.cameraDevice = .front
+        }
         picker.delegate = context.coordinator
         return picker
     }
@@ -30,9 +34,9 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
 
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        private let parent: CameraPicker
+        private let parent: ImagePicker
 
-        init(_ parent: CameraPicker) {
+        init(_ parent: ImagePicker) {
             self.parent = parent
         }
 
@@ -41,7 +45,7 @@ struct CameraPicker: UIViewControllerRepresentable {
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
             if let image = info[.originalImage] as? UIImage {
-                parent.onCapture(image)
+                parent.onPick(image)
             }
             parent.dismiss()
         }

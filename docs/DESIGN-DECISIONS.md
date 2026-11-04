@@ -41,7 +41,7 @@ These decisions apply to Figma page **"05 — Hi-Fi v2 (Polished)"** and should 
   - Quest logs: all four filters
 - **Profile & Identity:**
   - Aspiration and archetype are compact pull-down menus.
-  - The photo button opens a sheet (Take photo / Choose from library → iOS PhotosPicker / Use my character / Remove).
+  - The photo button opens a sheet (Take photo / Choose from library → iOS's photo library, through `UIImagePickerController` / Use my character / Remove).
   - **The photo appears only on Profile and Settings.** The character stays on Home and Character.
 
 ## Streaks (secondary, optional)

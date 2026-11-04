@@ -30,7 +30,7 @@ struct ProfilePhotoSheet: View {
                 .padding(.top, 20)
 
             VStack(spacing: 0) {
-                if CameraPicker.isAvailable {
+                if ImagePicker.isCameraAvailable {
                     Button {
                         onChoose(.camera)
                         dismiss()
