@@ -159,6 +159,9 @@ struct SettingsView: View {
             LogOutSheet {
                 profile.clear()
                 router.logOut()
+                Task {
+                    await AccountService.logOut()
+                }
             }
         }
         .sheet(isPresented: $isShowingDeleteAccount) {
@@ -237,13 +240,16 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    /// Nothing is stored outside this device yet. When accounts are real, this
-    /// must also delete the account and its data on the server.
+    /// Not complete yet: this only signs out and clears the device. Backend step 5
+    /// must also delete the login and its data on the server.
     private func deleteAccount() {
         ReminderNotifications.cancelAll()
         questStore.resetProgress()
         profile.clear()
         router.logOut()
+        Task {
+            await AccountService.logOut()
+        }
     }
 
     private func resetProgress() {

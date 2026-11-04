@@ -16,6 +16,7 @@ enum AuthRoute: Hashable {
     case recoverySuccess(email: String)
     case identity
     case archetype
+    case newPassword
 }
 
 /// Owns the root stack's path, so every screen shares one source of truth.
@@ -23,7 +24,12 @@ enum AuthRoute: Hashable {
 final class AppRouter {
     var path: [AuthRoute] = []
     /// True once sign-up or login finishes, which swaps the root to the tabs.
-    private(set) var isInApp = false
+    private(set) var isInApp: Bool
+
+    /// Someone already signed in starts in the tabs, skipping Splash and auth.
+    init(isSignedIn: Bool = false) {
+        isInApp = isSignedIn
+    }
 
     /// Ignored when `route` is already on top, so a double tap pushes once.
     func push(_ route: AuthRoute) {
@@ -47,6 +53,12 @@ final class AppRouter {
     /// Returns to Welcome. Swapping the root also clears the tabs' state.
     func logOut() {
         path = [.welcome]
+        isInApp = false
+    }
+
+    /// From a password reset link, wherever the app was.
+    func showNewPassword() {
+        path = [.welcome, .newPassword]
         isInApp = false
     }
 

@@ -10,6 +10,8 @@ import SwiftUI
 /// The polished primary button from Figma "05 — Hi-Fi v2".
 struct PrimaryButton: View {
     let title: String
+    /// Waiting on the server: shows a spinner and ignores taps.
+    var isBusy = false
     let action: () -> Void
 
     var body: some View {
@@ -18,6 +20,13 @@ struct PrimaryButton: View {
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(Self.labelColor)
                 .multilineTextAlignment(.center)
+                .opacity(isBusy ? 0 : 1)
+                .overlay {
+                    if isBusy {
+                        ProgressView()
+                            .tint(Self.labelColor)
+                    }
+                }
                 .padding(.horizontal, 16)
                 .frame(maxWidth: .infinity)
                 // Grows past 56 pt so large text wraps instead of truncating
@@ -39,6 +48,8 @@ struct PrimaryButton: View {
                 .contentShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(PressableButtonStyle())
+        .allowsHitTesting(!isBusy)
+        .accessibilityValue(isBusy ? "Loading" : "")
     }
 
     // Deliberately not tokenised (see docs/DESIGN-DECISIONS.md)

@@ -17,7 +17,12 @@ struct LoginView: View {
 
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var showsError = false
+    @State private var errorMessage: String?
+    @State private var isBusy = false
+
+    private var showsError: Bool {
+        errorMessage != nil
+    }
 
     @FocusState private var focus: Field?
 
@@ -27,10 +32,10 @@ struct LoginView: View {
         }
         .animation(.easeInOut(duration: 0.2), value: showsError)
         .onChange(of: email) {
-            showsError = false
+            errorMessage = nil
         }
         .onChange(of: password) {
-            showsError = false
+            errorMessage = nil
         }
     }
 
@@ -72,8 +77,8 @@ struct LoginView: View {
             }
             .padding(.top, 36)
 
-            if showsError {
-                FieldErrorRow(message: "Incorrect email or password. Try again.")
+            if let errorMessage {
+                FieldErrorRow(message: errorMessage)
                     .padding(.top, 8)
             }
 
@@ -81,7 +86,7 @@ struct LoginView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.top, 12)
 
-            PrimaryButton(title: "LOG IN", action: submit)
+            PrimaryButton(title: "LOG IN", isBusy: isBusy, action: submit)
                 .padding(.top, 24)
 
             OrDivider()
@@ -121,16 +126,25 @@ struct LoginView: View {
         }
     }
 
-    /// Authentication is mocked until a backend exists, so this only checks the
-    /// format. Any well-formed email with a password logs in.
     private func submit() {
         focus = nil
 
-        if email.isValidEmail && !password.isEmpty {
-            profile.email = email
-            router.enterApp()
-        } else {
-            showsError = true
+        guard email.isValidEmail, !password.isEmpty else {
+            errorMessage = AccountError.invalidCredentials.message
+            return
+        }
+
+        isBusy = true
+        Task {
+            defer { isBusy = false }
+
+            do {
+                try await AccountService.logIn(email: email, password: password)
+                profile.email = email
+                router.enterApp()
+            } catch {
+                errorMessage = (error as? AccountError ?? .unknown).message
+            }
         }
     }
 }

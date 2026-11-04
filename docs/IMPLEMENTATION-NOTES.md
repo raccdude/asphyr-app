@@ -4,6 +4,7 @@ The running record of how the app is being built. Design intent lives in [DESIGN
 
 ## Project structure
 - **`Components`:** reusable pieces, grouped by feature: `Auth`, `Buttons`, `Cards`, `Character`, `Common`, `Effects`, `Inputs`, `Journey`, `Quests`.
+- **`Backend`:** the connection to Supabase, and account actions.
 - **`DesignSystem`:** colors and typography.
 - **`Models`:** data and rules, grouped as `Journey`, `Profile`, `Quests`, `Settings`.
 - **`Views`:** one folder per area: `App` (root, router and tabs), `Authentication`, `Onboarding`, `Home`, `Quests`, `Journey`, `Character`, `Settings`.
@@ -40,7 +41,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
-| Backend steps 2 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
+| Backend step 2: email accounts | Built, not merged | `feat/backend-accounts` |
+| Backend steps 3 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -72,18 +74,18 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Validation:** errors appear when leaving a field and on submit, and clear when that field is edited. A weak password blocks submit and keeps the checklist visible, a state Figma has no frame for.
 - **Header (all auth screens):** Create Account, Login, Account Recovery and Recovery Success share `AuthScreen` and `AuthHeader`, so change spacing there and it applies everywhere. Welcome also uses `AuthScreen`, with `showsBackButton: false`, so its wordmark sits in the same position. Home has its own wordmark; line it up in the Home step. `AuthTopBar` draws a custom glass back button and hides the system bar, an exception recorded in DESIGN-DECISIONS.md. Swipe-back is turned on only while that screen is visible, so Welcome and Home stay unaffected. The back button starts at 76pt on iPhone 18 Pro.
 - **Backend choice:** Supabase, chosen on 4 Nov 2026 over Firebase. ASPHYR's data is connected and suits tables, Edge Functions can check rewards on the server, and standard Postgres avoids lock-in. The first release doesn't need to work fully offline, as decided on the same day, so it won't build offline sync. It still needs clear loading and no-connection states.
-- **Sign-in is still mocked in the app.** The Supabase project exists, and email accounts are backend step 2. Authentication stays mocked and the Apple and Google buttons stay display only until the go-ahead is given. Real sign-in is needed before release.
+- **Email accounts are real:** sign-up, login, logout, password reset and staying signed in use Supabase, through `Backend/AccountService.swift`. The Apple and Google buttons stay display only until backend step 6.
 - **`StatusError`** is now `#FF5C5C`, Figma's Error value.
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
 ## Login
-- **Mock validation:** "Incorrect email or password" appears on submit for a malformed email or an empty field, and clears on edit. Any well-formed email with a password logs in. Replace this in `LoginView.submit()` when the backend arrives.
+- **Errors:** a malformed email, an empty field or wrong details show "Incorrect email or password", and connection and rate-limit problems show their own message. All clear on edit.
 - **After login:** goes to the tabs through `router.enterApp()`.
 - **Save Password prompt:** iOS offers this after logging in, and it stays on purpose. It's standard, and the same field settings let password managers fill in the login.
 
 ## Account Recovery
 - **Spirit:** `SpiritView` shows wave, focused, surprised or cheer, and crossfades between them. The assets are original-color SVGs in the catalog. Add other moods there when their screens are built.
-- **Mock behaviour:** no email is sent. Resend shows the toast and starts a 30-second countdown, which resets when the screen is left. Replace this in `RecoverySuccessView.resend()` when the backend arrives.
+- **Reset email:** Supabase sends the link, which opens `asphyr://reset-password` and then `SetNewPasswordView`. Resend starts a 30-second countdown. An unknown email still shows success, so the screen can't reveal who has an account. The link must be opened on the device that asked for it.
 - **Keyboard:** the email field sits low, so Recovery scrolls it into view when focused. `AuthTopBar` has a solid background so scrolling content doesn't show behind the wordmark. Use the same scroll approach on any screen with a low field.
 - **`AsphyrToast`** is reusable, with a Reset Progress toast planned in DESIGN-DECISIONS.md.
 
@@ -335,6 +337,10 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 
+### Accounts
+- Add a Set New Password frame, matching `SetNewPasswordView`, and the busy state on the primary button.
+- Add the new account errors on Create Account, Login and Account Recovery if they should have frames.
+
 ### Planned designs
 Figma doesn't have these yet, because the app doesn't either.
 - **Store and Inventory:** new frames, plus the store icon on Home's frames and moving the CLOAKS grid off Character (`15` to `15.5`). See Store and inventory.
@@ -349,7 +355,7 @@ Figma doesn't have these yet, because the app doesn't either.
 - **Launch screen:** `LaunchScreen.storyboard` shows the Prism mark on a fixed dark background, `#0B0D12`. It's a storyboard because the `UILaunchScreen` color was ignored on the iPhone 18 Pro simulator, which showed white behind the logo. iOS draws it before the app runs, so it stays dark even if Light is chosen in Settings.
 - **If the flame moves in Splash, update the storyboard's centerY constant,** or the flame will jump on launch. The -95pt comes from Splash's -64 offset plus half of the 21pt gap and the name's line height.
 - **Splash:** the flame starts visible, to carry on from the launch screen, then pops. The halo, name and tap prompt then appear.
-- **Launch speed:** don't link `PhotosUI`. Measured on the iPhone 18 Pro simulator, it alone took an empty SwiftUI app from 0.21s to 1.07s before its first line of code. The photo library uses `UIImagePickerController` instead, which UIKit already includes.
+- **Launch speed:** on the simulator, `AuthenticationServices` alone takes an empty app from 0.20s to about 1.05s before its first line of code. Supabase's login library requires it, and Sign in with Apple would too, so the app is back to about 1.17s to Splash, in both Debug and Release. `PhotosUI` showed the same delay. Nothing has been measured on a real iPhone, which may be much faster, so measure there before working around it.
 - **Stale launch screens:** iOS caches them. If an old one shows, delete the app from the device and run it again.
 
 ## Deploying to a phone (teach at the end)
@@ -369,4 +375,6 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
+- **High, until backend steps 3 and 4:** accounts are real, but profile and progress still aren't saved. After a relaunch, a signed-in user goes to the tabs as "Traveler" with empty progress, and logging back in does the same.
+- **High, until backend step 5:** Delete Account only signs out and clears the device. The login stays on the server.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.

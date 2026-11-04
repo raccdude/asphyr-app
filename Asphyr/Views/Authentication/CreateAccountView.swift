@@ -22,6 +22,8 @@ struct CreateAccountView: View {
     @State private var showsEmailError = false
     @State private var showsMismatchError = false
     @State private var showsPasswordRules = false
+    @State private var accountError: String?
+    @State private var isBusy = false
 
     @FocusState private var focus: Field?
 
@@ -44,6 +46,7 @@ struct CreateAccountView: View {
             validateOnLeaving(oldValue)
         }
         .onChange(of: email) {
+            accountError = nil
             showsEmailError = false
         }
         .onChange(of: password) {
@@ -128,7 +131,12 @@ struct CreateAccountView: View {
             }
             .padding(.top, 36)
 
-            PrimaryButton(title: "CREATE ACCOUNT", action: submit)
+            if let accountError {
+                FieldErrorRow(message: accountError)
+                    .padding(.top, 8)
+            }
+
+            PrimaryButton(title: "CREATE ACCOUNT", isBusy: isBusy, action: submit)
                 .padding(.top, 28)
 
             OrDivider()
@@ -173,9 +181,20 @@ struct CreateAccountView: View {
         showsPasswordRules = !PasswordChecklist.isValid(password)
         showsMismatchError = !doPasswordsMatch
 
-        if isEmailValid && PasswordChecklist.isValid(password) && doPasswordsMatch {
-            profile.email = email
-            router.push(.identity)
+        guard isEmailValid, PasswordChecklist.isValid(password), doPasswordsMatch else { return }
+
+        accountError = nil
+        isBusy = true
+        Task {
+            defer { isBusy = false }
+
+            do {
+                try await AccountService.signUp(email: email, password: password)
+                profile.email = email
+                router.push(.identity)
+            } catch {
+                accountError = (error as? AccountError ?? .unknown).message
+            }
         }
     }
 }

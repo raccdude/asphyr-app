@@ -16,6 +16,8 @@ struct RecoverAccountView: View {
 
     @State private var email: String = ""
     @State private var showsError = false
+    @State private var sendError: String?
+    @State private var isBusy = false
 
     @FocusState private var focus: Field?
 
@@ -37,6 +39,7 @@ struct RecoverAccountView: View {
         }
         .onChange(of: email) {
             showsError = false
+            sendError = nil
         }
     }
 
@@ -93,9 +96,14 @@ struct RecoverAccountView: View {
                     .padding(.top, 8)
             }
 
+            if let sendError {
+                FieldErrorRow(message: sendError)
+                    .padding(.top, 8)
+            }
+
             Spacer(minLength: 24)
 
-            PrimaryButton(title: "SEND RESET LINK", action: submit)
+            PrimaryButton(title: "SEND RESET LINK", isBusy: isBusy, action: submit)
         }
         .padding(.horizontal, 20)
         // Tapping empty space dismisses the keyboard
@@ -108,10 +116,21 @@ struct RecoverAccountView: View {
     private func submit() {
         focus = nil
 
-        if email.isValidEmail {
-            router.push(.recoverySuccess(email: email))
-        } else {
+        guard email.isValidEmail else {
             showsError = true
+            return
+        }
+
+        isBusy = true
+        Task {
+            defer { isBusy = false }
+
+            do {
+                try await AccountService.sendPasswordReset(email: email)
+                router.push(.recoverySuccess(email: email))
+            } catch {
+                sendError = (error as? AccountError ?? .unknown).message
+            }
         }
     }
 }

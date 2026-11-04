@@ -10,7 +10,7 @@ import SwiftUI
 /// The root `NavigationStack` for auth and onboarding, swapped for the tabs
 /// once they finish. Pushed screens should not create their own stack.
 struct RootView: View {
-    @State private var router = AppRouter()
+    @State private var router = AppRouter(isSignedIn: AccountService.isSignedIn)
     @State private var profile = OnboardingProfile()
     @State private var settings = AppSettings()
 
@@ -38,6 +38,8 @@ struct RootView: View {
                                 IdentityCreationView()
                             case .archetype:
                                 ArchetypeSelectionView()
+                            case .newPassword:
+                                SetNewPasswordView()
                             }
                         }
                 }
@@ -50,6 +52,21 @@ struct RootView: View {
         .environment(settings)
         .environment(\.hapticsEnabled, settings.soundsAndHaptics)
         .preferredColorScheme(settings.appearance.colorScheme)
+        .onOpenURL { url in
+            AccountService.handle(url)
+        }
+        .task {
+            if let email = AccountService.currentEmail {
+                profile.email = email
+            }
+            await AccountService.followEvents {
+                router.showNewPassword()
+            } onSignedOut: {
+                // Also covers a session that can no longer be refreshed
+                profile.clear()
+                router.logOut()
+            }
+        }
     }
 }
 

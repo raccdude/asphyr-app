@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. The app isn't connected yet.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Step 2 is built, and waiting on the developer's check:** email accounts in the app.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -79,11 +79,18 @@ Checked with two throwaway users, which the test then removed:
 
 Supabase's security and performance advisors reported nothing.
 
+**GitHub:** `raccdude/asphyr-app` is connected, with working directory `.`, deploy to production from `main`, and automatic branching off, which needs the Pro plan. New files in `supabase/migrations` apply to the database when they reach `main`. A migration already applied directly must keep the same version number in its filename, so it doesn't run twice.
+
+## Step 2 notes
+- **Supabase settings changed:** `asphyr://reset-password` is an allowed redirect, and Confirm email is off for development. Turn it back on before release. `signUp` then returns no session, so Create Account will need a check-your-email state.
+- **Library:** `supabase-swift`, up to the next major version from 2.55.6.
+- **Launch time:** adding the library took the simulator from 0.30s to about 1.17s to Splash, because it needs `AuthenticationServices`. Measure on a real iPhone before deciding what to do.
+- **Email limits:** Supabase's built-in sender is limited, so a reset email may not arrive at every address until custom email sending is set up.
+
 ## Defaults, unless the developer says otherwise
 - **Project:** a new project called ASPHYR, in the developer's own Supabase account.
 - **Region:** Singapore (`ap-southeast-1`), for lower delay in the Philippines, where the developer lives.
 - **Email confirmation:** off during development, and on before release.
-- **GitHub:** connect the repo after step 1, with deploy to production on `main` and automatic branching off.
 
 ## Before release, not in these steps
 - Custom email sending for sign-up and reset emails, as Supabase's built-in sender is limited.

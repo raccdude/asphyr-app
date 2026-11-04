@@ -15,6 +15,8 @@ struct RecoverySuccessView: View {
     @State private var resendCount = 0
     @State private var resendSecondsLeft = 0
     @State private var showsToast = false
+    @State private var toastMessage = ""
+    @State private var toastIcon = "iconMailSmall"
 
     var body: some View {
         AuthScreen {
@@ -22,7 +24,7 @@ struct RecoverySuccessView: View {
         }
         .overlay(alignment: .top) {
             if showsToast {
-                AsphyrToast(icon: "iconMailSmall", message: "Reset link sent again to \(email)")
+                AsphyrToast(icon: toastIcon, message: toastMessage)
                     .padding(.horizontal, 20)
                     .padding(.top, -4)
                     .transition(.move(edge: .top).combined(with: .opacity))
@@ -101,11 +103,20 @@ struct RecoverySuccessView: View {
         String(format: "%d:%02d", resendSecondsLeft / 60, resendSecondsLeft % 60)
     }
 
-    /// Email is mocked until a backend exists, so nothing is actually sent.
     private func resend() {
-        resendSecondsLeft = 30
-        showsToast = true
-        resendCount += 1
+        Task {
+            do {
+                try await AccountService.sendPasswordReset(email: email)
+                toastIcon = "iconMailSmall"
+                toastMessage = "Reset link sent again to \(email)"
+                resendSecondsLeft = 30
+            } catch {
+                toastIcon = "iconAlert"
+                toastMessage = (error as? AccountError ?? .unknown).message
+            }
+            showsToast = true
+            resendCount += 1
+        }
     }
 
     private func runResendCooldown() async {
