@@ -157,7 +157,23 @@ struct HomeView: View {
             }
         }
         .onChange(of: isResting) {
-            characterMood = isResting ? .sleepy : .idle
+            if isResting {
+                characterMood = .sleepy
+            } else if characterMood == .sleepy {
+                characterMood = .idle
+            }
+        }
+        // Happy for a moment after finishing a quest
+        .onChange(of: questStore.completionDates.count) { oldCount, newCount in
+            guard newCount > oldCount else { return }
+            characterMood = .happy
+
+            Task {
+                try? await Task.sleep(for: .seconds(4))
+                if characterMood == .happy {
+                    characterMood = isResting ? .sleepy : .idle
+                }
+            }
         }
         .navigationDestination(isPresented: $isShowingSettings) {
             SettingsView()

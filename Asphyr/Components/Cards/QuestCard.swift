@@ -119,7 +119,7 @@ struct QuestCard: View {
         .padding(.top, 16)
         .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
-        .questCardBackground(isActive: isActive)
+        .questCardBackground(isActive: isActive, showsComet: true)
     }
 
     private var rewards: some View {
@@ -158,14 +158,18 @@ struct QuestCard: View {
 }
 
 extension View {
-    /// Active quests sit on the elevated surface with a green lower edge.
-    func questCardBackground(isActive: Bool) -> some View {
+    /// Active quests sit on the elevated surface with a green lower edge. Home's
+    /// card has the comet instead, as more than one in the quest log was too much.
+    func questCardBackground(isActive: Bool, showsComet: Bool = false) -> some View {
         background {
             if isActive {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.asphyrSurfaceElevated)
+                    .shadow(color: showsComet ? .clear : .asphyrAccentPrimary, radius: 1, x: 0, y: 1)
                     .overlay {
-                        CometBorder(cornerRadius: 16)
+                        if showsComet {
+                            CometBorder(cornerRadius: 16)
+                        }
                     }
             } else {
                 RoundedRectangle(cornerRadius: 20)

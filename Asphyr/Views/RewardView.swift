@@ -17,6 +17,8 @@ struct RewardView: View {
 
     @State private var isRevealed = false
     @State private var isShowingUnlockedReward = false
+    /// Surprised as the rewards appear, then settles on how the quest went.
+    @State private var spiritMood: SpiritView.Mood = .surprised
 
     private var quest: Quest {
         completion.quest
@@ -37,7 +39,36 @@ struct RewardView: View {
     }
 
     var body: some View {
-        ScrollView {
+        GeometryReader { proxy in
+            ScrollView {
+                rewardContent
+                    // Centered, so a short reward doesn't leave a gap above the button
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            PrimaryButtonV2(title: "CONTINUE") {
+                dismiss()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 16)
+            .background(Color.asphyrBackground)
+        }
+        .background(Color.asphyrBackground.ignoresSafeArea())
+        .hapticFeedback(.success, trigger: isRevealed)
+        .onAppear {
+            isRevealed = true
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(0.9))
+            spiritMood = quest.isBonusReward ? .happy : .cheer
+        }
+    }
+
+    private var rewardContent: some View {
             VStack(alignment: .leading, spacing: 0) {
                 spiritMessage
 
@@ -95,28 +126,14 @@ struct RewardView: View {
             .padding(.horizontal, 20)
             .padding(.top, 8)
             .padding(.bottom, 16)
-        }
-        .scrollBounceBehavior(.basedOnSize)
-        .scrollIndicators(.hidden)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            PrimaryButtonV2(title: "CONTINUE") {
-                dismiss()
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 16)
-            .background(Color.asphyrBackground)
-        }
-        .background(Color.asphyrBackground.ignoresSafeArea())
-        .hapticFeedback(.success, trigger: isRevealed)
-        .onAppear {
-            isRevealed = true
-        }
     }
 
     private var spiritMessage: some View {
         HStack(spacing: 2) {
-            SpiritView(mood: .cheer, size: 104)
+            SpiritView(mood: spiritMood, size: 104)
+                .scaleEffect(isRevealed ? 1 : 0.6)
+                .opacity(isRevealed ? 1 : 0)
+                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isRevealed)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Nice work, \(displayName)!")
@@ -139,6 +156,10 @@ struct RewardView: View {
                     topTrailingRadius: 16
                 )
             )
+            // Pops out from the spirit, like the reward cards
+            .scaleEffect(isRevealed ? 1 : 0.6, anchor: .leading)
+            .opacity(isRevealed ? 1 : 0)
+            .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(0.08), value: isRevealed)
         }
         // The spirit's art has space around it, so it sits just past the margin
         .padding(.leading, -6)

@@ -59,6 +59,7 @@ struct CreateQuestView: View {
     @State private var steps: [QuestStep] = []
     @State private var newStep = ""
     @State private var showsTitleError = false
+    @State private var isShowingRewardDetails = false
     @State private var showsStepsError = false
     @State private var toastMessage: String?
     @State private var toastCount = 0
@@ -393,7 +394,12 @@ struct CreateQuestView: View {
         let attributes = RewardRules.attributes(category: category, difficulty: difficulty)
         let shownAttributes = isBonus ? RewardRules.bonusAttributes(from: attributes) : attributes
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isShowingRewardDetails.toggle()
+            }
+        } label: {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("COMPLETION REWARD")
@@ -418,11 +424,29 @@ struct CreateQuestView: View {
                         .animation(.snappy, value: shownXP)
                 }
                 .foregroundStyle(Color.asphyrWarning)
+
+                Image("iconChevronRight")
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .rotationEffect(.degrees(isShowingRewardDetails ? 90 : 0))
+                    .accessibilityHidden(true)
             }
 
-            Text(shownAttributes.map { "+\($0.value) \($0.name)" }.joined(separator: "   "))
-                .font(AppTypography.captionMedium)
-                .foregroundStyle(Color.asphyrWarning)
+            // Tucked away so the card stays short while typing
+            if isShowingRewardDetails {
+                ForEach(shownAttributes, id: \.name) { attribute in
+                    HStack(spacing: 8) {
+                        Image(attribute.iconName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .accessibilityHidden(true)
+
+                        Text("+\(attribute.value) \(attribute.name)")
+                            .font(AppTypography.captionMedium)
+                    }
+                    .foregroundStyle(Color.asphyrWarning)
+                }
+            }
         }
         .padding(.horizontal, 17)
         .padding(.vertical, 12)
@@ -432,7 +456,11 @@ struct CreateQuestView: View {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(Color.asphyrWarning.opacity(0.25), lineWidth: 1)
         }
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+        .accessibilityValue(isShowingRewardDetails ? "Expanded" : "Collapsed")
     }
 
     private func rewardSubtitle(isBonus: Bool) -> String {

@@ -50,7 +50,7 @@ struct XPBar: View {
                 GeometryReader { proxy in
                     fill(trackWidth: proxy.size.width)
                         .frame(width: proxy.size.width * shownProgress, alignment: .leading)
-                        .clipped()
+                        .clipShape(Capsule())
                         .shadow(color: Color.asphyrAccentPrimary.opacity(0.5), radius: 6)
                 }
             }

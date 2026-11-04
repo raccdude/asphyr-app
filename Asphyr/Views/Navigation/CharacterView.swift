@@ -104,6 +104,18 @@ struct CharacterView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: toast)
+        // Happy for a moment after finishing a quest
+        .onChange(of: questStore.completionDates.count) { oldCount, newCount in
+            guard newCount > oldCount else { return }
+            mood = .happy
+
+            Task {
+                try? await Task.sleep(for: .seconds(4))
+                if mood == .happy {
+                    mood = .idle
+                }
+            }
+        }
         .hapticFeedback(.warning, trigger: lockedTapCount)
         .task(id: toastCount) {
             guard toast != nil else { return }

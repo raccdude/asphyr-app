@@ -19,6 +19,16 @@ struct CharacterArt: View {
 
     var body: some View {
         ZStack {
+            // A soft glow in the user's color
+            GeometryReader { proxy in
+                RadialGradient(
+                    colors: [color.faceColor.opacity(0.2), color.faceColor.opacity(0)],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: proxy.size.width / 2
+                )
+            }
+
             layer("characterLayerBase")
             cloakLayer("characterLayerCloakBack")
             layer("characterTunic\(color.rawValue)")

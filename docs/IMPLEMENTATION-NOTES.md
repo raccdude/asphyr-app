@@ -136,10 +136,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 
 ## UI polish for later
 Don't build these until asked.
-- **Expressions on achievements:** change the character's and the flame spirit's expressions when there's an achievement or a completion.
-- **Character glow:** wherever the character appears, add a soft glow or ring around it in the user's chosen color. Not bright.
-- **Character tap effect:** add a visual effect when the character is tapped. Tapping already cycles its expressions on Home.
-- **Create Quest reward card:** redesign it, possibly as a dropdown.
 - **Circle animation:** the developer also suggested one for quest cards. Where it goes isn't decided.
 
 ## Journey
@@ -236,14 +232,21 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Streak alerts:** a real local notification at 8 PM on the last day that keeps the streak going. Finishing a quest moves it to the next day.
 - **Known limit:** streaks use the phone's clock and reset on relaunch until saving exists.
 
+## UI polish
+- **Expressions on completion:** on Reward, the spirit starts surprised, then becomes cheerful, or happy for a small bonus. The character on Home and Character is happy for 4 seconds after a quest is finished.
+- **Character glow:** `CharacterArt` has a soft glow in the user's color, wherever the character appears.
+- **Character tap effect:** a small bounce and a fading ring each time the mood changes. It also plays when a mood changes on its own.
+- **Create Quest reward card:** a dropdown. XP and difficulty always show, and attributes appear when it's tapped.
+- **Reward:** the spirit and its message pop in like the reward cards, and the content is centered above the button.
+
 ## Quest timer
 - **Timer bar:** `QuestTimerBar` shows a timed quest's progress on Quest Details and Home, with a glowing dot at its leading edge. It replaces the elapsed time and timer icon. A halfway tick and a "Complete in 3 min" status were tried and dropped, as they needed explaining and repeated the notice above the button.
 - **Countdown:** the big number is the time left, rounded up. The corner only shows "Paused" or "Time's up". Time's up takes nothing away, and the quest can still be completed.
 - **When it can be completed:** the notice above the button says so.
 
 ## Animated cards and bars
-- **Comet border:** `CometBorder` sends a point of light clockwise around active quest cards every 5 seconds, over a faint green edge. It replaces the solid green edge on Home and the quest log. Available and completed cards stay still.
-- **Aurora bars:** every `XPBar` uses a green and cyan gradient. Most flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm.
+- **Comet border:** `CometBorder` sends a point of light clockwise around Home's active card every 5 seconds, over a faint green edge. The quest log keeps the solid green edge, as two comets were too much.
+- **Aurora bars:** every `XPBar` uses a green and cyan gradient, with a rounded end. Most flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm.
 - **Cyan:** `#3EE0F0` only appears inside bars, written in `XPBar` rather than as a color token.
 
 ## Character evolution (later)
@@ -306,7 +309,10 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 ### Timer, cards and bars
 `06` still shows the earlier timer. Make these once Figma access is back.
 - On `6.1`, `6.2`, `6.5`, `6.6`, `6.7`, the Light `6.1` and Home `9.1`: remove the halfway tick and the "Complete in 3 min" text, keeping "Paused" and "Time's up".
-- Show the Aurora gradient on every bar, and note the Comet border's motion beside active cards. A still frame can't show either moving.
+- Show the Aurora gradient with a rounded end on every bar, and note the Comet border's motion beside Home's active card. A still frame can't show either moving. The quest log keeps its green edge.
+- Center Reward's content above the button, and note the spirit and message popping in, with the surprised then cheerful expressions.
+- Add the character glow, and note the tap bounce and ring.
+- Make Create Quest's reward card a dropdown, collapsed and expanded, replacing the attributes line added earlier on `06`.
 
 ### Contrast
 - Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.

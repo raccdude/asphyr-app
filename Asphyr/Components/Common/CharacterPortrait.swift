@@ -56,6 +56,36 @@ struct CharacterPortrait: View {
         }
         .frame(width: size, height: size)
         .animation(.easeInOut(duration: 0.2), value: mood)
+        // A little bounce and a ring in the user's color when the mood changes
+        .keyframeAnimator(initialValue: MoodChange(), trigger: mood) { content, change in
+            content
+                .scaleEffect(change.scale)
+                .background {
+                    Circle()
+                        .stroke(color.faceColor, lineWidth: 2)
+                        .scaleEffect(change.ringScale)
+                        .opacity(change.ringOpacity)
+                }
+        } keyframes: { _ in
+            KeyframeTrack(\.scale) {
+                SpringKeyframe(1.08, duration: 0.14)
+                SpringKeyframe(1, duration: 0.3)
+            }
+            KeyframeTrack(\.ringScale) {
+                CubicKeyframe(0.55, duration: 0.01)
+                CubicKeyframe(1.1, duration: 0.45)
+            }
+            KeyframeTrack(\.ringOpacity) {
+                CubicKeyframe(0.45, duration: 0.01)
+                CubicKeyframe(0, duration: 0.45)
+            }
+        }
+    }
+
+    private struct MoodChange {
+        var scale: CGFloat = 1
+        var ringScale: CGFloat = 0.55
+        var ringOpacity: Double = 0
     }
 
     private func layer(_ name: String) -> some View {
