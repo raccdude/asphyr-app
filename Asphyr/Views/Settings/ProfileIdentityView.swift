@@ -44,13 +44,7 @@ struct ProfileIdentityView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.asphyrBackground
-                .ignoresSafeArea()
-                .onTapGesture {
-                    isNameFocused = false
-                }
-
+        VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 0) {
                     photoButton
@@ -80,17 +74,32 @@ struct ProfileIdentityView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 24)
+                // The scroll view would swallow a tap on the screen's background
+                .background {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            isNameFocused = false
+                        }
+                }
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
             .scrollDismissesKeyboard(.interactively)
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+
             saveButton
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .padding(.bottom, 16)
-                .background(Color.asphyrBackground)
+        }
+        // The button stays at the bottom, behind the keyboard, instead of rising with it
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .background {
+            Color.asphyrBackground
+                .ignoresSafeArea()
+                .onTapGesture {
+                    isNameFocused = false
+                }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
