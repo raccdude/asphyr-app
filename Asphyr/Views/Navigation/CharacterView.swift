@@ -133,7 +133,8 @@ struct CharacterView: View {
                 .accessibilityAddTraits(.isHeader)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 8)
+        // Lines up with the header on Home and Journey
+        .padding(.top, 14)
     }
 
     private var identity: some View {

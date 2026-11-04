@@ -288,7 +288,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Copying a page:** Figma's page copy lost the opacity of colors bound to variables, so see-through fills turned solid and bright on 167 layers. These were restored from `05`, and a fingerprint of fills, strokes and effects then matched on every frame. Copying frames loses them too, and so does binding a new color to a variable, so set the opacity afterwards and check after any copy.
 
-**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Journey (`10` to `10.3`, plus new `10.4` to `10.8`) and Character (`11`, `11.1`, plus new `11.2` to `11.5`) are done too, with `Notes / Journey` and `Notes / Character`. Sections from `08 · Settings & sheets` down moved 300pt lower to make room. Also done: the simplified timer, the button's gradient on every bar, Reward as option B, and Create Quest's section titles, even category rows and reward dropdown, with a new reward expanded frame. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
+**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Journey (`10` to `10.3`, plus new `10.4` to `10.8`) and Character (`11`, `11.1`, plus new `11.2` to `11.5`) are done too, with `Notes / Journey` and `Notes / Character`. Streaks are done as well, with new one-day sheets for today and yesterday, and `Notes / Streaks`. Sections from `08 · Settings & sheets` down moved 300pt lower to make room. Also done: the simplified timer, the button's gradient on every bar, Reward as option B, and Create Quest's section titles, even category rows and reward dropdown, with a new reward expanded frame. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
 
 ### All screens
 - **Header position:** screens with a back button or top header sit 14pt lower than Figma (back button top 76pt, not 62pt). Move the content below down with it.
@@ -296,11 +296,6 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 ### Character
 - Frames show Starter, Midnight and Oxblood worn. Add the other cloaks if needed, and redesign the character art when that work starts, keeping its layers.
-
-### Streaks
-- Hide the chip on Home until the first quest is finished.
-- Make the sheet's spirit tappable through its expressions.
-- Add a state for a one-day streak: "You took a step today." or "You took a step yesterday."
 
 ### Motion and character effects
 A still frame can't show these, so write them as notes beside the screens.
