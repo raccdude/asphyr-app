@@ -138,7 +138,7 @@ struct IdentityCreationView: View {
                 Button {
                     profile.color = color
                 } label: {
-                    ColoredDots(color: color.swatch, isSelected: profile.color == color)
+                    ColorSwatch(color: color.swatch, isSelected: profile.color == color)
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
                 }

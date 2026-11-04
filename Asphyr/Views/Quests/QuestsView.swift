@@ -1,5 +1,5 @@
 //
-//  QuestView.swift
+//  QuestsView.swift
 //  Asphyr
 //
 //  Created by Mac-LAB on 9/17/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct QuestView: View {
+struct QuestsView: View {
     enum QuestFilter: String, CaseIterable {
         case all = "ALL"
         case active = "ACTIVE"
@@ -326,22 +326,22 @@ private extension View {
 }
 
 #Preview("Default") {
-    QuestView()
+    QuestsView()
         .environment(QuestStore())
 }
 
 #Preview("All quest types") {
-    QuestView()
+    QuestsView()
         .environment(QuestStore(quests: Quest.samples))
 }
 
 #Preview("No quests") {
-    QuestView()
+    QuestsView()
         .environment(QuestStore(quests: []))
 }
 
 #Preview("Completed quest") {
-    QuestView()
+    QuestsView()
         .environment(QuestStore(quests: [
             Quest(
                 type: .dailyQuest,

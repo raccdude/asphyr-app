@@ -8,8 +8,7 @@
 import SwiftUI
 
 /// The Apple and Google sign-in row from Figma "05 — Hi-Fi v2".
-/// Display only until real sign-in exists. Once every screen uses it,
-/// it replaces `BrandCard`.
+/// Display only until real sign-in exists.
 struct SocialSignInRow: View {
     var body: some View {
         HStack(spacing: 12) {

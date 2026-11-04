@@ -206,7 +206,7 @@ struct CharacterView: View {
                 Button {
                     profile.color = color
                 } label: {
-                    ColoredDots(color: color.swatch, isSelected: profile.color == color)
+                    ColorSwatch(color: color.swatch, isSelected: profile.color == color)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .contentShape(Rectangle())
                 }
@@ -265,7 +265,7 @@ struct CharacterView: View {
     ) -> some View {
         Button(action: action) {
             VStack(spacing: 8) {
-                ColoredDots(color: swatch, isSelected: isSelected)
+                ColorSwatch(color: swatch, isSelected: isSelected)
                     .frame(width: 44, height: 44)
                     .overlay {
                         if isLocked {

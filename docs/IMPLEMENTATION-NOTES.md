@@ -2,6 +2,14 @@
 
 The running record of how the app is being built. Design intent lives in [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md). Update this file on the same branch as the work it describes.
 
+## Project structure
+- **`Components`:** reusable pieces, grouped by feature: `Auth`, `Buttons`, `Cards`, `Character`, `Common`, `Effects`, `Inputs`, `Journey`, `Quests`.
+- **`DesignSystem`:** colors and typography.
+- **`Models`:** data and rules, grouped as `Journey`, `Profile`, `Quests`, `Settings`.
+- **`Views`:** one folder per area: `App` (root, router and tabs), `Authentication`, `Onboarding`, `Home`, `Quests`, `Journey`, `Character`, `Settings`.
+- **Names:** one main type per file, and the file carries its name. `SettingsComponents.swift` is the exception, as it holds Settings' small shared pieces.
+- **Adding files:** the project uses a synchronized folder, so new or moved files in `Asphyr` join the app without touching the project file.
+
 ## Workflow
 See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a time from Figma page "05 — Hi-Fi v2 (Polished)".
 
@@ -95,7 +103,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
   - **Main and personal:** user generated, through Create Quest. Neither appears by default. The developer stated this for main quests; personal is treated the same because it's also offered on Create Quest.
 - **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
 - **Filters:** ALL shows every open quest, available or active, and completed quests appear only under Completed so they don't pile up. The others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
-- **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
+- **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestsView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
 - **Unused now:** `iconGamepad` is left over from the old card. Delete it in a cleanup.
 
 ## Create Quest

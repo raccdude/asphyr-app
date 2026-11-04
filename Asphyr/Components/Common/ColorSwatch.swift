@@ -1,5 +1,5 @@
 //
-//  DotColor.swift
+//  ColorSwatch.swift
 //  Asphyr
 //
 //  Created by Mac-LAB on 8/25/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ColoredDots: View {
+struct ColorSwatch: View {
     let color: Color
     let isSelected: Bool
 

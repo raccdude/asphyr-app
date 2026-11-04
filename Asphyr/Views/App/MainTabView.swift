@@ -52,7 +52,7 @@ struct MainTabView: View {
 
             Tab(value: MainTab.quests) {
                 NavigationStack {
-                    QuestView()
+                    QuestsView()
                         .mainTabBar(selection: $selection)
                 }
             }

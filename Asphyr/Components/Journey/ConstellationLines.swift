@@ -1,5 +1,5 @@
 //
-//  ConstellationShape.swift
+//  ConstellationLines.swift
 //  Asphyr
 //
 
