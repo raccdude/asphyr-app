@@ -229,6 +229,7 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Known limit:** streaks use the phone's clock and reset on relaunch until saving exists.
 
 ## UI polish
+- **Splash:** the flame pops in with a spring, then the name, then the tap prompt fades in.
 - **Expressions on completion:** on Reward, the spirit starts surprised, then becomes cheerful, or happy for a small bonus. The character on Home and Character is happy for 4 seconds after a quest is finished.
 - **Character glow:** `CharacterArt` has a soft glow in the user's color, except in the Settings and Profile avatars.
 - **Character tap effect:** a small bounce and a ripple in the user's color, only when tapped.
@@ -286,7 +287,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Copying a page:** Figma's page copy lost the opacity of colors bound to variables, so see-through fills turned solid and bright on 167 layers. These were restored from `05`, and a fingerprint of fills, strokes and effects then matched on every frame. Copying frames loses them too, and so does binding a new color to a variable, so set the opacity afterwards and check after any copy.
 
-**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
+**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Also done: the simplified timer, the button's gradient on every bar, Reward as option B, and Create Quest's section titles, even category rows and reward dropdown, with a new reward expanded frame. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
 
 ### All screens
 - **Header position:** screens with a back button or top header sit 14pt lower than Figma (back button top 76pt, not 62pt). Move the content below down with it.
@@ -306,15 +307,11 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 - Make the sheet's spirit tappable through its expressions.
 - Add a state for a one-day streak: "You took a step today." or "You took a step yesterday."
 
-### Timer, cards and bars
-`06` still shows the earlier timer. Make these once Figma access is back.
-- On `6.1`, `6.2`, `6.5`, `6.6`, `6.7`, the Light `6.1` and Home `9.1`: remove the halfway tick and the "Complete in 3 min" text, keeping "Paused" and "Time's up".
-- Show the button's gradient with a rounded end on every bar, and note the Comet border's motion beside Home's active card. A still frame can't show either moving. The quest log keeps its green edge.
-- Rebuild Reward as Option B: centered header on top, larger spirit and message, cards, then XP with the level. Remove the level up banner and speech bubble. Note the pop-ins and the surprised then cheerful expressions.
+### Motion and character effects
+A still frame can't show these, so write them as notes beside the screens.
+- The Comet border on Home's active card, the flowing bars, the splash logo popping in, Reward's pop-ins and its surprised then cheerful expressions.
 - Add the character glow, and note the tap bounce and ripple.
-- Add the angry character with flames in each character color, and the two even rows of categories.
-- Add QUEST TITLE and DESCRIPTION section titles to Create Quest.
-- Make Create Quest's reward card a dropdown, collapsed and expanded, replacing the attributes line added earlier on `06`.
+- Add the angry character with flames in each character color.
 
 ### Contrast
 - Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.

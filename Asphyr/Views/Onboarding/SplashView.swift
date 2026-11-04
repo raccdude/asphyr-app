@@ -41,15 +41,20 @@ struct SplashView: View {
                             .frame(width: 113, height: 105)
                             .blur(radius: 40)
                     }
+                    // The flame pops in, then the name follows
+                    .scaleEffect(showLogo || reduceMotion ? 1 : 0.6)
+                    .opacity(showLogo ? 1 : 0)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.6), value: showLogo)
 
                 Text("ASPHYR")
                     .font(AppTypography.display)
                     .tracking(1.92)
                     .foregroundStyle(Color.asphyrAccentPrimary)
+                    .scaleEffect(showLogo || reduceMotion ? 1 : 0.85)
+                    .opacity(showLogo ? 1 : 0)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.15), value: showLogo)
             }
             .offset(y: -64)
-            .opacity(showLogo ? 1 : 0)
-            .scaleEffect(showLogo || reduceMotion ? 1 : 0.96)
 
             // TAP ANYWHERE TO BEGIN
             VStack {
@@ -64,6 +69,7 @@ struct SplashView: View {
                         ? (isPulsing ? 0.45 : 1.0)
                         : 0
                     )
+                    .animation(.easeOut(duration: 0.6).delay(0.3), value: showLogo)
                     .animation(
                         .easeInOut(duration: 1.2)
                             .repeatForever(autoreverses: true),
@@ -82,10 +88,7 @@ struct SplashView: View {
         .accessibilityHint("Tap anywhere to begin")
         .accessibilityAddTraits(.isButton)
         .onAppear {
-            // Fade in flame + ASPHYR
-            withAnimation(.easeOut(duration: 0.8)) {
-                showLogo = true
-            }
+            showLogo = true
 
             // Start tap-text pulse after logo appears
             guard !reduceMotion else { return }
