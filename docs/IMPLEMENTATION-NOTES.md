@@ -39,7 +39,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Figma revisions | Merged. Prototype and a few small items remain, listed under Figma updates | `docs/figma-revisions` |
 | Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
-| Backend (Supabase) | Next | — |
+| Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
+| Backend steps 2 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -71,7 +72,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Validation:** errors appear when leaving a field and on submit, and clear when that field is edited. A weak password blocks submit and keeps the checklist visible, a state Figma has no frame for.
 - **Header (all auth screens):** Create Account, Login, Account Recovery and Recovery Success share `AuthScreen` and `AuthHeader`, so change spacing there and it applies everywhere. Welcome also uses `AuthScreen`, with `showsBackButton: false`, so its wordmark sits in the same position. Home has its own wordmark; line it up in the Home step. `AuthTopBar` draws a custom glass back button and hides the system bar, an exception recorded in DESIGN-DECISIONS.md. Swipe-back is turned on only while that screen is visible, so Welcome and Home stay unaffected. The back button starts at 76pt on iPhone 18 Pro.
 - **Backend choice:** Supabase, chosen on 4 Nov 2026 over Firebase. ASPHYR's data is connected and suits tables, Edge Functions can check rewards on the server, and standard Postgres avoids lock-in. The first release doesn't need to work fully offline, as decided on the same day, so it won't build offline sync. It still needs clear loading and no-connection states.
-- **Backend and sign-in are on hold.** Screens come first. Authentication stays mocked and the Apple and Google buttons stay display only until the go-ahead is given. Real sign-in is needed before release.
+- **Sign-in is still mocked in the app.** The Supabase project exists, and email accounts are backend step 2. Authentication stays mocked and the Apple and Google buttons stay display only until the go-ahead is given. Real sign-in is needed before release.
 - **`StatusError`** is now `#FF5C5C`, Figma's Error value.
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
