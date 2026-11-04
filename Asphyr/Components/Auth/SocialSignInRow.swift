@@ -44,7 +44,7 @@ struct SocialSignInRow: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         SocialSignInRow()

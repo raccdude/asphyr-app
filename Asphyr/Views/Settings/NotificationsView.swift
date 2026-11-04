@@ -146,7 +146,7 @@ struct NotificationsView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         NotificationsView()
     }

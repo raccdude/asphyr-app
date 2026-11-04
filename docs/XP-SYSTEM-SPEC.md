@@ -1,6 +1,6 @@
 # ASPHYR — XP and rewards spec
 
-Replaces the placeholder XP, level, attribute and reward logic. Approved design from 3 Nov 2026; build it on its own branch after `feat/reward-v2` merges.
+Replaces the placeholder XP, level, attribute and reward logic. Approved on 3 Nov 2026 and built. Updated on 4 Nov 2026 with attributes that scale with duration, Hard keywords in the title only, and level rewards that need their XP.
 
 ## Goal
 Rewards are inferred by the system, so users can't choose how much a quest is worth. It works on the device, with no backend or cloud AI.

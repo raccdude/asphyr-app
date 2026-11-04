@@ -8,6 +8,7 @@ The running record of how the app is being built. Design intent lives in [DESIGN
 - **`Models`:** data and rules, grouped as `Journey`, `Profile`, `Quests`, `Settings`.
 - **`Views`:** one folder per area: `App` (root, router and tabs), `Authentication`, `Onboarding`, `Home`, `Quests`, `Journey`, `Character`, `Settings`.
 - **Names:** one main type per file, and the file carries its name. `SettingsComponents.swift` is the exception, as it holds Settings' small shared pieces.
+- **Previews:** use `#Preview(traits: .dark)`, or `#Preview("Name", traits: .dark)`, so the canvas matches the dark-first app. The trait is in `DesignSystem/DarkPreview.swift`.
 - **Adding files:** the project uses a synchronized folder, so new or moved files in `Asphyr` join the app without touching the project file.
 
 ## Workflow
@@ -226,6 +227,7 @@ Agreed on 3 Nov 2026 and updated on 4 Nov 2026. Not built, and Figma has no fram
 The developer still doesn't like the Reward screen, even after option B, so it needs another redesign. Nothing is decided and nothing is built. Start by asking what feels wrong, then propose options before changing Figma or the app.
 
 ## Settings
+- **Account rows:** Log out, then Reset progress, then Delete account.
 - **Delete Account:** required by Apple for apps with accounts. It stops reminders, clears progress and the profile, and returns to Welcome. Nothing is stored outside the device yet, so `deleteAccount()` in `SettingsView` must also delete the account and its data on Supabase when accounts are real. A privacy policy is also needed before release, supplied by the developer.
 - **Screens:** Settings, Profile & Identity and Notifications are pushed from Home, with the system back button. Appearance, Reset Progress, Profile Photo and Reminder Time are sheets.
 - **Preferences:** `AppSettings` holds them in memory, so they reset on relaunch until saving exists. They survive logging out and resetting progress.
@@ -287,7 +289,7 @@ Plan this together with the character art redesign, and keep the layers so cloak
 Whether users can choose a gender is undecided, and nothing is built. The character is hooded and reads as neutral today, so this would mostly affect the art. Decide with the character art redesign. If it's added, it should be optional.
 
 ## Light mode (later)
-Light mode works but needs its own design pass. Nothing here is built yet.
+Light mode works but needs its own design pass. Nothing here is built yet. Figma only needs Light versions of the essential screens: Home, Quests, Quest Details, Reward, Journey, Character, Settings and Appearance, not every screen. When a Dark frame changes, copy it again, because copies lose the opacity of colors bound to variables and must have it restored.
 - **Components:** review every screen's components and designs in Light.
 - **Settings icon:** the gear on Home looks off.
 - **Outlines:** many are hard to see. The Light border `#DCDFE6` is very close to the Light background `#F3F4F7`.
@@ -328,7 +330,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 | 14 Profile & Identity | `18` to `18.6` |
 | 15 Notifications | `19` to `19.2` |
 | 16 Character art | `20.1` to `20.8` |
-| 17 Light mode | `21.1` to `21.8`, which still show the old designs until light mode gets its pass |
+| 17 Light mode | `21.1` to `21.8`: only the essential screens, copied from the current Dark frames and set to the Light color mode |
 
 **Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 

@@ -135,7 +135,7 @@ struct LoginView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         LoginView()
     }

@@ -39,7 +39,7 @@ struct CometBorder: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     RoundedRectangle(cornerRadius: 16)
         .fill(Color.asphyrSurfaceElevated)
         .frame(height: 200)

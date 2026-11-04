@@ -58,7 +58,7 @@ struct PressableButtonStyle: ButtonStyle {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         PrimaryButton(title: "BEGIN JOURNEY") {}

@@ -105,7 +105,7 @@ struct AsphyrInputField<Field: Hashable>: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     @Previewable @FocusState var focus: Int?
     @Previewable @State var email = ""
     @Previewable @State var password = "secret"

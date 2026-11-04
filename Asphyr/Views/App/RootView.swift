@@ -53,6 +53,6 @@ struct RootView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     RootView()
 }

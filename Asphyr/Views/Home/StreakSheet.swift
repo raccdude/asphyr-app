@@ -140,7 +140,7 @@ struct StreakSheet: View {
     }
 }
 
-#Preview("Active") {
+#Preview("Active", traits: .dark) {
     Color.asphyrBackground
         .sheet(isPresented: .constant(true)) {
             StreakSheet(status: StreakRules.status(completions: [.now, .now.addingTimeInterval(-86_400)]))
@@ -148,7 +148,7 @@ struct StreakSheet: View {
         }
 }
 
-#Preview("Resting") {
+#Preview("Resting", traits: .dark) {
     Color.asphyrBackground
         .sheet(isPresented: .constant(true)) {
             StreakSheet(status: StreakRules.status(completions: [.now.addingTimeInterval(-172_800)]))

@@ -176,7 +176,7 @@ struct CreateAspirationView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     Color.asphyrBackground
         .ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {

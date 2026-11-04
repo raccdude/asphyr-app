@@ -38,7 +38,7 @@ struct AsphyrToast: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         AsphyrToast(icon: "iconMailSmall", message: "Reset link sent again to lou@gmail.com")

@@ -61,7 +61,7 @@ struct CharacterArt: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     VStack {
         HStack {
             CharacterArt(color: .green, archetype: .strategist)

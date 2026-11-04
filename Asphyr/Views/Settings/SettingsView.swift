@@ -87,6 +87,15 @@ struct SettingsView: View {
 
                     VStack(spacing: 0) {
                         Button {
+                            isShowingLogOut = true
+                        } label: {
+                            SettingsRow(icon: "iconSettingsLogOut", title: "Log out")
+                        }
+                        .buttonStyle(.plain)
+
+                        SettingsRowDivider()
+
+                        Button {
                             isShowingReset = true
                         } label: {
                             SettingsRow(
@@ -98,15 +107,6 @@ struct SettingsView: View {
                             ) {
                                 SettingsDisclosure()
                             }
-                        }
-                        .buttonStyle(.plain)
-
-                        SettingsRowDivider()
-
-                        Button {
-                            isShowingLogOut = true
-                        } label: {
-                            SettingsRow(icon: "iconSettingsLogOut", title: "Log out")
                         }
                         .buttonStyle(.plain)
 
@@ -255,7 +255,7 @@ struct SettingsView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     let profile = OnboardingProfile()
     profile.name = "Lou"
     profile.archetype = .strategist

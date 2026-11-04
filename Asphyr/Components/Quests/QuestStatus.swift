@@ -47,7 +47,7 @@ struct QuestStatus: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     VStack(spacing: 16) {
         QuestStatus(status: .available)
         QuestStatus(status: .active)

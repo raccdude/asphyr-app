@@ -174,7 +174,7 @@ private extension View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     MainTabView()
         .environment(OnboardingProfile())
         .environment(AppSettings())

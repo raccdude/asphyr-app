@@ -1,6 +1,6 @@
 # ASPHYR — Real constellations spec
 
-Replaces Journey's arbitrary star positions. Design agreed on 3 Nov 2026; build it on its own branch after `feat/journey-v2` merges.
+Replaces Journey's arbitrary star positions. Agreed on 3 Nov 2026 and built.
 
 ## Goal
 Each aspiration's path is a real constellation that represents it, so the sky means something. Zooming out shows that it's one chapter of a much longer journey.

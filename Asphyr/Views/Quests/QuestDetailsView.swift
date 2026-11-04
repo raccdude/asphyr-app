@@ -465,7 +465,7 @@ struct QuestDetailsView: View {
     }
 }
 
-#Preview("Available") {
+#Preview("Available", traits: .dark) {
     let store = QuestStore()
 
     NavigationStack {
@@ -474,7 +474,7 @@ struct QuestDetailsView: View {
     .environment(store)
 }
 
-#Preview("Main quest") {
+#Preview("Main quest", traits: .dark) {
     let store = QuestStore(quests: Quest.samples)
 
     NavigationStack {
@@ -483,7 +483,7 @@ struct QuestDetailsView: View {
     .environment(store)
 }
 
-#Preview("Active with timer") {
+#Preview("Active with timer", traits: .dark) {
     let store = QuestStore(quests: Quest.samples)
 
     NavigationStack {

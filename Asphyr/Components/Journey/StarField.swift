@@ -40,7 +40,7 @@ struct StarField: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     StarField()
         .background(Color.asphyrBackground)
 }

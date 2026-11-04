@@ -325,22 +325,22 @@ private extension View {
     }
 }
 
-#Preview("Default") {
+#Preview("Default", traits: .dark) {
     QuestsView()
         .environment(QuestStore())
 }
 
-#Preview("All quest types") {
+#Preview("All quest types", traits: .dark) {
     QuestsView()
         .environment(QuestStore(quests: Quest.samples))
 }
 
-#Preview("No quests") {
+#Preview("No quests", traits: .dark) {
     QuestsView()
         .environment(QuestStore(quests: []))
 }
 
-#Preview("Completed quest") {
+#Preview("Completed quest", traits: .dark) {
     QuestsView()
         .environment(QuestStore(quests: [
             Quest(

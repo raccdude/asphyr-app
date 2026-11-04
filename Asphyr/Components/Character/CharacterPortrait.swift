@@ -185,13 +185,13 @@ private struct FlameShape: Shape {
     }
 }
 
-#Preview("Angry") {
+#Preview("Angry", traits: .dark) {
     CharacterPortrait(color: .green, archetype: .strategist, mood: .angry)
         .padding(40)
         .background(Color.asphyrBackground)
 }
 
-#Preview {
+#Preview(traits: .dark) {
     HStack {
         ForEach(CharacterPortrait.Mood.allCases, id: \.self) { mood in
             CharacterPortrait(color: .green, mood: mood)

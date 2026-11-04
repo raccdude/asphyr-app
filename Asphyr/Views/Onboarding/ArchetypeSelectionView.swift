@@ -83,7 +83,7 @@ struct ArchetypeSelectionView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         ArchetypeSelectionView()
     }

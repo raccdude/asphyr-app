@@ -128,7 +128,7 @@ struct JourneySkyMap: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     JourneySkyMap(
         chapters: JourneyPath.chapters(for: "Musician").map(\.constellation),
         spots: JourneySkyLayout.spots(for: "Musician"),

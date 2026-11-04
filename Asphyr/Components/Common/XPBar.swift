@@ -76,6 +76,6 @@ struct XPBar: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     XPBar()
 }

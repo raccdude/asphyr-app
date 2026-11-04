@@ -39,7 +39,7 @@ struct QuestTimerBar: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     VStack(spacing: 24) {
         QuestTimerBar(progress: 0, isPaused: false)
         QuestTimerBar(progress: 0.43, isPaused: false)

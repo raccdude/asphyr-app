@@ -165,7 +165,7 @@ struct QuestStepRow: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     VStack(spacing: 12) {
         ForEach(Quest.samples) { quest in
             QuestLogCard(quest: quest)

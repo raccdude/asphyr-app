@@ -132,7 +132,7 @@ struct RecoverySuccessView: View {
 }
 
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         RecoverySuccessView(email: "lou@gmail.com")
     }

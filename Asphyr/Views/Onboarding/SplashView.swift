@@ -107,7 +107,7 @@ struct SplashView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         SplashView()
     }

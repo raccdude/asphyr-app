@@ -382,7 +382,7 @@ struct CharacterView: View {
     }
 }
 
-#Preview("New user") {
+#Preview("New user", traits: .dark) {
     let profile = OnboardingProfile()
     profile.name = "Lou"
     profile.archetype = .strategist

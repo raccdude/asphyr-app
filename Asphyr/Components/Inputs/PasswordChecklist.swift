@@ -49,7 +49,7 @@ struct PasswordChecklist: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         PasswordChecklist(password: "abc123")

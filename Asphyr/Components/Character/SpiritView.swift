@@ -56,7 +56,7 @@ struct SpiritMessage: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         HStack {

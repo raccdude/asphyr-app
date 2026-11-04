@@ -25,7 +25,7 @@ struct FieldErrorRow: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         FieldErrorRow(message: "Enter a valid email address.")

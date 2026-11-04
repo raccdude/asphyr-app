@@ -299,7 +299,7 @@ struct HomeView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         HomeView()
     }
@@ -318,7 +318,7 @@ private func storeWithQuests(finishedDaysAgo days: [Double]) -> QuestStore {
     })
 }
 
-#Preview("Streak active") {
+#Preview("Streak active", traits: .dark) {
     NavigationStack {
         HomeView()
     }
@@ -327,7 +327,7 @@ private func storeWithQuests(finishedDaysAgo days: [Double]) -> QuestStore {
     .environment(AppSettings())
 }
 
-#Preview("Streak resting") {
+#Preview("Streak resting", traits: .dark) {
     NavigationStack {
         HomeView()
     }

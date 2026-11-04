@@ -153,7 +153,7 @@ struct QuestCard: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     QuestCard(quest: Quest.sampleDaily)
 }
 

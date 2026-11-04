@@ -318,7 +318,7 @@ struct RewardView: View {
     }
 }
 
-#Preview("Level up") {
+#Preview("Level up", traits: .dark) {
     RewardView(
         completion: QuestCompletion(
             quest: Quest.sampleDaily,
@@ -333,7 +333,7 @@ struct RewardView: View {
     .environment(OnboardingProfile())
 }
 
-#Preview("No level up") {
+#Preview("No level up", traits: .dark) {
     RewardView(
         completion: QuestCompletion(
             quest: Quest.sampleDaily,

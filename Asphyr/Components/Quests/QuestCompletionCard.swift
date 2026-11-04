@@ -78,7 +78,7 @@ struct QuestCompletionCard: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     QuestCompletionCard(questCount: 1, xp: 100) {}
         .padding(20)
         .background(Color.asphyrBackground)

@@ -21,7 +21,7 @@ struct OrDivider: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         OrDivider()

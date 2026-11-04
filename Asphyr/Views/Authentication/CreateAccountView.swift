@@ -180,7 +180,7 @@ struct CreateAccountView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         CreateAccountView()
     }

@@ -501,23 +501,23 @@ private func journeyPreview(aspiration: String?, completed: Int = 3, daysAgo: Do
         .environment(profile)
 }
 
-#Preview("New user") { journeyPreview(aspiration: "Doctor", completed: 0, seen: 0) }
-#Preview("Star unlocked") { journeyPreview(aspiration: "Doctor", completed: 5, seen: 0) }
-#Preview("Welcome back") { journeyPreview(aspiration: "Doctor", daysAgo: 4) }
-#Preview("Chapter complete") { journeyPreview(aspiration: "Doctor", completed: 20, seen: 0) }
-#Preview("Chapter 2") { journeyPreview(aspiration: "Doctor", completed: 25) }
-#Preview("All lit") { journeyPreview(aspiration: "Doctor", completed: 100) }
+#Preview("New user", traits: .dark) { journeyPreview(aspiration: "Doctor", completed: 0, seen: 0) }
+#Preview("Star unlocked", traits: .dark) { journeyPreview(aspiration: "Doctor", completed: 5, seen: 0) }
+#Preview("Welcome back", traits: .dark) { journeyPreview(aspiration: "Doctor", daysAgo: 4) }
+#Preview("Chapter complete", traits: .dark) { journeyPreview(aspiration: "Doctor", completed: 20, seen: 0) }
+#Preview("Chapter 2", traits: .dark) { journeyPreview(aspiration: "Doctor", completed: 25) }
+#Preview("All lit", traits: .dark) { journeyPreview(aspiration: "Doctor", completed: 100) }
 
-#Preview("Doctor") { journeyPreview(aspiration: "Doctor") }
-#Preview("Musician") { journeyPreview(aspiration: "Musician") }
-#Preview("Teacher") { journeyPreview(aspiration: "Teacher") }
-#Preview("Athlete") { journeyPreview(aspiration: "Athlete") }
-#Preview("Entrepreneur") { journeyPreview(aspiration: "Entrepreneur") }
-#Preview("Mechanical Engineer") { journeyPreview(aspiration: "Mechanical Engineer") }
-#Preview("Engineer") { journeyPreview(aspiration: "Engineer") }
-#Preview("Designer") { journeyPreview(aspiration: "Designer") }
-#Preview("Game Developer") { journeyPreview(aspiration: "Game Developer") }
-#Preview("Artist") { journeyPreview(aspiration: "Artist") }
-#Preview("Writer") { journeyPreview(aspiration: "Writer") }
-#Preview("Psychologist") { journeyPreview(aspiration: "Psychologist") }
-#Preview("Custom") { journeyPreview(aspiration: "Marine Biologist") }
+#Preview("Doctor", traits: .dark) { journeyPreview(aspiration: "Doctor") }
+#Preview("Musician", traits: .dark) { journeyPreview(aspiration: "Musician") }
+#Preview("Teacher", traits: .dark) { journeyPreview(aspiration: "Teacher") }
+#Preview("Athlete", traits: .dark) { journeyPreview(aspiration: "Athlete") }
+#Preview("Entrepreneur", traits: .dark) { journeyPreview(aspiration: "Entrepreneur") }
+#Preview("Mechanical Engineer", traits: .dark) { journeyPreview(aspiration: "Mechanical Engineer") }
+#Preview("Engineer", traits: .dark) { journeyPreview(aspiration: "Engineer") }
+#Preview("Designer", traits: .dark) { journeyPreview(aspiration: "Designer") }
+#Preview("Game Developer", traits: .dark) { journeyPreview(aspiration: "Game Developer") }
+#Preview("Artist", traits: .dark) { journeyPreview(aspiration: "Artist") }
+#Preview("Writer", traits: .dark) { journeyPreview(aspiration: "Writer") }
+#Preview("Psychologist", traits: .dark) { journeyPreview(aspiration: "Psychologist") }
+#Preview("Custom", traits: .dark) { journeyPreview(aspiration: "Marine Biologist") }

@@ -95,7 +95,7 @@ struct WelcomeView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         WelcomeView()
     }

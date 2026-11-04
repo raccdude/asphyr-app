@@ -135,7 +135,7 @@ private struct SwipeBackEnabler: UIViewControllerRepresentable {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack(alignment: .top) {
         Color.asphyrBackground.ignoresSafeArea()
         AuthTopBar()

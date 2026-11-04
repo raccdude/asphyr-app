@@ -202,7 +202,7 @@ struct IdentityCreationView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         IdentityCreationView()
     }

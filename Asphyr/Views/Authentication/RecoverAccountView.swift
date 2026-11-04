@@ -117,7 +117,7 @@ struct RecoverAccountView: View {
 }
 
 
-#Preview {
+#Preview(traits: .dark) {
     NavigationStack {
         RecoverAccountView()
     }

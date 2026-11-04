@@ -50,7 +50,7 @@ struct AuthSwitchPrompt: View {
     }
 }
 
-#Preview {
+#Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
         AuthSwitchPrompt(prompt: "Already have an account?", actionTitle: "LOG IN") {}
