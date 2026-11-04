@@ -73,27 +73,34 @@ struct QuestLogCard: View {
             HStack(alignment: .top, spacing: 14) {
                 icon
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(quest.title)
-                        .font(AppTypography.subheading)
-                        .foregroundStyle(Color.asphyrTextPrimary)
+                VStack(alignment: .leading, spacing: 8) {
+                    // A long title wraps instead of running into the step count
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        Text(quest.title)
+                            .font(AppTypography.subheading)
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Text("\(quest.completedStepCount) / \(quest.steps.count) steps")
-                        .font(AppTypography.bodySecondary)
-                        .foregroundStyle(Color.asphyrTextSecondary)
-                }
-                .frame(minHeight: 46)
+                        Text("\(quest.completedStepCount) / \(quest.steps.count) steps")
+                            .font(AppTypography.bodySecondary)
+                            .foregroundStyle(Color.asphyrTextSecondary)
+                            .fixedSize()
+                    }
 
-                Spacer(minLength: 8)
+                    // Stacks at large text sizes so nothing is cut off
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 12) {
+                            QuestStatus(status: quest.status)
+                            xpReward
+                        }
 
-                VStack(alignment: .trailing, spacing: 8) {
-                    xpReward
-
-                    // The green edge already says this card is active
-                    if !isActive {
-                        QuestStatus(status: quest.status)
+                        VStack(alignment: .leading, spacing: 8) {
+                            QuestStatus(status: quest.status)
+                            xpReward
+                        }
                     }
                 }
+                .frame(minHeight: 46)
             }
 
             XPBar(

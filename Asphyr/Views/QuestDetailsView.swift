@@ -166,39 +166,23 @@ struct QuestDetailsView: View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
-                    Image("iconQuestTimer")
-                        .foregroundStyle(Color.asphyrAccentPrimary)
-                        .frame(width: 36, height: 36)
-                        .background(Color.asphyrAccentPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-                        .accessibilityHidden(true)
-
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("ELAPSED")
+                        Text(quest.timeLeftClock(at: context.date))
+                            .font(AppTypography.screenTitle)
+                            .foregroundStyle(Color.asphyrTextPrimary)
+                            .monospacedDigit()
+
+                        Text("left of \(quest.durationMinutes ?? 0) min")
                             .font(AppTypography.captionMedium)
                             .foregroundStyle(Color.asphyrTextSecondary)
-
-                        HStack(alignment: .lastTextBaseline, spacing: 8) {
-                            Text(quest.elapsed(at: context.date).timerText)
-                                .font(AppTypography.screenTitle)
-                                .foregroundStyle(Color.asphyrTextPrimary)
-                                .monospacedDigit()
-
-                            Text("/ \(TimeInterval((quest.durationMinutes ?? 0) * 60).timerText)")
-                                .font(AppTypography.bodySecondary)
-                                .foregroundStyle(Color.asphyrTextSecondary)
-                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     pauseButton(quest)
                 }
 
-                XPBar(
-                    progress: quest.timerProgress(at: context.date),
-                    height: 6,
-                    trackColor: .asphyrSurfaceElevated
-                )
-                .padding(.top, 14)
+                QuestTimerBar(progress: quest.timerProgress(at: context.date), isPaused: quest.isPaused)
+                    .padding(.top, 14)
 
                 HStack {
                     if let startedAt = quest.startedAt {
@@ -208,8 +192,10 @@ struct QuestDetailsView: View {
 
                     Spacer(minLength: 8)
 
-                    Text(quest.isPaused ? "Paused" : quest.timeLeftText(at: context.date))
-                        .foregroundStyle(quest.isPaused ? Color.asphyrWarning : Color.asphyrAccentPrimary)
+                    if let state = quest.timerStateText(at: context.date) {
+                        Text(state)
+                            .foregroundStyle(quest.isPaused ? Color.asphyrWarning : Color.asphyrAccentPrimary)
+                    }
                 }
                 .font(AppTypography.captionMedium)
                 .padding(.top, 12)

@@ -25,9 +25,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Journey | Merged | `feat/journey-constellations` |
 | Character | Merged | `feat/character-v2` |
 | Cloak layers | Merged | `feat/cloak-layers` |
-| Settings | In review | `feat/settings-v2` |
-| Streaks | In review | `feat/streaks-v2` |
-| Figma revisions | After every Figma screen is built | — |
+| Settings | Merged | `feat/settings-v2` |
+| Streaks | Merged | `feat/streaks-v2` |
+| Figma revisions | In progress: auth, onboarding, Home, Quests, Create Quest, Quest Details and Reward done | `docs/figma-revisions` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -108,7 +108,6 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
 - **Placeholders:** main quests use the book icon and personal quests the hammer.
 - **Unused now:** nothing calls `AsphyrTextField` anymore. Delete it in a cleanup.
-- **Main quest card:** the status pill sits in the header, under the XP reward, when available or completed. The active card has no pill, as in Figma, because its green edge shows the state.
 
 ## Quest Details
 - **Data:** opened with a quest's id and read from `QuestStore`, so the timer and status stay live on Home and in the log.
@@ -141,9 +140,7 @@ Don't build these until asked.
 - **Character glow:** wherever the character appears, add a soft glow or ring around it in the user's chosen color. Not bright.
 - **Character tap effect:** add a visual effect when the character is tapped. Tapping already cycles its expressions on Home.
 - **Create Quest reward card:** redesign it, possibly as a dropdown.
-- **Quest Details active banner:** redesign the active timer card.
-- **XP bars:** animate every progress bar with a moving linear gradient.
-- **Quest cards:** animate the outlines. The developer also suggested a circle animation, possibly for these; where it goes isn't decided.
+- **Circle animation:** the developer also suggested one for quest cards. Where it goes isn't decided.
 
 ## Journey
 - **Constellations:** each aspiration uses a real constellation, in [JOURNEY-CONSTELLATIONS-SPEC.md](JOURNEY-CONSTELLATIONS-SPEC.md). `ConstellationData.swift` is generated from the d3-celestial data, whose license is in `Resources`. Don't edit its positions by hand.
@@ -171,6 +168,7 @@ Not built, and needs a design first.
 ## Quest rules
 - **Active quests:** at most two at once: the main quest plus one other, either the daily or a personal quest. When one is done, the other stays active. Enforced by `QuestStore.canStart`; a blocked Accept is dimmed, with the reason above it.
 - **Quest limits:** one open main quest and five open personal quests at a time, as built in Create Quest.
+- **Main quest card:** the title and step count share the top row, with the status and XP under them, like every other card. An active main quest shows ACTIVE as well as its green edge. Long titles wrap.
 - **Deleting quests:** swipe left on a main or personal quest in the quest log, tap Delete, then confirm. Daily quests can't be deleted because the system renews them, and completed quests stay as a record. The cards are `List` rows, because swipe actions need one. Deleting a main quest takes back the XP from its ticked steps, and can lower the level, but earned cloaks stay.
 
 ## XP and rewards
@@ -233,10 +231,20 @@ Agreed on 3 Nov 2026. The store isn't built yet. The cloak art and the three new
 - **Active:** a streak stays alive until the end of the day after the last finished quest, so today shows as open until a quest is finished.
 - **Resting:** with nothing finished yesterday or today, Home shows the Rest chip and the sleeping character, and the sheet offers Find a Quest, which opens Quests. The next quest starts again from 1. Nothing is ever taken away.
 - **Spirit:** tapping it in the sheet cycles its expressions, like the character on Home. It opens happy, or sleepy when resting.
-- **New users:** Home shows no chip until the first quest is finished, as there's nothing to count.
+- **New users:** Home shows no chip until the first quest is finished, so the flame appears as a small reward. A greyed-out 0 was tried and dropped, as it shows a score nobody has earned yet.
 - **Toggles:** Show streak on Home and the Settings toggle are the same setting. Off hides the chip and the sleeping character, and stops the alert.
 - **Streak alerts:** a real local notification at 8 PM on the last day that keeps the streak going. Finishing a quest moves it to the next day.
 - **Known limit:** streaks use the phone's clock and reset on relaunch until saving exists.
+
+## Quest timer
+- **Timer bar:** `QuestTimerBar` shows a timed quest's progress on Quest Details and Home, with a glowing dot at its leading edge. It replaces the elapsed time and timer icon. A halfway tick and a "Complete in 3 min" status were tried and dropped, as they needed explaining and repeated the notice above the button.
+- **Countdown:** the big number is the time left, rounded up. The corner only shows "Paused" or "Time's up". Time's up takes nothing away, and the quest can still be completed.
+- **When it can be completed:** the notice above the button says so.
+
+## Animated cards and bars
+- **Comet border:** `CometBorder` sends a point of light clockwise around active quest cards every 5 seconds, over a faint green edge. It replaces the solid green edge on Home and the quest log. Available and completed cards stay still.
+- **Aurora bars:** every `XPBar` uses a green and cyan gradient. Most flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm.
+- **Cyan:** `#3EE0F0` only appears inside bars, written in `XPBar` rather than as a color token.
 
 ## Character evolution (later)
 The character should change as the user levels up, as in Figma's section 11 (`13.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
@@ -263,37 +271,23 @@ Light mode works but needs its own design pass. Nothing here is built yet.
 ## Figma updates for later
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
+Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 — Hi-Fi v2 (Polished)`, one group at a time. `05` stays untouched. Each item leaves this list once it's done.
+
+**Sample data:** every example must match the app's code for the sample user: Lou, The Strategist, Game Developer. The daily quest comes from `DailyQuests`, and rewards from `RewardRules` and `DifficultyEstimator`.
+
+**Sample data done on:** Home, Quests, Create Quest, Quest Details and Reward. Character still needs checking.
+
+**Main quest card:** the developer's `8.2` design is the layout everywhere: step count at the top right, then the same status and XP row as every other card, including ACTIVE. Long titles wrap.
+
+**At the end, when the developer says so:** number and organize every screen on `06` in order, then build the interactive prototype.
+
+**Copying a page:** Figma's page copy lost the opacity of colors bound to variables, so see-through fills turned solid and bright on 167 layers. These were restored from `05`, and a fingerprint of fills, strokes and effects then matched on every frame. Copying frames loses them too, and so does binding a new color to a variable, so set the opacity afterwards and check after any copy.
+
+**Done on `06`:** Welcome (`2`), Create Account (`3` to `3.5`, plus new `3.6` weak password and `3.7` password revealed), Login (`4` to `4.2`) Account Recovery (`5` to `5.2`), Build Your Identity (`7`, plus new `7.1` errors and `7.2` custom aspiration), Create Aspiration (`7.5`, plus new `7.5b` error), Your Character (`8`, plus new `8.1` unselected and `8.2` error), `13.4 - Colours`, Home (`9` to `9.3`, plus new `9.2b` two quests and `9.4` personal quest) Quests (`8`, plus new `8.1` default, `8.2` main available, `8.3` swipe, `8.4` delete confirmation and `8.5` bonus), Create Quest (plus new main quest, limits reached and small bonus frames), Quest Details (`6`, `6.1`, plus new `6.2` to `6.9`) and Reward (`7`, plus new `7.1` to `7.4`). Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and isn't wired up as a Figma prototype.
+
 ### All screens
 - **Header position:** screens with a back button or top header sit 14pt lower than Figma (back button top 76pt, not 62pt). Move the content below down with it.
 - **Toasts:** add the app's toast style wherever it's used: limits on Create Quest, the sky map and step limits.
-
-### Welcome
-- Move the wordmark down 20pt to line up with the other auth screens. The rest of the frame stays.
-- Center the "Already have an account? LOG IN" row. It sits about 5pt right of center.
-
-### Create Account (`3` to `3.5`)
-- Add the back button, with the same header as Login.
-- Add a frame for a weak password on submit, with the checklist showing unmet items and no error row.
-- Add the open-eye icon for a revealed password. The app uses the SF Symbol `eye` for now.
-
-### Login (`4` to `4.2`)
-- Move the back button and wordmark down 14pt, with everything below.
-- End "Forgot password?" at the field's right edge (about 6pt in).
-- Center the "Don’t have an account? CREATE ACCOUNT" row (about 6pt left).
-
-### Account Recovery
-- Move the back button and wordmark down 14pt, with everything below.
-
-### Build Your Identity
-- Add a ring on the selected color swatch, as Figma doesn't mark the selection.
-- Move the content down 14pt, and add the "Enter your name." and "Choose an aspiration." errors.
-- Replace orange (`#FF9F40`) with Snow (`#F5F7FF`), and red, cyan and purple with Oxblood (`#4A0F1C`), Midnight (`#16264F`) and Plum (`#2F1650`), including `13.4 - Colours`.
-
-### Create Aspiration
-- Add a saved custom aspiration on the "Something else" card, the "Enter an aspiration." error, and the sheet's 8pt floating margin.
-
-### Your Character
-- Add the unselected state and the "Choose an archetype." error, and move the content down 14pt.
 
 ### Character
 - Replace the six old swatches under CUSTOMIZE with the app's six character colors.
@@ -304,13 +298,15 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 - Add earned icons for Scholar, Builder and Master, and the toast with a badge's rule.
 - Fill the new user frame's attribute bars so 10 shows 40%, matching the main frame.
 
-### Reward: View in Character
-- Add "VIEW IN CHARACTER" under the expanded New Reward Unlocked card.
-
 ### Streaks
 - Hide the chip on Home until the first quest is finished.
 - Make the sheet's spirit tappable through its expressions.
 - Add a state for a one-day streak: "You took a step today." or "You took a step yesterday."
+
+### Timer, cards and bars
+`06` still shows the earlier timer. Make these once Figma access is back.
+- On `6.1`, `6.2`, `6.5`, `6.6`, `6.7`, the Light `6.1` and Home `9.1`: remove the halfway tick and the "Complete in 3 min" text, keeping "Paused" and "Time's up".
+- Show the Aurora gradient on every bar, and note the Comet border's motion beside active cards. A still frame can't show either moving.
 
 ### Contrast
 - Add a 1pt outline to every color swatch, so Snow and the dark colors stay visible.
@@ -330,40 +326,6 @@ Every place the app has moved ahead of Figma, by screen. Development comes first
 - Add the novice holding the book, brush and lantern, with each item in all six colors, the dark details on Snow and Yellow, and the white book lines on the dark colors.
 - The five non-green novice characters were generated outside Figma, including Snow's dark crest. Add them if Figma should stay the source of truth.
 - Add the three character mood faces for every color, as Home now uses them.
-
-### Home
-- Move the header down 14pt.
-- Make the character tappable through its moods.
-- Make the available card the default for new and ongoing users. `9.1` stays as the state after a quest is started, with darker tags on its active card.
-- Change the section title by state: "ACTIVE QUEST", "TODAY'S QUEST" or "AVAILABLE QUEST".
-- Add the available and active cards for any quest type, and aspiration-specific daily quests. Figma only has Build a Small Mechanic.
-- Show `9.2` only once nothing is active or available, add its button's link to Create Quest, and its copy for more than one completed quest.
-- Show level and XP on the new curve, such as 100 / 700 XP.
-
-### Quests (`8`)
-- Move the content down 14pt, and add the meaning of ALL: every open quest, with completed quests only under Completed.
-- By default, show only the daily quest, marked available. Main and personal quests appear after the user creates them. Revisit the Active frame and the "no logs" frames, as the daily means ALL and Available are never empty by default.
-- Add the swipe-to-delete action and its confirmation, including the message about main quest XP.
-- Add the main quest card's available state, with its status pill under the XP. The active card has no pill.
-- Add the +10 XP bonus shown on open personal quests past the daily limit.
-
-### Create Quest
-- Move the reward card directly under the description, with attributes and difficulty that update as the user types.
-- Add the quest type selection: Main and Personal, Personal selected by default, the disabled states and their toasts, and "Finish a quest to create a new one."
-- Select Development by default, and change the reward with duration and difficulty.
-- For Main, hide Estimated Duration, show XP for each step, and add the steps section with "Add at least 3 steps."
-- Add the bonus state, "Small bonus today", with +10 XP and +1.
-
-### Quest Details (`6`, `6.1`)
-- Move the content down 14pt.
-- Put notices above the button, with dimmed locked buttons: "Available in 12 min.", "Finish every step first.", "Finish or abandon your active quest first." and the bonus message.
-- Add the main quest version, with steps, no timer and "EARNED", plus the daily step limit toast.
-- Add the paused state, "Time's up", the abandon confirmation, the completed state and the bonus reward amounts.
-
-### Reward (`7`)
-- Move the content down 14pt and use `PrimaryButtonV2`'s button.
-- Add states with no level up and no attribute rewards, the main quest line, and the expanded New Reward Unlocked card showing cloaks.
-- Add the bonus state, with +10, +1 and "Small progress is still progress."
 
 ### Journey (`10`)
 - Move the content down 14pt, replace Swift samples with the 13 real constellations and aspiration paths, and add the meaning line under the chapter.

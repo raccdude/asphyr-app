@@ -69,14 +69,28 @@ struct QuestCard: View {
 
             if quest.hasTimer {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
-                    HStack(spacing: 8) {
-                        Image("iconQuestTimerSmall")
-                            .accessibilityHidden(true)
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text(quest.timeLeftText(at: context.date))
+                                .font(AppTypography.bodySecondarySemiBold)
+                                .foregroundStyle(Color.asphyrTextPrimary)
 
-                        Text("\(quest.elapsed(at: context.date).timerText) elapsed · \(quest.timeLeftText(at: context.date))")
-                            .font(AppTypography.captionMedium)
+                            Spacer(minLength: 8)
+
+                            if quest.isPaused {
+                                Text("Paused")
+                                    .font(AppTypography.captionMedium)
+                                    .foregroundStyle(Color.asphyrWarning)
+                            }
+                        }
+
+                        // The active card's surface would hide the usual track
+                        QuestTimerBar(
+                            progress: quest.timerProgress(at: context.date),
+                            isPaused: quest.isPaused,
+                            trackColor: .asphyrBackground
+                        )
                     }
-                    .foregroundStyle(Color.asphyrAccentPrimary)
                 }
                 .padding(.top, 14)
             }
@@ -150,7 +164,9 @@ extension View {
             if isActive {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.asphyrSurfaceElevated)
-                    .shadow(color: .asphyrAccentPrimary, radius: 1, x: 0, y: 1)
+                    .overlay {
+                        CometBorder(cornerRadius: 16)
+                    }
             } else {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color.asphyrSurface)

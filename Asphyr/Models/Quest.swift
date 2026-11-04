@@ -70,6 +70,20 @@ struct Quest: Identifiable {
         return min(1, elapsed(at: date) / Double(durationMinutes * 60))
     }
 
+    /// The countdown, e.g. "17:12". Rounds up, so it only shows 0:00 once time's up.
+    func timeLeftClock(at date: Date) -> String {
+        guard let durationMinutes else { return "" }
+        return max(0, Double(durationMinutes * 60) - elapsed(at: date)).rounded(.up).timerText
+    }
+
+    /// Only said when the countdown alone wouldn't explain it. Time's up takes
+    /// nothing away, and the quest can still be completed.
+    func timerStateText(at date: Date) -> String? {
+        if isPaused { return "Paused" }
+        guard let durationMinutes else { return nil }
+        return elapsed(at: date) >= Double(durationMinutes * 60) ? "Time’s up" : nil
+    }
+
     /// E.g. "17 min left", for a quest with a timer.
     func timeLeftText(at date: Date) -> String {
         guard let durationMinutes else { return "" }

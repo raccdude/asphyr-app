@@ -308,7 +308,7 @@ struct CharacterView: View {
                         .foregroundStyle(Color.asphyrTextPrimary)
                         .frame(width: 92, alignment: .leading)
 
-                    XPBar(progress: UserAttribute.barProgress(forValue: value), height: 6)
+                    XPBar(progress: UserAttribute.barProgress(forValue: value), height: 6, motion: .fillsOnAppear)
                         .accessibilityHidden(true)
 
                     Text("\(value)")
