@@ -45,7 +45,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend step 4: quests and rewards on the server | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 5: photos and Delete Account | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 6: Apple and Google sign-in | Merged. Waits on the Apple and Google accounts | `claude/gifted-archimedes-l90m2f` |
-| Store, Inventory and Embers | Written 12 Nov 2026, server tested. App not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
+| Store, Inventory and Embers | Merged and deployed 12 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
