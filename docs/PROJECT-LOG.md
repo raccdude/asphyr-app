@@ -75,3 +75,9 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Review:** a self-review of the whole Store change against the spec found nothing critical. Two small things to check on the iPhone: Reward's "VIEW IN INVENTORY" when the quest was opened from Home (it closes Quest Details and opens the Store at once), and that the Ember chip fits beside the streak chip on a smaller iPhone.
 - **Merged and deployed:** the developer merged to `main` (`5a5fd68`), and Supabase applied `20261112120000_store`. Checked on the live project: the four cloaks are on sale at 200, `buy_cloak` is open to signed-in users only, and the one-off payment matched (the account with 2 completed quests got the 15 Embers they were worth).
 
+### Profile saves no longer fail silently
+- **Problem**, from the first inspection: a profile change made in the tabs (name, color, aspiration, cloak) that failed to save, for example offline, was dropped without a word.
+- **Fix:** `RootView.saveProfileChanges` tries again after 2, 4 and 8 seconds, then shows "Your profile changes weren't saved. Check your connection and change them again." The toast that showed expired reset links now covers both, renamed `alertMessage`.
+- **Not tested:** Swift, no compiler here. To try on the iPhone: turn on Airplane Mode, change your name in Profile & Identity, and wait about 15 seconds for the toast.
+- **Also corrected** in the notes: the known issue about the phone's clock was fixed by backend step 4.
+
