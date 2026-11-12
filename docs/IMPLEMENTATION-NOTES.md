@@ -42,9 +42,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
 | Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
-| Backend step 4: quests and rewards on the server | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
-| Backend step 5: photos and Delete Account | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
-| Backend step 6: Apple and Google sign-in | Code written in a cloud session, not built in Xcode yet. Needs the accounts set up | `claude/gifted-archimedes-l90m2f` |
+| Backend step 4: quests and rewards on the server | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
+| Backend step 5: photos and Delete Account | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
+| Backend step 6: Apple and Google sign-in | Merged. Waits on the Apple and Google accounts | `claude/gifted-archimedes-l90m2f` |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -236,7 +236,7 @@ The developer still doesn't like the Reward screen, even after option B, so it n
 
 ## Settings
 - **Account rows:** Log out, then Reset progress, then Delete account.
-- **Delete Account:** required by Apple for apps with accounts. It stops reminders, clears progress and the profile, and returns to Welcome. Nothing is stored outside the device yet, so `deleteAccount()` in `SettingsView` must also delete the account and its data on Supabase when accounts are real. A privacy policy is also needed before release, supplied by the developer.
+- **Delete Account:** required by Apple for apps with accounts. It calls the `delete-account` Edge Function, which removes the photo, the login and every row of the account's data, then stops reminders, clears the device and returns to Welcome. If it fails, the user stays signed in and sees why. A privacy policy is also needed before release, supplied by the developer.
 - **Screens:** Settings, Profile & Identity and Notifications are pushed from Home, with the system back button. Appearance, Reset Progress, Profile Photo and Reminder Time are sheets.
 - **Preferences:** `AppSettings` holds them in memory, so they reset on relaunch until saving exists. They survive logging out and resetting progress.
 - **Appearance:** dark by default. Light and System work through the color sets, using Figma's Light values. Warning and the second accent keep one value, as Figma's Light frames don't define them.
@@ -381,8 +381,8 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **Fixed in backend step 4, not built in Xcode yet:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
-- **Fixed in backend step 5, not built in Xcode yet:** the profile photo is saved in Storage.
+- **Fixed in backend step 4:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
+- **Fixed in backend step 5:** the profile photo is saved in Storage.
 - **Low:** if a profile change fails to save in the tabs, nothing tells the user. It saves with the next change.
-- **Fixed in backend step 5, not built in Xcode yet:** Delete Account deletes the login and its data through the `delete-account` Edge Function, once it's deployed.
+- **Fixed in backend step 5:** Delete Account deletes the login and its data through the `delete-account` Edge Function.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.
