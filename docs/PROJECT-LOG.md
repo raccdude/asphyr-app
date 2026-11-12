@@ -80,4 +80,5 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Fix:** `RootView.saveProfileChanges` tries again after 2, 4 and 8 seconds, then shows "Your profile changes weren't saved. Check your connection and change them again." The toast that showed expired reset links now covers both, renamed `alertMessage`.
 - **Not tested:** Swift, no compiler here. To try on the iPhone: turn on Airplane Mode, change your name in Profile & Identity, and wait about 15 seconds for the toast.
 - **Also corrected** in the notes: the known issue about the phone's clock was fixed by backend step 4.
+- **Tidied** the known issues: onboarding answers have been saved since backend step 3, and the duplicate silent-save entry was removed.
 

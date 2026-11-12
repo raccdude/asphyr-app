@@ -383,9 +383,8 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** using the eye button while a password field is focused briefly drops focus, so "Passwords don't match" can appear while the user is still typing. The error clears on the next edit.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
-- **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
+- **Fixed in backend step 3:** onboarding answers are saved to the account.
 - **Fixed in backend step 4:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
 - **Fixed in backend step 5:** the profile photo is saved in Storage.
-- **Low:** if a profile change fails to save in the tabs, nothing tells the user. It saves with the next change.
 - **Fixed in backend step 5:** Delete Account deletes the login and its data through the `delete-account` Edge Function.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.
