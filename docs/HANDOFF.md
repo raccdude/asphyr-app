@@ -1,6 +1,6 @@
 # ASPHYR — Handoff
 
-Read this first when picking up the project on another Mac or in a new session. Claude's memory stays on the Mac it was written on, so everything needed to continue is here. Last updated 12 Nov 2026.
+Read this first when picking up the project on another Mac or in a new session. `PROJECT-LOG.md` has what was done, step by step. Claude's memory stays on the Mac it was written on, so everything needed to continue is here. Last updated 12 Nov 2026.
 
 ## Where things stand
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
@@ -17,14 +17,15 @@ Read this first when picking up the project on another Mac or in a new session. 
 ## How the developer works
 These are on top of `WORKFLOW.md`:
 - **Git:** the developer runs every merge to `main`. Give exact commands, each in its own block. In a cloud session, whose files are temporary, Claude commits and pushes only to that session's own branch. Commits are credited to the developer (Angelo Buedo) with no Claude co-author lines, so Claude isn't listed as a contributor.
-- **Steps:** one step per branch, and never start the next one without approval. When told to "take note" of something, record it and don't build it.
+- **Steps:** one commit per step, with its docs. Since 12 Nov 2026, Claude carries on to the next step without waiting for approval, and the developer tests on the iPhone and merges to `main`. When told to "take note" of something, record it and don't build it.
 - **Tokens:** keep usage and messages short. Don't check the whole Figma file until asked, probably after the backend.
 - **Figma:** edit it only when asked. List anything the app has that Figma doesn't under "Figma updates for later".
 - **Testing:** the developer tests. Judge launch speed on a real iPhone opened from the Home Screen, as the simulator and Xcode's debugger add about a second. Report only what was actually run and seen.
 - **Scope:** iPhone portrait, dark-first. VoiceOver, Reduce Motion and large text aren't in scope. Light mode only needs the essential screens.
 - **Previews:** use `#Preview(traits: .dark)`.
 - **Sample data:** Figma examples must match the app's code for Lou, The Strategist, Game Developer.
-- **Decisions:** the developer's design direction wins over generic advice. Give a recommendation with its trade-offs, and let them decide.
+- **Decisions:** from 12 Nov 2026, Claude goes with its own recommendation instead of asking, and records the choice and its trade-offs in the spec and `PROJECT-LOG.md`. The developer's design direction still wins: anything they've already decided stands, and they can overrule a choice afterwards.
+- **Record keeping:** log every step, command and decision that matters to the project in `PROJECT-LOG.md`, on the same branch as the work.
 
 ## Checking the rules
 ```bash
