@@ -16,6 +16,9 @@ enum QuestError: Error, Equatable {
     case limitReached
     case tooSoon
     case notEnoughEmbers
+    /// The app called a server function that isn't live yet, because the branch that
+    /// adds it hasn't been merged to `main`.
+    case serverNotUpdated
     case busy
     case noConnection
     case unknown
@@ -33,6 +36,12 @@ enum QuestError: Error, Equatable {
 
         guard let error = error as? PostgrestError else {
             self = .unknown
+            return
+        }
+
+        // PostgREST's code for a function it can't find
+        if error.code == "PGRST202" {
+            self = .serverNotUpdated
             return
         }
 
@@ -58,6 +67,7 @@ enum QuestError: Error, Equatable {
         case .limitReached: "That’s today’s limit. More tomorrow."
         case .tooSoon: "Keep going a little longer first."
         case .notEnoughEmbers: "You need more Embers for this. Complete quests to earn them."
+        case .serverNotUpdated: "This needs a server update that isn’t live yet. Try again after the next update."
         case .busy: nil
         case .noConnection: AccountError.noConnection.message
         case .unknown: AccountError.unknown.message

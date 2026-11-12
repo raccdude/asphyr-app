@@ -103,3 +103,8 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Back swipe in Settings:** kept. It's standard iOS, and every pushed screen already has it.
 - **Not possible here:** running the app on different screen sizes. The layout was fixed from the code; check it on the 12 Pro Max and a small simulator.
 
+### Edit quest didn't save
+- **Cause:** Supabase's API logs showed `/rest/v1/rpc/update_quest` answering 404, ten times. The edit's migration was still only on the branch, so Supabase hadn't applied it. Same cause as the earlier login error.
+- **Fix:** merge to `main`. The app now says "This needs a server update that isn't live yet" for this case (PostgREST code `PGRST202`) instead of "Something went wrong".
+- **Rule recorded** in `HANDOFF.md`: when a branch adds a migration, merge before testing on the phone.
+
