@@ -15,6 +15,7 @@ enum QuestError: Error, Equatable {
     case notAllowed
     case limitReached
     case tooSoon
+    case notEnoughEmbers
     case busy
     case noConnection
     case unknown
@@ -42,6 +43,7 @@ enum QuestError: Error, Equatable {
         case "not_allowed": self = .notAllowed
         case "limit_reached": self = .limitReached
         case "too_soon": self = .tooSoon
+        case "not_enough_embers": self = .notEnoughEmbers
         default: self = .unknown
         }
     }
@@ -55,6 +57,7 @@ enum QuestError: Error, Equatable {
         case .notAllowed: "This quest has changed. Check it and try again."
         case .limitReached: "That’s today’s limit. More tomorrow."
         case .tooSoon: "Keep going a little longer first."
+        case .notEnoughEmbers: "You need more Embers for this. Complete quests to earn them."
         case .busy: nil
         case .noConnection: AccountError.noConnection.message
         case .unknown: AccountError.unknown.message
@@ -126,6 +129,11 @@ enum QuestService {
 
     static func markJourneySeen(litStarCount: Int) async throws -> QuestReply {
         try await call("mark_journey_seen", ["p_lit_star_count": .integer(litStarCount)])
+    }
+
+    /// By `CharacterCloak` raw value, e.g. "Green".
+    static func buyCloak(_ name: String) async throws -> QuestReply {
+        try await call("buy_cloak", ["p_cloak": .string(name)])
     }
 
     static func resetProgress() async throws -> QuestReply {
