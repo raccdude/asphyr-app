@@ -42,6 +42,8 @@ struct MainTabView: View {
     @Environment(QuestStore.self) private var questStore
 
     @State private var inventoryRequest = 0
+    /// Read from the phone once, so the bar sits the same way on every iPhone.
+    @State private var tabBarMetrics = TabBarMetrics(deviceBottomInset: 34)
 
     var body: some View {
         TabView(selection: $selection) {
@@ -49,25 +51,25 @@ struct MainTabView: View {
                 // The bar sits inside the stack so pushed screens cover it
                 NavigationStack {
                     HomeView(inventoryRequest: inventoryRequest)
-                        .mainTabBar(selection: $selection)
+                        .mainTabBar(selection: $selection, metrics: tabBarMetrics)
                 }
             }
 
             Tab(value: MainTab.quests) {
                 NavigationStack {
                     QuestsView()
-                        .mainTabBar(selection: $selection)
+                        .mainTabBar(selection: $selection, metrics: tabBarMetrics)
                 }
             }
 
             Tab(value: MainTab.journey) {
                 JourneyView()
-                    .mainTabBar(selection: $selection)
+                    .mainTabBar(selection: $selection, metrics: tabBarMetrics)
             }
 
             Tab(value: MainTab.character) {
                 CharacterView()
-                    .mainTabBar(selection: $selection)
+                    .mainTabBar(selection: $selection, metrics: tabBarMetrics)
             }
         }
         .environment(\.openCharacter) { selection = .character }
@@ -75,6 +77,9 @@ struct MainTabView: View {
         .environment(\.openInventory) {
             selection = .home
             inventoryRequest += 1
+        }
+        .onAppear {
+            tabBarMetrics = TabBarMetrics(deviceBottomInset: TabBarMetrics.windowBottomInset())
         }
         .onAppear(perform: refreshDailyQuest)
         .onAppear(perform: updateStreakAlert)
@@ -144,7 +149,7 @@ private struct MainTabBar: View {
             }
         }
         .padding(.horizontal, 8)
-        .frame(height: 64)
+        .frame(height: TabBarMetrics.barHeight)
         .background {
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.asphyrSurface)
@@ -157,35 +162,66 @@ private struct MainTabBar: View {
     }
 }
 
+/// Where the floating bar sits, worked out from the phone's own bottom safe area, so it
+/// looks the same on an iPhone SE, a 12 Pro Max or an 18 Pro.
+struct TabBarMetrics: Equatable {
+    static let barHeight: CGFloat = 64
+    /// Clear space between the end of the content and the top of the bar.
+    static let contentGap: CGFloat = 12
+    /// How far the backdrop fades in above the bar.
+    static let fadeHeight: CGFloat = 14
+
+    /// The home indicator's area: 34pt on Face ID iPhones, 0 on an iPhone SE.
+    let deviceBottomInset: CGFloat
+
+    /// From the screen's bottom edge: just above the home indicator, or a small margin.
+    var barBottom: CGFloat { deviceBottomInset > 0 ? 12 : 10 }
+
+    var barTop: CGFloat { barBottom + Self.barHeight }
+
+    /// The room content leaves above the safe area, so it ends just above the bar.
+    var contentInset: CGFloat { max(0, barTop - deviceBottomInset) + Self.contentGap }
+
+    var backdropHeight: CGFloat { barTop + Self.fadeHeight }
+
+    /// The key window's bottom safe area. Read once, so the keyboard doesn't move the bar.
+    static func windowBottomInset() -> CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .safeAreaInsets.bottom ?? 34
+    }
+}
+
 private extension View {
-    func mainTabBar(selection: Binding<MainTab>) -> some View {
+    func mainTabBar(selection: Binding<MainTab>, metrics: TabBarMetrics) -> some View {
         toolbar(.hidden, for: .tabBar)
-            // Lets scrolling content end above the floating bar
+            // Lets scrolling content end just above the floating bar
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Color.clear.frame(height: 64)
+                Color.clear.frame(height: metrics.contentInset)
             }
             .overlay(alignment: .bottom) {
                 ZStack(alignment: .bottom) {
-                    // Fades in above the bar, then solid from the bar down to the screen's
-                    // edge, so content scrolling underneath never shows through or
-                    // competes with the bar
+                    // Solid behind and below the bar, so nothing shows through or under
+                    // it, with a short fade above. Content above the bar isn't covered.
                     LinearGradient(
                         stops: [
-                            .init(color: .clear, location: 0),
-                            .init(color: Color.asphyrBackground.opacity(0.85), location: 0.3),
-                            .init(color: Color.asphyrBackground, location: 0.5),
+                            .init(color: Color.asphyrBackground.opacity(0), location: 0),
+                            .init(color: Color.asphyrBackground, location: TabBarMetrics.fadeHeight / metrics.backdropHeight),
                             .init(color: Color.asphyrBackground, location: 1)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
-                    .frame(height: 150)
+                    .frame(height: metrics.backdropHeight)
                     .allowsHitTesting(false)
 
                     MainTabBar(selection: selection)
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 22)
+                        .padding(.bottom, metrics.barBottom)
                 }
+                // Measured from the screen's edge, and the keyboard never pushes it up
                 .ignoresSafeArea(edges: .bottom)
             }
     }

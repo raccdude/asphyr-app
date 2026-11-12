@@ -53,6 +53,7 @@ struct LoginView: View {
                     field: .email,
                     hasError: showsError
                 )
+                .characterLimit(TextLimits.email, text: $email)
                 .textContentType(.username)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
@@ -69,6 +70,7 @@ struct LoginView: View {
                     isSecure: true,
                     hasError: showsError
                 )
+                .characterLimit(TextLimits.password, text: $password)
                 .textContentType(.password)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

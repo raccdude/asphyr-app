@@ -189,6 +189,7 @@ struct ProfileIdentityView: View {
 
             field(icon: "iconSettingsPerson", isFocused: isNameFocused) {
                 TextField("Your name", text: $name)
+                    .characterLimit(TextLimits.name, text: $name)
                     .font(AppTypography.body)
                     .foregroundStyle(Color.asphyrTextPrimary)
                     .focused($isNameFocused)

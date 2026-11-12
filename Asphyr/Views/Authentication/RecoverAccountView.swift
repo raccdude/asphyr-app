@@ -82,6 +82,7 @@ struct RecoverAccountView: View {
                 field: .email,
                 hasError: showsError
             )
+            .characterLimit(TextLimits.email, text: $email)
             .textContentType(.username)
             .keyboardType(.emailAddress)
             .textInputAutocapitalization(.never)

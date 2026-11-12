@@ -72,6 +72,7 @@ struct IdentityCreationView: View {
                     field: .name,
                     hasError: showsNameError
                 )
+                .characterLimit(TextLimits.name, text: $profile.name)
                 .textContentType(.name)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()

@@ -90,6 +90,7 @@ struct CreateAspirationView: View {
                 hasError: showsError,
                 fill: .asphyrBackground
             )
+            .characterLimit(TextLimits.aspiration, text: $aspiration)
             .textInputAutocapitalization(.words)
             .submitLabel(.done)
             .onSubmit { focus = nil }
