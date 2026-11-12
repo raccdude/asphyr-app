@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. Step 4 is next.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. Step 4b, connecting `QuestStore`, is next.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -38,14 +38,27 @@ Deleting a login removes all of that person's rows.
 **Staying on the device:** Appearance, sounds and haptics, reminders and the other `AppSettings`, because they belong to the device. They reset on relaunch today, so they move to `UserDefaults`.
 
 ## Server functions
-These replace `QuestStore`'s rules, using the same numbers as `docs/XP-SYSTEM-SPEC.md`:
-- `create_quest`: checks the limits, then works out difficulty, XP and attributes itself.
-- `start_quest`, `pause_quest` and `abandon_quest`.
-- `toggle_step`: checks the 3-a-day limit and adds or removes XP.
-- `complete_quest`: checks the steps and minimum time, then awards rewards, cloaks and badges, and returns what Reward shows.
-- `delete_quest`: removes step XP, and any level rewards that XP reached.
-- `refresh_daily_quest`: the app sends today's quest text, and the server sets its rewards and allows one a day.
-- `reset_progress`.
+These replace `QuestStore`'s rules, using the same numbers as `docs/XP-SYSTEM-SPEC.md`. They're in `supabase/migrations/20261112090000_quest_functions.sql`:
+- `create_quest(p_type, p_title, p_description, p_category, p_duration_minutes, p_steps)`: checks the limits, then works out difficulty, XP and attributes itself.
+- `start_quest(p_quest)` and `abandon_quest(p_quest)`.
+- `pause_quest(p_quest, p_paused)`: takes the state wanted rather than toggling, so a retry after a dropped connection is safe.
+- `set_step_done(p_step, p_done)`: was `toggle_step`, renamed for the same reason. Checks the 3-a-day limit and adds or removes XP.
+- `complete_quest(p_quest)`: checks the steps and minimum time, then awards rewards, cloaks and badges, and returns what Reward shows under `reward`.
+- `delete_quest(p_quest)`: removes step XP, and any level rewards that XP reached.
+- `refresh_daily_quest(p_title, p_description, p_objective, p_icon_name, p_category)`: the app sends today's quest text, and the server sets its rewards from the profile's archetype and allows one a day.
+- `renew_daily_quest(...)`: the same, after the aspiration or archetype changes. Added to match `QuestStore.renewDailyQuest`.
+- `mark_journey_seen(p_lit_star_count)`: added, because Journey's seen stars are in `player_progress`, which only the server writes.
+- `reset_progress()`.
+
+**Replies:** each returns `quest` (the changed quest with its `steps`, or null) and `player` (XP, level, attribute gains, announced level, Journey stars seen, cloaks and badges), so the app updates from the reply without a second request.
+
+**Errors:** a short code as the message, for the app to put into words: `not_signed_in`, `not_found`, `invalid_input`, `not_allowed`, `limit_reached` and `too_soon`.
+
+**Days:** the daily limits count from the user's own midnight, using `profiles.time_zone`. It's `UTC` until the app saves the phone's time zone in step 4b. Changing the phone's time zone could give a few extra steps once, which the developer accepted.
+
+**Minimum time:** `private.settings.minimum_time_fraction` is `0.01` during development, matching Debug builds. It's one setting so it can change without a new app build.
+
+**Tests:** `zsh scripts/db-tests/run.sh` applies every migration to a fresh local database and runs `supabase/tests/quest_functions.test.sql`: 129 checks, including the same cases as `scripts/rule-tests`. They ran on Postgres 16 here; the project runs 17.
 
 Streaks are still counted from finished quests, and Journey from the number completed, so neither needs its own table.
 
@@ -62,7 +75,7 @@ Each is its own branch, and the next starts only after approval.
 1. **Project and tables:** create the project, then add the tables and security rules as migrations in `supabase/migrations`. Check that one user can't read another's rows.
 2. **Email accounts:** add the Supabase library, real sign-up, login, logout, password reset and staying signed in. Measure launch time before and after, because of what `PhotosUI` did.
 3. **Profile and onboarding:** save and load the profile, and move `AppSettings` to `UserDefaults`.
-4. **Quests and rewards:** the server functions, with tests for every rule, then connect `QuestStore`. This is the largest step.
+4. **Quests and rewards:** the largest step, in two parts. **4a:** the server functions, with tests for every rule. **4b:** connect `QuestStore`, and save the phone's time zone with the profile.
 5. **Photos and Delete Account:** Storage, the Edge Function, and real deletion.
 6. **Apple and Google sign-in:** needs the paid Apple Developer account and a Google Cloud project.
 
@@ -94,6 +107,7 @@ Supabase's security and performance advisors reported nothing.
 - **Email confirmation:** off during development, and on before release.
 
 ## Before release, not in these steps
+- Set `private.settings.minimum_time_fraction` to `0.5`, to match the app's Release builds.
 - Custom email sending for sign-up and reset emails, as Supabase's built-in sender is limited.
 - A privacy policy, from the developer.
 - Password AutoFill: Associated Domains with an `apple-app-site-association` file on a website the developer owns. It needs the paid Apple Developer account, and could also replace the `asphyr://` reset link.

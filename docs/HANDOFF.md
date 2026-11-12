@@ -1,11 +1,12 @@
 # ASPHYR — Handoff
 
-Read this first when picking up the project on another Mac or in a new session. Claude's memory stays on the Mac it was written on, so everything needed to continue is here. Last updated 4 Nov 2026.
+Read this first when picking up the project on another Mac or in a new session. Claude's memory stays on the Mac it was written on, so everything needed to continue is here. Last updated 12 Nov 2026.
 
 ## Where things stand
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
 - **Backend:** steps 1 to 3 of `BACKEND-SPEC.md` are done: Supabase project, email accounts, password reset, staying signed in, and the saved profile. Checked by the developer on their iPhone.
-- **Next:** backend step 4, saving quests and rewards on the server. Wait for the developer's go-ahead.
+- **Backend step 4a:** the server functions for quests and rewards, written in a cloud session on 12 Nov 2026 and tested on a local database. Not on `main` yet: the migration deploys when it's merged.
+- **Next:** step 4b, connecting `QuestStore` to those functions. Wait for the developer's go-ahead.
 - **After the backend:** teach the developer to deploy to their iPhone, then Store and Inventory, the Reward redesign, and the Figma prototype.
 
 ## Services
@@ -16,7 +17,7 @@ Read this first when picking up the project on another Mac or in a new session. 
 
 ## How the developer works
 These are on top of `WORKFLOW.md`:
-- **Git:** the developer runs every commit, push, merge and branch command. Give exact commands, each in its own block. Claude only uses read-only git.
+- **Git:** the developer runs every commit, push, merge and branch command. Give exact commands, each in its own block. Claude only uses read-only git. In a cloud session, whose files are temporary, Claude commits and pushes only to that session's own branch, and the developer still does every merge.
 - **Steps:** one step per branch, and never start the next one without approval. When told to "take note" of something, record it and don't build it.
 - **Tokens:** keep usage and messages short. Don't check the whole Figma file until asked, probably after the backend.
 - **Figma:** edit it only when asked. List anything the app has that Figma doesn't under "Figma updates for later".
@@ -31,6 +32,11 @@ These are on top of `WORKFLOW.md`:
 zsh scripts/rule-tests/run.sh
 ```
 This checks rewards, settings and onboarding without Xcode. The app itself has no test target yet.
+
+```bash
+zsh scripts/db-tests/run.sh
+```
+This checks the server's quest and reward rules on a fresh local database. It needs a local Postgres: `brew install postgresql@17`, then `brew services start postgresql@17`.
 
 ## Moving to another Mac
 1. Clone the repo, or `git pull` if it's already there, then open `Asphyr.xcodeproj`. Xcode downloads the Supabase library.
