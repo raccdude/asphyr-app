@@ -45,7 +45,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend step 4: quests and rewards on the server | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 5: photos and Delete Account | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 6: Apple and Google sign-in | Merged. Waits on the Apple and Google accounts | `claude/gifted-archimedes-l90m2f` |
-| Store, Inventory and currency | After the backend | — |
+| Store, Inventory and Embers | Written 12 Nov 2026, server tested. App not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -202,7 +202,7 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 
 ## Character
 - **Data:** the name, archetype, aspiration, level, XP and attributes come from `OnboardingProfile` and `QuestStore`, in memory like the rest of the app. Changing color here also changes it on Home.
-- **Cloaks:** chosen from a CLOAKS grid, which Figma doesn't have. Locked ones shake and explain themselves, and the worn cloak shows on Character and Home. A cloak unlocks when a quest is completed at its level, as on Reward.
+- **Cloaks:** chosen in the Inventory since the Store was built (see Store and inventory). The worn cloak still shows on Character and Home.
 - **Attribute bars:** attributes have no maximum, so each bar fills towards the next multiple of 25. This matches Figma's main frame, where 10 fills 40% and 15 fills 60%. Figma's new user frame shows 10 as empty, so that frame doesn't match.
 - **Achievements:** our rules, since Figma only names them. First Quest: complete one quest. Level 2: reach level 2. Consistency: complete quests on 3 different days. Scholar: 25 Knowledge. Builder: 25 Problem Solving. Master: reach level 5. They're checked when a quest is completed and stay earned, like cloaks. Tapping a badge shows its rule in a toast.
 - **Earned icons:** Figma only has icons for the first three badges. Scholar and Builder use their attribute's icon, and Master uses the crown.
@@ -211,18 +211,20 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Layers:** `CharacterArt` builds every character from 40 images: shared base, cloak and hand layers, 6 tunics and 30 sets of details. This replaces 120 whole images, and the app uses it everywhere, including onboarding. Each rebuilt starter matched its original at 252pt.
 - **Adding a cloak:** add its colors to `CharacterCloak`, with no new art. Only the cloak and hands are tinted, so crests and items don't change.
 - **Hands:** the cloak's top color × 1.25.
-- **Coming soon:** Green, Yellow, Snow and Teal show as locked until the store exists, with their colors still to be checked on screen.
+- **Store cloaks:** Green, Yellow, Snow and Teal are sold in the Store for Embers. Their colors still need checking on screen.
 - **Redesign planned:** the character art will be redesigned. Nothing is decided yet. New art should keep the same layers (base, cloak back, tunic, cloak front, details, hands), so `CharacterArt` and the cloak colors keep working.
 
-## Store and inventory (planned)
-Agreed on 3 Nov 2026 and updated on 4 Nov 2026. Not built, and Figma has no frames yet. Build it after the backend, so what people earn is saved from the start. Device-only saving is dropped, because Supabase replaces it.
-- **Where it lives:** a store icon on Home, in the top row with Settings and the streak chip, or in the greeting row. Which row isn't decided; compare both when designing it.
-- **Layout:** the icon opens one screen with two tabs: **Store**, where cosmetics are bought, and **Inventory**, with what's owned and what's locked.
-- **Cloaks move here:** the developer prefers cloaks in Inventory rather than on Character, so the CLOAKS grid and its toasts leave Character when this is built. The character itself stays on Character, wearing what was chosen. Reward's "View in Character" link needs to point to Inventory too.
-- **Currency:** earned in the app only, and spent on cosmetics, never bought and never XP. No real money in the first release. Paid purchases can be added later if the app needs them, and should stay cosmetic. The name isn't final; Embers is the suggestion.
-- **Earning:** paid when a quest is completed, not per step, and limited like full rewards, so it can't be farmed by ticking steps and deleting a quest.
-- **Level cloaks:** Midnight, Oxblood and Plum stay earned by level and aren't for sale. They show in Inventory.
-- **First store items:** Green, Yellow, Snow and Teal cloaks, which show as locked with "Coming soon" until the store exists. Starting values, to check on screen:
+## Store and inventory
+Built on 12 Nov 2026 from `docs/superpowers/specs/2026-11-12-store-and-inventory-design.md`, which records every choice and why. The server side is tested; the app side was written without a Swift compiler.
+- **Embers:** 1 for every 10 XP a quest gives, rounded down, paid when it's completed. Steps pay nothing, so ticking and deleting earns nothing. A bonus quest gives 1. Existing accounts were paid once for quests they had already completed. The server keeps the balance in `player_progress.embers`.
+- **Prices:** Green, Yellow, Snow and Teal cloaks at 200 Embers each, in `private.store_items` on the server. Change a price there; the app needs no update.
+- **Buying:** `buy_cloak` checks the item is for sale, isn't owned and is affordable, then takes the Embers and adds the cloak, in one go. The app asks to confirm first. Short of Embers, the price is dimmed and a tap says how many more are needed.
+- **Home:** an Ember chip in the top row, beside the streak chip and Settings, shows the balance and opens the Store.
+- **Store screen:** `Views/Store/StoreView.swift`, pushed like Settings, with a STORE / INVENTORY switch. Each store card shows the user's own character wearing the cloak, with its price, WEAR or WEARING.
+- **Inventory:** the cloak grid moved from Character into `Components/Character/CloakGrid.swift`. Locked cloaks say "Level 3" or "200 Embers", and a tap explains how to get them.
+- **Reward:** "+10 Embers" under the loot cards, and "VIEW IN INVENTORY" in place of "VIEW IN CHARACTER".
+- **Kept:** Midnight, Oxblood and Plum stay level rewards, not for sale. A bought cloak is never taken back when XP drops. Reset progress clears Embers and bought cloaks.
+- **Icon:** `iconEmber`, a small cut gem drawn for this, in the reward gold.
 
 | Cloak | Cloak top | Cloak bottom |
 |---|---|---|
@@ -349,7 +351,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 ### Planned designs
 Figma doesn't have these yet, because the app doesn't either.
-- **Store and Inventory:** new frames, plus the store icon on Home's frames and moving the CLOAKS grid off Character (`15` to `15.5`). See Store and inventory.
+- **Store and Inventory:** built in the app first, so Figma needs: the Store and Inventory frames, the Ember chip on Home's frames, the CLOAKS grid removed from Character (`15` to `15.5`), the Embers line and "VIEW IN INVENTORY" on Reward (`13` to `13.4`), and the `iconEmber` icon. See Store and inventory.
 - **Reward:** new frames for `13` to `13.4` once a redesign is chosen. See Reward redesign.
 - **Character art:** new art and the level stages, when that work starts, keeping its layers. See Character evolution.
 

@@ -5,8 +5,9 @@ Read this first when picking up the project on another Mac or in a new session. 
 ## Where things stand
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
 - **Backend:** all six steps of `BACKEND-SPEC.md` are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone: accounts, the saved profile and photo, quests and rewards checked by the server, and Delete Account. Apple and Google sign-in wait on the paid Apple Developer account and a Google Cloud project (see `BACKEND-SPEC.md`, Step 6 notes).
-- **Next:** Store and Inventory. See `IMPLEMENTATION-NOTES.md`, Store and inventory (planned).
-- **After that:** the Reward redesign, then the Figma prototype.
+- **Store and Inventory:** written on 12 Nov 2026, on the session branch. The server side is tested (159 database checks); the app side needs building in Xcode, then merging to `main` deploys the Store's migration. See `IMPLEMENTATION-NOTES.md`, Store and inventory.
+- **Next:** the Reward redesign. Ask the developer what feels wrong first.
+- **After that:** the Figma prototype, and the Figma frames listed under "Figma updates for later".
 
 ## Services
 - **Figma:** file key `27W7B4MhKAFJ8LwiWJgcmD`, page `06 — Hi-Fi v3 (App revisions)`.

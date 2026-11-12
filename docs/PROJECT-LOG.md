@@ -58,3 +58,19 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
   ```
 - **Checked on the live project:** all four migrations applied, 12 public functions, signed-out visitors can't call them, the `avatars` bucket and its 4 rules exist, and `delete-account` is active. Supabase's security advisor flagged the 12 functions as callable by signed-in users, which is intended, and leaked-password protection being off, which is worth turning on before release.
 - The developer then tested everything on their iPhone, and it worked.
+
+### Store and Inventory
+- **Design:** `docs/superpowers/specs/2026-11-12-store-and-inventory-design.md`. Following the developer's instruction to go with Claude's recommendations: Embers at 1 per 10 XP, cloaks at 200 each, an Ember chip on Home, past quests paid once, and reset clearing Embers.
+- **Plan:** `docs/superpowers/plans/2026-11-12-store-and-inventory.md`, run in this session.
+- **Server, test first:** the new tests in `supabase/tests/quest_functions.test.sql` were run before the migration existed and failed as expected. Then `supabase/migrations/20261112120000_store.sql` was added, and all 159 checks and the 8 function tests passed:
+  ```bash
+  zsh scripts/db-tests/run.sh
+  ```
+- **App:** `QuestStore` reads Embers, owned cloaks and prices; `buyCloak` spends them. New `StoreView`, `StoreCloakCard` and `CloakGrid`, the `iconEmber` icon, the Ember chip on Home, and Reward's Embers line. The CLOAKS grid left Character. **Not built:** no Swift compiler in the cloud session.
+- **Calls made while building**, recorded so they can be overruled:
+  - After buying, the card's own button turns to WEAR; the toast only confirms, as the app's toasts have no buttons.
+  - Inventory keeps a CLOAKS heading and a one-line explanation, like Character's sections.
+  - The past-quest payment can't be tested locally, so it's checked on the live project after deploying.
+- **To do on the Mac:** build, fix any compiler errors, test on the iPhone, then merge to `main`. After merging, Claude checks the live project.
+- **Review:** a self-review of the whole Store change against the spec found nothing critical. Two small things to check on the iPhone: Reward's "VIEW IN INVENTORY" when the quest was opened from Home (it closes Quest Details and opens the Store at once), and that the Ember chip fits beside the streak chip on a smaller iPhone.
+
