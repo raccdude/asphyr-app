@@ -373,7 +373,8 @@ After the backend is implemented, Claude walks the user through putting the app 
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
 - **Low:** the data script that generates `ConstellationData.swift` isn't in the repo.
-- **Medium:** the minimum time and daily limits use the device clock, so changing the date gets around them until there's a backend. Read from the code; not tried.
+- **Fixed in backend step 4:** the minimum time and daily limits use the server's clock, so changing the phone's date no longer gets around them. Checked by the database tests.
+- **Fixed on 12 Nov 2026, not built in Xcode yet:** a profile change made in the tabs that fails to save is tried three more times, then a toast says it wasn't saved. Before, it failed silently.
 - **Low:** a word in the title can still make a quest Hard, so a title can be inflated. The daily limits cap what that earns, and proper checking waits for better difficulty judging.
 - **Low:** typing immediately after pressing return in the step field can drop characters. Seen at automated typing speed only; a 2-second gap was fine.
 - **Low:** a newly added step field on Create Quest can be partly hidden behind the button.

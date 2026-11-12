@@ -21,7 +21,8 @@ struct RootView: View {
     @State private var accountError: String?
     @State private var loadAttempt = 0
     @State private var isSplashTapped = false
-    @State private var linkError: String?
+    /// A toast over every screen: an expired reset link, or a profile change that wasn't saved.
+    @State private var alertMessage: String?
 
     /// What's saved to the account, so a change can be saved once.
     private var savedProfile: [String?] {
@@ -89,13 +90,13 @@ struct RootView: View {
         .environment(\.hapticsEnabled, settings.soundsAndHaptics)
         .preferredColorScheme(settings.appearance.colorScheme)
         .overlay(alignment: .top) {
-            if let linkError {
-                AsphyrToast(icon: "iconAlert", message: linkError)
+            if let alertMessage {
+                AsphyrToast(icon: "iconAlert", message: alertMessage)
                     .padding(.horizontal, 20)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: linkError)
+        .animation(.easeInOut(duration: 0.25), value: alertMessage)
         .onOpenURL(perform: openLink)
         .task {
             // Also covers a session that can no longer be refreshed
@@ -117,12 +118,12 @@ struct RootView: View {
         .task(id: savedProfile) {
             await saveProfileChanges()
         }
-        .task(id: linkError) {
-            guard linkError != nil else { return }
+        .task(id: alertMessage) {
+            guard alertMessage != nil else { return }
 
             try? await Task.sleep(for: .seconds(4))
             if !Task.isCancelled {
-                linkError = nil
+                alertMessage = nil
             }
         }
     }
@@ -169,7 +170,19 @@ struct RootView: View {
         try? await Task.sleep(for: .seconds(0.5))
         guard !Task.isCancelled else { return }
 
-        try? await ProfileService.save(profile)
+        // A dropped connection often comes back within seconds, so try a few times
+        for delay in [2.0, 4.0, 8.0] {
+            do {
+                try await ProfileService.save(profile)
+                return
+            } catch {
+                try? await Task.sleep(for: .seconds(delay))
+                // A newer change started its own save
+                guard !Task.isCancelled else { return }
+            }
+        }
+
+        alertMessage = "Your profile changes weren’t saved. Check your connection and change them again."
     }
 
     private func openLink(_ url: URL) {
@@ -182,7 +195,7 @@ struct RootView: View {
                 isLoadingAccount = false
                 router.showNewPassword()
             } catch {
-                linkError = "This reset link has expired or was already used. Request a new one."
+                alertMessage = "This reset link has expired or was already used. Request a new one."
             }
         }
     }
