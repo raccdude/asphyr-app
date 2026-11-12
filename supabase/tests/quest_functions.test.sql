@@ -764,6 +764,101 @@ begin
 end;
 $$;
 
+-- Store: Embers and buying ----------------------------------------------------------
+
+create function tests.embers(p_user uuid) returns int
+language sql as $$
+  select (private.player_json(p_user) ->> 'embers')::int
+$$;
+
+do $$
+declare
+  a uuid := tests.new_user();
+  m uuid;
+  r jsonb;
+begin
+  r := tests.finish(a, tests.personal(a, 'Read a book', 30));
+  perform tests.check('a 100 XP quest pays 10 Embers',
+    (r -> 'reward' ->> 'embers_earned')::int = 10 and (r -> 'player' ->> 'embers')::int = 10);
+
+  m := tests.main(a, 'Learn Swift', 3);
+  perform tests.act(a, format('public.start_quest(%L)', m));
+  perform tests.act(a, format('public.set_step_done(%L, true)', tests.step(m, i))) from generate_series(0, 2) i;
+  perform tests.check('ticking steps pays no Embers', tests.embers(a) = 10);
+  r := tests.act(a, format('public.complete_quest(%L)', m));
+  perform tests.check('a main quest pays Embers for its full XP when completed',
+    (r -> 'reward' ->> 'embers_earned')::int = 30 and tests.embers(a) = 40);
+end;
+$$;
+
+do $$
+declare
+  a uuid := tests.new_user();
+  r jsonb;
+begin
+  perform tests.finish(a, tests.personal(a));
+  perform tests.finish(a, tests.personal(a));
+  perform tests.finish(a, tests.personal(a));
+  r := tests.finish(a, tests.personal(a));
+  perform tests.check('a bonus quest pays exactly 1 Ember',
+    (r -> 'reward' ->> 'embers_earned')::int = 1 and tests.embers(a) = 31);
+end;
+$$;
+
+do $$
+declare
+  a uuid := tests.new_user();
+  m uuid;
+  r jsonb;
+begin
+  update public.player_progress set embers = 199 where user_id = a;
+  perform tests.check('199 Embers can''t buy a 200 cloak',
+    tests.error(a, 'public.buy_cloak(''Green'')') = 'not_enough_embers'
+    and tests.embers(a) = 199 and not tests.player(a) -> 'owned_cloaks' ? 'Green');
+
+  update public.player_progress set embers = 200 where user_id = a;
+  r := tests.act(a, 'public.buy_cloak(''Green'')');
+  perform tests.check('exactly 200 Embers buys a cloak and leaves 0',
+    (r -> 'player' ->> 'embers')::int = 0 and r -> 'player' -> 'owned_cloaks' ? 'Green');
+  perform tests.check('a bought cloak isn''t listed as a level cloak',
+    not r -> 'player' -> 'unlocked_cloaks' ? 'Green');
+
+  update public.player_progress set embers = 500 where user_id = a;
+  perform tests.check('a cloak already owned can''t be bought again',
+    tests.error(a, 'public.buy_cloak(''Green'')') = 'not_allowed' and tests.embers(a) = 500);
+  perform tests.check('level cloaks aren''t for sale',
+    tests.error(a, 'public.buy_cloak(''Midnight'')') = 'not_found' and tests.embers(a) = 500);
+  perform tests.check('unknown items aren''t for sale',
+    tests.error(a, 'public.buy_cloak(''Rainbow'')') = 'not_found');
+
+  perform set_config('request.jwt.claim.sub', a::text, false);
+  set role authenticated;
+  update public.profiles set cloak = 'Green' where id = a;
+  reset role;
+  perform tests.check('a bought cloak can be worn', (select cloak from public.profiles where id = a) = 'Green');
+
+  -- Ticking a step then deleting the quest drops XP, which takes back level rewards
+  m := tests.main(a, 'Learn Swift', 3);
+  perform tests.act(a, format('public.start_quest(%L)', m));
+  perform tests.act(a, format('public.set_step_done(%L, true)', tests.step(m, 0)));
+  perform tests.act(a, format('public.delete_quest(%L)', m));
+  perform tests.check('a bought cloak stays owned and worn when XP drops',
+    tests.player(a) -> 'owned_cloaks' ? 'Green' and (select cloak from public.profiles where id = a) = 'Green');
+
+  r := tests.act(a, 'public.reset_progress()');
+  perform tests.check('reset clears Embers and bought cloaks, and takes the cloak off',
+    (r -> 'player' ->> 'embers')::int = 0 and r -> 'player' -> 'owned_cloaks' = '[]'
+    and (select cloak from public.profiles where id = a) is null);
+
+  r := tests.act(a, 'public.get_player_state()');
+  perform tests.check('the store lists four cloaks at 200 Embers, in order',
+    r -> 'store' = '[{"item":"Green","price":200},{"item":"Yellow","price":200},{"item":"Snow","price":200},{"item":"Teal","price":200}]');
+  perform tests.check('signed-out visitors can''t buy',
+    tests.error(null, 'public.buy_cloak(''Green'')', 'anon') like 'permission denied%'
+    and tests.error(null, 'public.buy_cloak(''Green'')') = 'not_signed_in');
+end;
+$$;
+
 -- Result ------------------------------------------------------------------------------
 
 do $$
