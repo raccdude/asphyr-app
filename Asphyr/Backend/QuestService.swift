@@ -91,6 +91,26 @@ enum QuestService {
         ])
     }
 
+    /// An untouched quest changes everything; a started one only its title and description.
+    static func update(
+        _ questID: UUID,
+        type: QuestType,
+        title: String,
+        description: String?,
+        category: String,
+        durationMinutes: Int?,
+        steps: [String]
+    ) async throws -> QuestReply {
+        try await call("update_quest", [
+            "p_quest": .string(questID.uuidString),
+            "p_title": .string(title),
+            "p_description": description.map(AnyJSON.string) ?? .null,
+            "p_category": .string(category),
+            "p_duration_minutes": durationMinutes.map(AnyJSON.integer) ?? .null,
+            "p_steps": type == .mainQuest ? .array(steps.map(AnyJSON.string)) : .null
+        ])
+    }
+
     static func start(_ questID: UUID) async throws -> QuestReply {
         try await call("start_quest", ["p_quest": .string(questID.uuidString)])
     }

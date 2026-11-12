@@ -859,6 +859,61 @@ begin
 end;
 $$;
 
+-- Editing quests ---------------------------------------------------------------------
+
+do $$
+declare
+  a uuid := tests.new_user();
+  b uuid := tests.new_user();
+  p uuid := tests.personal(a, 'Read a book', 30);
+  m uuid := tests.main(a, 'Learn Swift', 3);
+  r jsonb;
+begin
+  r := tests.act(a, format('public.update_quest(%L, %L, %L, %L, 60)', p, 'Read two books', 'Slowly', 'Creative'));
+  perform tests.check('an untouched quest can be fully edited, and its rewards are worked out again',
+    r -> 'quest' ->> 'title' = 'READ TWO BOOKS' and r -> 'quest' ->> 'description' = 'Slowly'
+    and r -> 'quest' ->> 'category' = 'CREATIVE' and (r -> 'quest' ->> 'duration_minutes')::int = 60
+    and (r -> 'quest' ->> 'xp_reward')::int = 200
+    and r -> 'quest' -> 'attribute_rewards' = '[{"name":"CREATIVITY","value":10}]');
+
+  r := tests.act(a, format('public.update_quest(%L, %L, null, %L, null, %L::text[])', m, 'Learn Swift', 'Development',
+    array['One', 'Two', 'Three', 'Four']));
+  perform tests.check('an untouched main quest''s steps are replaced',
+    (r -> 'quest' ->> 'xp_reward')::int = 400 and jsonb_array_length(r -> 'quest' -> 'steps') = 4
+    and r -> 'quest' -> 'steps' -> 3 ->> 'title' = 'Four');
+
+  perform tests.act(a, format('public.start_quest(%L)', p));
+  r := tests.act(a, format('public.update_quest(%L, %L, %L, %L, 120)', p, 'Physics exam', 'New words', 'Learning'));
+  perform tests.check('a started quest only changes its title and description',
+    r -> 'quest' ->> 'title' = 'PHYSICS EXAM' and r -> 'quest' ->> 'description' = 'New words'
+    and r -> 'quest' ->> 'difficulty' = 'MODERATE' and (r -> 'quest' ->> 'duration_minutes')::int = 60
+    and r -> 'quest' ->> 'category' = 'CREATIVE' and (r -> 'quest' ->> 'xp_reward')::int = 200);
+
+  perform tests.act(a, format('public.start_quest(%L)', m));
+  perform tests.act(a, format('public.set_step_done(%L, true)', tests.step(m, 0)));
+  r := tests.act(a, format('public.update_quest(%L, %L, null, %L, null, %L::text[])', m, 'Learn SwiftUI', 'Development',
+    array['A', 'B', 'C']));
+  perform tests.check('a main quest with a ticked step keeps its steps',
+    r -> 'quest' ->> 'title' = 'LEARN SWIFTUI' and r -> 'quest' -> 'steps' -> 0 ->> 'title' = 'One'
+    and r -> 'quest' -> 'steps' -> 0 ->> 'done_at' is not null and jsonb_array_length(r -> 'quest' -> 'steps') = 4);
+
+  perform tests.check('the title still can''t be blank when editing',
+    tests.error(a, format('public.update_quest(%L, %L, null, %L, 60)', p, '  ', 'Learning')) = 'invalid_input');
+  perform tests.check('another user''s quest can''t be edited',
+    tests.error(b, format('public.update_quest(%L, %L, null, %L, 60)', p, 'Mine now', 'Learning')) = 'not_found');
+  perform tests.check('signed-out visitors can''t edit',
+    tests.error(null, format('public.update_quest(%L, %L, null, %L, 60)', p, 'X', 'Learning'), 'anon') like 'permission denied%');
+
+  update public.quests set started_at = started_at - interval '2 hours' where id = p;
+  perform tests.act(a, format('public.complete_quest(%L)', p));
+  perform tests.check('a completed quest can''t be edited',
+    tests.error(a, format('public.update_quest(%L, %L, null, %L, 30)', p, 'X', 'Other')) = 'not_allowed');
+  r := tests.daily(a, 'refresh');
+  perform tests.check('a daily quest can''t be edited',
+    tests.error(a, format('public.update_quest(%L, %L, null, %L, 30)', r -> 'quest' ->> 'id', 'X', 'Other')) = 'not_allowed');
+end;
+$$;
+
 -- Result ------------------------------------------------------------------------------
 
 do $$
