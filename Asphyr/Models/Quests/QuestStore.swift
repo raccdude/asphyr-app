@@ -25,6 +25,13 @@ final class QuestStore {
     /// Every attribute starts at 10.
     private var attributeGains: [String: Int] = [:]
 
+    /// Earned from completed quests and spent in the Store.
+    private(set) var embers = 0
+    /// Every cloak owned, level and bought, by `CharacterCloak` raw value.
+    private(set) var ownedCloakNames: Set<String> = []
+    /// What the Store sells, in order.
+    private(set) var storeItems: [StoreItemRecord] = []
+
     /// True once the account's quests have loaded from the server.
     private(set) var isLoaded = false
     /// True while a request is on its way, so a second tap waits for it.
@@ -39,12 +46,14 @@ final class QuestStore {
     func load(_ state: PlayerStateRecord) {
         quests = state.quests.map(Quest.init(record:))
         apply(state.player)
+        storeItems = state.store ?? []
         isLoaded = true
     }
 
     /// Forgets the account, after logging out.
     func clear() {
         resetProgress()
+        storeItems = []
         isLoaded = false
         isBusy = false
     }
@@ -56,6 +65,17 @@ final class QuestStore {
         seenLitStarCount = player.seenLitStarCount
         unlockedCloaks = player.unlockedCloaks.compactMap(CloakReward.init(serverName:))
         earnedAchievements = Set(player.earnedAchievements.compactMap(Achievement.init(serverName:)))
+        embers = player.embers ?? 0
+        ownedCloakNames = Set(player.ownedCloaks ?? player.unlockedCloaks)
+    }
+
+    /// Whether a cloak is owned, by `CharacterCloak` raw value, e.g. "Green".
+    func owns(_ cloakName: String) -> Bool {
+        ownedCloakNames.contains(cloakName)
+    }
+
+    func price(of cloakName: String) -> Int? {
+        storeItems.first { $0.item == cloakName }?.price
     }
 
     /// Puts the changed quest in place, or adds it if it's new.
@@ -86,7 +106,8 @@ final class QuestStore {
             levelAfter: reward.levelAfter,
             xpIntoLevel: reward.xpIntoLevel,
             xpForLevel: reward.xpForLevel,
-            newCloaks: reward.newCloaks.compactMap(CloakReward.init(serverName:))
+            newCloaks: reward.newCloaks.compactMap(CloakReward.init(serverName:)),
+            embersEarned: reward.embersEarned ?? 0
         )
     }
 
@@ -111,6 +132,8 @@ final class QuestStore {
         seenLitStarCount = 0
         announcedLevel = 1
         attributeGains = [:]
+        embers = 0
+        ownedCloakNames = []
     }
 
     /// The quest on Home: what the user is working on, then today's daily quest,
@@ -360,6 +383,8 @@ struct QuestCompletion: Identifiable {
     let xpIntoLevel: Int
     let xpForLevel: Int
     let newCloaks: [CloakReward]
+    /// From the server's reply. Previews and the device copy of the rules leave it 0.
+    var embersEarned = 0
 
     var didLevelUp: Bool {
         levelAfter > levelBefore

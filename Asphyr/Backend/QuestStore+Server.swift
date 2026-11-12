@@ -87,6 +87,11 @@ extension QuestStore {
         try await send { try await QuestService.giveDailyQuest(daily, replace: true) }
     }
 
+    /// Spends Embers on a cloak from the store. The server checks the price and balance.
+    func buyCloak(_ name: String) async throws {
+        try await send { try await QuestService.buyCloak(name) }
+    }
+
     /// Display only, so it's sent without waiting and a failure is ignored.
     func markJourneySeen(litStarCount: Int) {
         seenLitStarCount = litStarCount
@@ -113,7 +118,7 @@ extension QuestStore {
         } catch {
             let error = QuestError(error)
             // The device was out of step with the server, so catch up
-            let outOfStep: [QuestError] = [.notFound, .notAllowed, .limitReached, .tooSoon]
+            let outOfStep: [QuestError] = [.notFound, .notAllowed, .limitReached, .tooSoon, .notEnoughEmbers]
             if outOfStep.contains(error) {
                 try? await loadFromServer()
             }

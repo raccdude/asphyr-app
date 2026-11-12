@@ -52,6 +52,16 @@ struct PlayerRecord: Decodable {
     let unlockedCloaks: [String]
     /// The `Achievement` case names, e.g. "firstQuest".
     let earnedAchievements: [String]
+    /// Optional, so a reply from before the Store still decodes.
+    let embers: Int?
+    /// Every cloak owned, level and bought, e.g. "Green".
+    let ownedCloaks: [String]?
+}
+
+/// A cloak for sale, e.g. Green at 200 Embers.
+struct StoreItemRecord: Decodable, Equatable {
+    let item: String
+    let price: Int
 }
 
 struct RewardRecord: Decodable {
@@ -61,6 +71,7 @@ struct RewardRecord: Decodable {
     let xpIntoLevel: Int
     let xpForLevel: Int
     let newCloaks: [String]
+    let embersEarned: Int?
 }
 
 /// The reply to every quest action. `quest` is nil when nothing was added or the
@@ -74,6 +85,7 @@ struct QuestReply: Decodable {
 struct PlayerStateRecord: Decodable {
     let quests: [QuestRecord]
     let player: PlayerRecord
+    let store: [StoreItemRecord]?
 }
 
 extension Quest {
