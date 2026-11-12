@@ -11,23 +11,30 @@ import SwiftUI
 /// creates the account the first time, so it works the same on both. Apple sign-in was
 /// removed on 12 Nov 2026 at the developer's request. See `Backend/SocialSignIn.swift`.
 struct SocialSignInRow: View {
-    /// Shown by the screen, under its own fields.
-    @Binding var errorMessage: String?
-
     @Environment(AppRouter.self) private var router
     @Environment(OnboardingProfile.self) private var profile
 
     @State private var isBusy = false
+    /// Shown under the button, so the screen's own fields don't turn red.
+    @State private var errorMessage: String?
 
     var body: some View {
-        option(.google, name: "Continue with Google") {
-            Image("googleLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 22, height: 22)
+        VStack(alignment: .leading, spacing: 8) {
+            option(.google, name: "Continue with Google") {
+                Image("googleLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 22, height: 22)
+            }
+            .opacity(isBusy ? 0.6 : 1)
+
+            if let errorMessage {
+                FieldErrorRow(message: errorMessage)
+                    .transition(.opacity)
+            }
         }
-        .opacity(isBusy ? 0.6 : 1)
         .animation(.easeInOut(duration: 0.2), value: isBusy)
+        .animation(.easeInOut(duration: 0.2), value: errorMessage)
     }
 
     private func option(_ provider: SocialProvider, name: String, @ViewBuilder logo: () -> some View) -> some View {
@@ -78,7 +85,7 @@ struct SocialSignInRow: View {
 #Preview(traits: .dark) {
     ZStack {
         Color.asphyrBackground.ignoresSafeArea()
-        SocialSignInRow(errorMessage: .constant(nil))
+        SocialSignInRow()
             .padding(.horizontal, 20)
     }
     .environment(AppRouter())

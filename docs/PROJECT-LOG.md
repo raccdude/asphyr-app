@@ -93,3 +93,13 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Noted, not done:** turn email confirmation on (after building a check-your-email screen), delete the test accounts, and turn on leaked-password protection. See `BACKEND-SPEC.md`, Before release.
 - **Not tested:** no Swift compiler or simulator here. Check on the iPhone 12 Pro Max, and on a small simulator such as iPhone SE or 13 mini: Journey, Reset Progress, the Home header, the tab bar, Create Quest's steps and Create Account's password fields.
 
+### Second batch from the developer (12 Nov 2026, testing on an iPhone 12 Pro Max)
+- **Google button did nothing:** Supabase's API logs showed `/auth/v1/authorize` answering 400, because the Google provider isn't turned on yet (it needs the Google Cloud project). The app now reads Supabase's public `/auth/v1/settings` first and says "This sign-in option isn't available yet" when Google is off. The message now shows under the Google button, so the email fields no longer turn red.
+- **Tab bar too high, and covering content:** it sat a fixed 22pt above the edge, and its backdrop rose 150pt, dimming Journey's guide card and the last cards. `TabBarMetrics` now works from the phone's own safe area; see Screen sizes in `IMPLEMENTATION-NOTES.md`. Journey's guide card gap was trimmed to match the other tabs.
+- **Text limits** on every field, in `TextLimits.swift`.
+- **Edit quest** on a long press, test first: the new tests failed before `update_quest` existed, then all 168 database checks and the 8 function tests passed.
+- **Green flash in the quest log:** each filter tap animated the whole list, cross-fading the active quest's green card. Now only the pill animates.
+- **Keyboard:** Save Changes on Profile & Identity rises above the keyboard like Create Quest, which is standard iOS. This reverses the 3 Nov choice to keep it down, at the developer's request to follow the standard.
+- **Back swipe in Settings:** kept. It's standard iOS, and every pushed screen already has it.
+- **Not possible here:** running the app on different screen sizes. The layout was fixed from the code; check it on the 12 Pro Max and a small simulator.
+
