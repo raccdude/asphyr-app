@@ -166,15 +166,20 @@ private extension View {
             }
             .overlay(alignment: .bottom) {
                 ZStack(alignment: .bottom) {
+                    // Fades in above the bar, then solid from the bar down to the screen's
+                    // edge, so content scrolling underneath never shows through or
+                    // competes with the bar
                     LinearGradient(
                         stops: [
                             .init(color: .clear, location: 0),
-                            .init(color: Color.asphyrBackground.opacity(0.95), location: 0.55)
+                            .init(color: Color.asphyrBackground.opacity(0.85), location: 0.3),
+                            .init(color: Color.asphyrBackground, location: 0.5),
+                            .init(color: Color.asphyrBackground, location: 1)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
-                    .frame(height: 130)
+                    .frame(height: 150)
                     .allowsHitTesting(false)
 
                     MainTabBar(selection: selection)

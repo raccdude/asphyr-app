@@ -51,6 +51,7 @@ struct CreateQuestView: View {
     ]
 
     private static let maxStepCount = 10
+    private static let addStepRowID = "addStepRow"
 
     @Environment(QuestStore.self) private var questStore
     @Environment(\.dismiss) private var dismiss
@@ -93,8 +94,18 @@ struct CreateQuestView: View {
     }
 
     var body: some View {
-        ScrollView {
-            content
+        ScrollViewReader { proxy in
+            ScrollView {
+                content
+            }
+            // Keeps the step field in view as steps are added, so it doesn't end up
+            // behind the button or the keyboard
+            .onChange(of: steps.count) { oldCount, newCount in
+                guard newCount > oldCount else { return }
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    proxy.scrollTo(Self.addStepRowID, anchor: .bottom)
+                }
+            }
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
@@ -389,6 +400,7 @@ struct CreateQuestView: View {
             )
             .submitLabel(.done)
             .onSubmit(addStep)
+            .id(Self.addStepRowID)
 
             Button(action: addStep) {
                 Image("iconQuestCreate")

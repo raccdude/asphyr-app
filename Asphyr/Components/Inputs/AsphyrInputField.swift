@@ -42,6 +42,11 @@ struct AsphyrInputField<Field: Hashable>: View {
             Group {
                 if isSecure && !isRevealed {
                     SecureField("", text: $text, prompt: promptText)
+                } else if isSecure {
+                    // A shown password is still a password: no suggestions or capitals
+                    TextField("", text: $text, prompt: promptText)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
                 } else {
                     TextField("", text: $text, prompt: promptText)
                 }

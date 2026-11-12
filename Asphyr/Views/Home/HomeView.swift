@@ -72,9 +72,12 @@ struct HomeView: View {
                             .font(AppTypography.bodySecondary)
                             .foregroundStyle(Color.asphyrTextPrimary)
 
+                        // Long names wrap rather than cut off
                         Text(displayName)
                             .font(AppTypography.screenTitle)
                             .foregroundStyle(Color.asphyrTextPrimary)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
                             .accessibilityAddTraits(.isHeader)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

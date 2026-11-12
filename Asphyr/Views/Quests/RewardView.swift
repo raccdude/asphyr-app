@@ -140,6 +140,7 @@ struct RewardView: View {
                 Text("Nice work, \(displayName)!")
                     .font(AppTypography.bodySemiBold)
                     .foregroundStyle(Color.asphyrTextPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(completion.didLevelUp ? "You reached level \(completion.levelAfter)." : clearedText)
                     .font(AppTypography.captionMedium)
