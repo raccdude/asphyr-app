@@ -12,12 +12,9 @@ struct CharacterView: View {
     @Environment(QuestStore.self) private var questStore
 
     @State private var mood: CharacterPortrait.Mood = .idle
-    @State private var cloakShakes: [CharacterCloak: Int] = [:]
-    @State private var lockedTapCount = 0
     @State private var toast: String?
     @State private var toastCount = 0
 
-    private let cloakColumns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 4)
     private let badgeColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
     /// Login skips onboarding until real accounts exist, so the name can be empty.
@@ -53,12 +50,6 @@ struct CharacterView: View {
                         .padding(.top, 32)
 
                     colorPicker
-                        .padding(.top, 14)
-
-                    SectionDivider(sectionTitle: "CLOAKS")
-                        .padding(.top, 24)
-
-                    cloakPicker
                         .padding(.top, 14)
 
                     SectionDivider(sectionTitle: "ATTRIBUTES")
@@ -108,7 +99,6 @@ struct CharacterView: View {
                 }
             }
         }
-        .hapticFeedback(.warning, trigger: lockedTapCount)
         .task(id: toastCount) {
             guard toast != nil else { return }
 
@@ -215,85 +205,6 @@ struct CharacterView: View {
                 .accessibilityAddTraits(profile.color == color ? .isSelected : [])
             }
         }
-    }
-
-    private var cloakPicker: some View {
-        LazyVGrid(columns: cloakColumns, alignment: .center, spacing: 16) {
-            cloakOption(
-                title: "Starter",
-                detail: "",
-                swatch: CloakPalette.starter.top,
-                isSelected: profile.cloak == nil,
-                isLocked: false
-            ) {
-                profile.cloak = nil
-            }
-
-            ForEach(CharacterCloak.allCases) { cloak in
-                let isLocked = cloak.reward.map { !questStore.unlockedCloaks.contains($0) } ?? true
-                let level = cloak.reward?.level
-
-                cloakOption(
-                    title: cloak.rawValue,
-                    detail: level.map { "Level \($0)" } ?? "Coming soon",
-                    swatch: cloak.palette.top,
-                    isSelected: profile.cloak == cloak,
-                    isLocked: isLocked
-                ) {
-                    if isLocked {
-                        withAnimation(.linear(duration: 0.4)) {
-                            cloakShakes[cloak, default: 0] += 1
-                        }
-                        lockedTapCount += 1
-                        showToast(level.map { "Complete a quest at level \($0) to unlock this cloak." } ?? "This cloak is coming soon to the store.")
-                    } else {
-                        profile.cloak = cloak
-                    }
-                }
-                .modifier(ShakeEffect(shakes: CGFloat(cloakShakes[cloak, default: 0])))
-            }
-        }
-    }
-
-    private func cloakOption(
-        title: String,
-        detail: String,
-        swatch: Color,
-        isSelected: Bool,
-        isLocked: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                ColorSwatch(color: swatch, isSelected: isSelected)
-                    .frame(width: 44, height: 44)
-                    .overlay {
-                        if isLocked {
-                            Image("iconBadgeLock")
-                                .resizable()
-                                .frame(width: 14, height: 14)
-                                .foregroundStyle(Color.asphyrTextPrimary)
-                        }
-                    }
-
-                VStack(spacing: 2) {
-                    Text(title)
-                        .font(AppTypography.captionMedium)
-                        .foregroundStyle(isLocked ? Color.asphyrTextSecondary : Color.asphyrTextPrimary)
-
-                    if isLocked {
-                        Text(detail)
-                            .font(AppTypography.captionRegular)
-                            .foregroundStyle(Color.asphyrTextSecondary)
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(isLocked ? "\(title) cloak, locked, \(detail)" : title)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var attributesCard: some View {
