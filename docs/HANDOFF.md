@@ -8,13 +8,14 @@ Read this first when picking up the project on another Mac or in a new session. 
 - **Backend step 4a:** the server functions for quests and rewards, written in a cloud session on 12 Nov 2026 and tested on a local database. Not on `main` yet: the migration deploys when it's merged.
 - **Backend step 4b:** the app connected to those functions, written in the same session. **Not built yet:** the session had no Swift compiler, so the first job on the Mac is to build, fix anything the compiler finds, and test on the iPhone.
 - **Backend step 5:** photos and Delete Account, written in the same session. The database rules and the `delete-account` Edge Function are tested; the app's side isn't built yet. After merging, check the function deployed (see `BACKEND-SPEC.md`, Step 5 notes).
-- **Next:** backend step 6, in the same session.
-- **After the backend:** teach the developer to deploy to their iPhone, then Store and Inventory, the Reward redesign, and the Figma prototype.
+- **Backend step 6:** Apple and Google sign-in, code written in the same session. They work once the developer sets up the paid Apple Developer account and a Google Cloud project (see `BACKEND-SPEC.md`, Step 6 notes).
+- **First job on the Mac:** build in Xcode and fix anything the compiler finds, as steps 4b to 6 were written without a Swift compiler. Run both test scripts, then test every flow on the iPhone.
+- **Then:** teach the developer to deploy to their iPhone, then Store and Inventory, the Reward redesign, and the Figma prototype.
 
 ## Services
 - **Figma:** file key `27W7B4MhKAFJ8LwiWJgcmD`, page `06 — Hi-Fi v3 (App revisions)`.
 - **Supabase:** project `qnotkiivqelufrqcnquu`, organization ASPHYR, Singapore, Free plan. A project called Synapse belongs to another person's account: never use it. Check which organization the connector shows before writing.
-- **GitHub:** `raccdude/asphyr-app`. Migrations in `supabase/migrations` deploy when they reach `main`.
+- **GitHub:** `raccdude/asphyr-app`. Migrations in `supabase/migrations`, and the Edge Functions declared in `supabase/config.toml`, deploy when they reach `main`.
 - **Xcode signing:** the team in the project file is the developer's own. On another Mac, sign in to Xcode and pick the team again.
 
 ## How the developer works
@@ -38,7 +39,7 @@ This checks rewards, settings and onboarding without Xcode. The app itself has n
 ```bash
 zsh scripts/db-tests/run.sh
 ```
-This checks the server's quest and reward rules on a fresh local database. It needs a local Postgres: `brew install postgresql@17`, then `brew services start postgresql@17`.
+This checks the server's quest, reward, photo and security rules on a fresh local database, then the `delete-account` Edge Function. It needs a local Postgres (`brew install postgresql@17`, then `brew services start postgresql@17`) and, for the function, Deno (`brew install deno`).
 
 ## Moving to another Mac
 1. Clone the repo, or `git pull` if it's already there, then open `Asphyr.xcodeproj`. Xcode downloads the Supabase library.

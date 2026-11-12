@@ -92,7 +92,7 @@ struct LoginView: View {
             OrDivider()
                 .padding(.top, 22)
 
-            SocialSignInRow()
+            SocialSignInRow(errorMessage: $errorMessage)
                 .padding(.top, 22)
 
             Spacer(minLength: 24)

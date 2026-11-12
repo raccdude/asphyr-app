@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. **Step 5 is written, 12 Nov 2026:** photos and Delete Account. The database rules and the Edge Function are tested; the app's side isn't built yet. Step 6 is next.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. **Step 5 is written, 12 Nov 2026:** photos and Delete Account. The database rules and the Edge Function are tested; the app's side isn't built yet. **Step 6's code is written, 12 Nov 2026:** Apple and Google sign-in. Neither works until the developer sets up the accounts below, and it isn't built in Xcode yet.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -108,6 +108,19 @@ Supabase's security and performance advisors reported nothing.
 - **Delete Account:** `supabase/functions/delete-account`. It checks the caller's session, removes their photo, then deletes their login, which removes every row of theirs. If the photo can't be removed, the login stays so the user can try again. It reads the new secret key from `SUPABASE_SECRET_KEYS`, falling back to the older service role key, which Supabase retires at the end of 2026.
 - **Deploying the function:** `supabase/config.toml` declares it, so the GitHub integration deploys it when it reaches `main`, as long as **Deploy to production** is on. Supabase ignores the file's other settings for production by default. After merging, check **Edge Functions** in the dashboard lists `delete-account`. If it doesn't, deploy it once with `supabase functions deploy delete-account`.
 - **Tests:** `scripts/db-tests/run.sh` also runs `deno test` on the function, with fake Supabase clients, when Deno is installed.
+
+## Step 6 notes
+- **How it works:** `Backend/SocialSignIn.swift`. Apple uses Apple's own sign-in sheet and `signInWithIdToken`. Google uses Supabase's sign-in page in a secure browser sheet, which returns to `asphyr://login-callback`. No new library was added. Both create the account the first time, then the profile load sends a new user to onboarding, like email sign-up.
+- **Until set up:** the buttons say "This sign-in option isn't available yet. Use your email for now." Cancelling says nothing.
+- **Not added yet, on purpose:** the Sign in with Apple capability. A free Apple account can't sign an app that has it, so adding it now would stop the app installing on the iPhone.
+- **To turn on Apple** (needs the paid Apple Developer Program):
+  1. In Xcode, **Signing & Capabilities**, add **Sign in with Apple**.
+  2. In Supabase, **Authentication → Sign In / Providers → Apple**: turn it on, and put the bundle id `mseuf.edu.ph.Asphyr` in **Client IDs**. Native sign-in needs no secret key. A bundle id under a school domain may need changing for the paid account, and this must then match.
+- **To turn on Google** (needs a free Google Cloud project):
+  1. In Google Cloud, set up the OAuth consent screen, then create an OAuth client of type **Web application** with the redirect URI `https://qnotkiivqelufrqcnquu.supabase.co/auth/v1/callback`.
+  2. In Supabase, **Authentication → Sign In / Providers → Google**: turn it on and paste the client ID and secret.
+  3. In Supabase, **Authentication → URL Configuration → Redirect URLs**: add `asphyr://login-callback`.
+- **App Review:** an app that offers Google sign-in must also offer Sign in with Apple, so turn both on before release.
 
 ## Defaults, unless the developer says otherwise
 - **Project:** a new project called ASPHYR, in the developer's own Supabase account.

@@ -28,6 +28,8 @@ enum AccountError: Error, Equatable {
     case samePassword
     case tooManyAttempts
     case noConnection
+    /// Apple or Google sign-in isn't set up yet.
+    case signInUnavailable
     case unknown
 
     init(_ error: Error) {
@@ -64,6 +66,7 @@ enum AccountError: Error, Equatable {
         case .samePassword: "Choose a different password from your current one."
         case .tooManyAttempts: "Too many attempts. Wait a moment and try again."
         case .noConnection: "No connection. Check your internet and try again."
+        case .signInUnavailable: "This sign-in option isn’t available yet. Use your email for now."
         case .unknown: "Something went wrong. Try again."
         }
     }

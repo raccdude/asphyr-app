@@ -44,7 +44,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
 | Backend step 4: quests and rewards on the server | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
 | Backend step 5: photos and Delete Account | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
-| Backend step 6 | See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
+| Backend step 6: Apple and Google sign-in | Code written in a cloud session, not built in Xcode yet. Needs the accounts set up | `claude/gifted-archimedes-l90m2f` |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -78,7 +78,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Backend choice:** Supabase, chosen on 4 Nov 2026 over Firebase. ASPHYR's data is connected and suits tables, Edge Functions can check rewards on the server, and standard Postgres avoids lock-in. The first release doesn't need to work fully offline, as decided on the same day, so it won't build offline sync. It still needs clear loading and no-connection states.
 - **Opening the app:** a signed-in user sees Splash without its prompt while the profile loads, for at least 1.2 seconds so the animation plays, then the tabs, or Build Your Identity if onboarding wasn't finished. Tapping moves on as soon as the profile is ready. There's no tap requirement, because this is an app people open daily. With no connection, `AccountLoadingView` offers Try again and Log out.
 - **Profile:** `ProfileService` saves it when onboarding finishes, and half a second after a change in the tabs. Settings are saved on the device.
-- **Email accounts are real:** sign-up, login, logout, password reset and staying signed in use Supabase, through `Backend/AccountService.swift`. The Apple and Google buttons stay display only until backend step 6.
+- **Email accounts are real:** sign-up, login, logout, password reset and staying signed in use Supabase, through `Backend/AccountService.swift`. The Apple and Google buttons work from backend step 6, once their accounts are set up (see `BACKEND-SPEC.md`, Step 6 notes).
 - **`StatusError`** is now `#FF5C5C`, Figma's Error value.
 - **Password prompts are kept on purpose.** iOS's "Use Strong Password" and "Save Password?" come from the correct field types, which password managers rely on.
 
