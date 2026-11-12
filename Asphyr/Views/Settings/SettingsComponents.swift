@@ -167,8 +167,18 @@ extension View {
             }
     }
 
+    /// Opens at the designed height. On a shorter screen, or with larger text, the sheet
+    /// is capped by iOS, so its content scrolls instead of being cut off at the bottom.
     func settingsSheet(height: CGFloat) -> some View {
-        presentationDetents([.height(height)])
+        ViewThatFits(in: .vertical) {
+            self
+            ScrollView {
+                self
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+        }
+        .presentationDetents([.height(height)])
             .presentationDragIndicator(.visible)
             .presentationBackground(Color.asphyrSurface)
             .presentationCornerRadius(28)

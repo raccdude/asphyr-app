@@ -275,6 +275,7 @@ struct ProfileIdentityView: View {
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(Color.asphyrTextPrimary)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Image("iconSettingsUpDown")
                 .foregroundStyle(Color.asphyrTextSecondary)

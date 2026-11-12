@@ -206,6 +206,9 @@ struct HomeView: View {
                 .tracking(1.44)
                 .foregroundStyle(Color.asphyrAccentPrimary)
                 .lineLimit(1)
+                // Shares the row with the Ember chip, streak chip and Settings, so on
+                // narrow phones or at large text it shrinks instead of being cut off
+                .minimumScaleFactor(0.6)
 
             Spacer(minLength: 0)
 

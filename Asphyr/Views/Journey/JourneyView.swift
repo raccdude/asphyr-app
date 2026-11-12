@@ -11,6 +11,8 @@ struct JourneyView: View {
     @Environment(QuestStore.self) private var questStore
     @Environment(OnboardingProfile.self) private var profile
 
+    /// The screen's width, so the constellation can shrink to fit narrower phones.
+    @State private var availableWidth = JourneyLayout.width
     @State private var isShowingSky = false
     /// The star whose details the guide card is showing.
     @State private var selectedStar: Int?
@@ -176,10 +178,23 @@ struct JourneyView: View {
                 .transition(.scale(scale: 1.4).combined(with: .opacity))
             } else {
                 ScrollView {
+                    // Drawn for a 402pt-wide screen, and scaled down on narrower ones
+                    // so the outer stars and labels aren't cut off
                     constellationView
+                        .scaleEffect(constellationScale, anchor: .topLeading)
+                        .frame(
+                            width: JourneyLayout.width * constellationScale,
+                            height: JourneyLayout.height * constellationScale,
+                            alignment: .topLeading
+                        )
                         .frame(maxWidth: .infinity)
                         // Centers the constellation in the space it has
                         .containerRelativeFrame(.vertical)
+                }
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.width
+                } action: { width in
+                    availableWidth = width
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.hidden)
@@ -277,6 +292,10 @@ struct JourneyView: View {
         // Lines up with the header on Home
         .padding(.top, 14)
         .padding(.bottom, 6)
+    }
+
+    private var constellationScale: CGFloat {
+        min(1, availableWidth / JourneyLayout.width)
     }
 
     private var constellationView: some View {
