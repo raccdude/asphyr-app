@@ -30,6 +30,8 @@ extension EnvironmentValues {
     @Entry var openCharacter: () -> Void = {}
     /// Switches to the Quests tab.
     @Entry var openQuests: () -> Void = {}
+    /// Opens the Inventory, from Home.
+    @Entry var openInventory: () -> Void = {}
 }
 
 struct MainTabView: View {
@@ -39,12 +41,14 @@ struct MainTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(QuestStore.self) private var questStore
 
+    @State private var inventoryRequest = 0
+
     var body: some View {
         TabView(selection: $selection) {
             Tab(value: MainTab.home) {
                 // The bar sits inside the stack so pushed screens cover it
                 NavigationStack {
-                    HomeView()
+                    HomeView(inventoryRequest: inventoryRequest)
                         .mainTabBar(selection: $selection)
                 }
             }
@@ -68,6 +72,10 @@ struct MainTabView: View {
         }
         .environment(\.openCharacter) { selection = .character }
         .environment(\.openQuests) { selection = .quests }
+        .environment(\.openInventory) {
+            selection = .home
+            inventoryRequest += 1
+        }
         .onAppear(perform: refreshDailyQuest)
         .onAppear(perform: updateStreakAlert)
         .onChange(of: questStore.completionDates) { updateStreakAlert() }

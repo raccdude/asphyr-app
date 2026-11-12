@@ -28,6 +28,11 @@ struct HomeView: View {
     @Environment(AppSettings.self) private var settings
 
     @State private var isShowingSettings = false
+    @State private var isShowingStore = false
+    @State private var storeTab: StoreView.Tab = .store
+
+    /// Rises each time Reward asks for the Inventory, which opens it here.
+    var inventoryRequest = 0
     @State private var isShowingStreak = false
     @State private var selectedQuestID: UUID?
     @State private var isShowingCreateQuest = false
@@ -171,6 +176,13 @@ struct HomeView: View {
         .navigationDestination(isPresented: $isShowingSettings) {
             SettingsView()
         }
+        .navigationDestination(isPresented: $isShowingStore) {
+            StoreView(initialTab: storeTab)
+        }
+        .onChange(of: inventoryRequest) {
+            storeTab = .inventory
+            isShowingStore = true
+        }
         .navigationDestination(item: $selectedQuestID) { questID in
             QuestDetailsView(questID: questID)
         }
@@ -193,6 +205,15 @@ struct HomeView: View {
                 .lineLimit(1)
 
             Spacer(minLength: 0)
+
+            Button {
+                storeTab = .store
+                isShowingStore = true
+            } label: {
+                EmberBalance(embers: questStore.embers)
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Opens the Store")
 
             if settings.showsStreaks, streak.state != .none {
                 Button {

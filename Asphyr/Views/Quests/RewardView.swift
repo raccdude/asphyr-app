@@ -13,7 +13,7 @@ struct RewardView: View {
 
     @Environment(OnboardingProfile.self) private var profile
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openCharacter) private var openCharacter
+    @Environment(\.openInventory) private var openInventory
 
     @State private var isRevealed = false
     @State private var isShowingUnlockedReward = false
@@ -91,6 +91,12 @@ struct RewardView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 17)
 
+                if completion.embersEarned > 0 {
+                    embersEarned
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 16)
+                }
+
                 if quest.isBonusReward {
                     Text("Small progress is still progress.")
                         .font(AppTypography.bodySecondary)
@@ -107,8 +113,8 @@ struct RewardView: View {
                         .padding(.top, 20)
 
                     if isShowingUnlockedReward {
-                        Button("VIEW IN CHARACTER") {
-                            openCharacter()
+                        Button("VIEW IN INVENTORY") {
+                            openInventory()
                             dismiss()
                         }
                         .font(AppTypography.captionMedium)
@@ -147,6 +153,19 @@ struct RewardView: View {
     }
 
     /// The XP card sits in the middle, with up to two attributes tilted beside it.
+    private var embersEarned: some View {
+        HStack(spacing: 6) {
+            Image("iconEmber")
+            Text("+\(completion.embersEarned) Embers")
+                .font(AppTypography.bodySemiBold)
+        }
+        .foregroundStyle(Color.asphyrWarning)
+        .accessibilityElement(children: .combine)
+        // Arrives after the loot cards
+        .opacity(isRevealed ? 1 : 0)
+        .animation(.easeOut(duration: 0.3).delay(1.3), value: isRevealed)
+    }
+
     private var lootCards: some View {
         let attributes = Array(quest.attributeRewards.prefix(2))
 
