@@ -202,7 +202,8 @@ struct JourneyView: View {
                     guideCard
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
-                        .padding(.bottom, 16)
+                        // The tab bar's inset already leaves a gap, like the other tabs
+                        .padding(.bottom, 4)
                 }
                 .transition(.scale(scale: 0.6).combined(with: .opacity))
             }

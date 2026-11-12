@@ -37,6 +37,7 @@ struct SetNewPasswordView: View {
                             field: .password,
                             isSecure: true
                         )
+                        .characterLimit(TextLimits.password, text: $password)
                         .textContentType(.newPassword)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -56,6 +57,7 @@ struct SetNewPasswordView: View {
                             isSecure: true,
                             hasError: showsMismatchError
                         )
+                        .characterLimit(TextLimits.password, text: $passwordConfirmation)
                         .textContentType(.newPassword)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()

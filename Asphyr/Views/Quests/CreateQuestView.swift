@@ -181,6 +181,7 @@ struct CreateQuestView: View {
                 hasError: showsTitleError,
                 fill: .asphyrBackground
             )
+            .characterLimit(TextLimits.questTitle, text: $title)
             .submitLabel(.next)
             .onSubmit { focus = .description }
             .padding(.top, 10)
@@ -313,6 +314,7 @@ struct CreateQuestView: View {
             }
 
             TextField("", text: $description, axis: .vertical)
+                .characterLimit(TextLimits.questDescription, text: $description)
                 .foregroundStyle(Color.asphyrTextPrimary)
                 .tint(Color.asphyrAccentPrimary)
                 .focused($focus, equals: .description)
@@ -398,6 +400,7 @@ struct CreateQuestView: View {
                 hasError: showsStepsError,
                 fill: .asphyrBackground
             )
+            .characterLimit(TextLimits.stepTitle, text: $newStep)
             .submitLabel(.done)
             .onSubmit(addStep)
             .id(Self.addStepRowID)

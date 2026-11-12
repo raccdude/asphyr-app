@@ -10,10 +10,12 @@ import Supabase
 /// security rules protect the data. Secret keys must never go in the app or the repo.
 enum Backend {
     static let passwordResetURL = URL(string: "asphyr://reset-password")!
+    static let projectURL = URL(string: "https://qnotkiivqelufrqcnquu.supabase.co")!
+    static let publishableKey = "sb_publishable_UFvvONfMYxfmu-GWjQj6yg_hYfNEwcJ"
 
     static let client = SupabaseClient(
-        supabaseURL: URL(string: "https://qnotkiivqelufrqcnquu.supabase.co")!,
-        supabaseKey: "sb_publishable_UFvvONfMYxfmu-GWjQj6yg_hYfNEwcJ",
+        supabaseURL: projectURL,
+        supabaseKey: publishableKey,
         options: SupabaseClientOptions(
             auth: .init(redirectToURL: passwordResetURL, emitLocalSessionAsInitialSession: true)
         )
@@ -28,7 +30,7 @@ enum AccountError: Error, Equatable {
     case samePassword
     case tooManyAttempts
     case noConnection
-    /// Apple or Google sign-in isn't set up yet.
+    /// Google sign-in isn’t set up yet.
     case signInUnavailable
     case unknown
 

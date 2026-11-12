@@ -82,6 +82,7 @@ struct CreateAccountView: View {
                         field: .email,
                         hasError: showsEmailError
                     )
+                    .characterLimit(TextLimits.email, text: $email)
                     .textContentType(.username)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -103,6 +104,7 @@ struct CreateAccountView: View {
                         field: .password,
                         isSecure: true
                     )
+                    .characterLimit(TextLimits.password, text: $password)
                     .textContentType(.newPassword)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -124,6 +126,7 @@ struct CreateAccountView: View {
                         isSecure: true,
                         hasError: showsMismatchError
                     )
+                    .characterLimit(TextLimits.password, text: $passwordConfirmation)
                     .textContentType(.newPassword)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
