@@ -73,4 +73,5 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
   - The past-quest payment can't be tested locally, so it's checked on the live project after deploying.
 - **To do on the Mac:** build, fix any compiler errors, test on the iPhone, then merge to `main`. After merging, Claude checks the live project.
 - **Review:** a self-review of the whole Store change against the spec found nothing critical. Two small things to check on the iPhone: Reward's "VIEW IN INVENTORY" when the quest was opened from Home (it closes Quest Details and opens the Store at once), and that the Ember chip fits beside the streak chip on a smaller iPhone.
+- **Merged and deployed:** the developer merged to `main` (`5a5fd68`), and Supabase applied `20261112120000_store`. Checked on the live project: the four cloaks are on sale at 200, `buy_cloak` is open to signed-in users only, and the one-off payment matched (the account with 2 completed quests got the 15 Embers they were worth).
 
