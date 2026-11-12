@@ -110,17 +110,14 @@ Supabase's security and performance advisors reported nothing.
 - **Tests:** `scripts/db-tests/run.sh` also runs `deno test` on the function, with fake Supabase clients, when Deno is installed.
 
 ## Step 6 notes
-- **How it works:** `Backend/SocialSignIn.swift`. Apple uses Apple's own sign-in sheet and `signInWithIdToken`. Google uses Supabase's sign-in page in a secure browser sheet, which returns to `asphyr://login-callback`. No new library was added. Both create the account the first time, then the profile load sends a new user to onboarding, like email sign-up.
-- **Until set up:** the buttons say "This sign-in option isn't available yet. Use your email for now." Cancelling says nothing.
-- **Not added yet, on purpose:** the Sign in with Apple capability. A free Apple account can't sign an app that has it, so adding it now would stop the app installing on the iPhone.
-- **To turn on Apple** (needs the paid Apple Developer Program):
-  1. In Xcode, **Signing & Capabilities**, add **Sign in with Apple**.
-  2. In Supabase, **Authentication → Sign In / Providers → Apple**: turn it on, and put the bundle id `mseuf.edu.ph.Asphyr` in **Client IDs**. Native sign-in needs no secret key. A bundle id under a school domain may need changing for the paid account, and this must then match.
+- **Google only, from 12 Nov 2026:** the developer removed the Apple button. `Backend/SocialSignIn.swift` now handles Google only, and the Apple code and `iconAppleLogo` are gone.
+- **How it works:** Supabase's Google sign-in page opens in a secure browser sheet and returns to `asphyr://login-callback`. No new library was added. It creates the account the first time, then the profile load sends a new user to onboarding, like email sign-up.
+- **Until set up:** the button says "This sign-in option isn't available yet. Use your email for now." Cancelling says nothing.
 - **To turn on Google** (needs a free Google Cloud project):
   1. In Google Cloud, set up the OAuth consent screen, then create an OAuth client of type **Web application** with the redirect URI `https://qnotkiivqelufrqcnquu.supabase.co/auth/v1/callback`.
   2. In Supabase, **Authentication → Sign In / Providers → Google**: turn it on and paste the client ID and secret.
   3. In Supabase, **Authentication → URL Configuration → Redirect URLs**: add `asphyr://login-callback`.
-- **App Review:** an app that offers Google sign-in must also offer Sign in with Apple, so turn both on before release.
+- **App Review risk:** Apple's guideline 4.8 says an app offering a third-party login like Google must also offer an equivalent option that limits data to name and email, lets people hide their email, and doesn't track them. Sign in with Apple is the usual answer. Email and password sign-up may not count, as it doesn't hide the email. Check the current guideline before submitting; adding Apple back would need the paid Apple Developer account.
 
 ## Defaults, unless the developer says otherwise
 - **Project:** a new project called ASPHYR, in the developer's own Supabase account.

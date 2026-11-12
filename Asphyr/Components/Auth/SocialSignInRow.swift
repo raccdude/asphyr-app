@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-/// The Apple and Google sign-in row from Figma "05 — Hi-Fi v2". Signing in also
-/// creates the account the first time, so it works the same on Login and Create
-/// Account. See `Backend/SocialSignIn.swift`.
+/// Google sign-in, under the email form on Login and Create Account. Signing in also
+/// creates the account the first time, so it works the same on both. Apple sign-in was
+/// removed on 12 Nov 2026 at the developer's request. See `Backend/SocialSignIn.swift`.
 struct SocialSignInRow: View {
     /// Shown by the screen, under its own fields.
     @Binding var errorMessage: String?
@@ -20,18 +20,11 @@ struct SocialSignInRow: View {
     @State private var isBusy = false
 
     var body: some View {
-        HStack(spacing: 12) {
-            option(.apple, name: "Apple") {
-                Image("iconAppleLogo")
-                    .foregroundStyle(Color.asphyrTextPrimary)
-            }
-
-            option(.google, name: "Google") {
-                Image("googleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 22, height: 22)
-            }
+        option(.google, name: "Continue with Google") {
+            Image("googleLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
         }
         .opacity(isBusy ? 0.6 : 1)
         .animation(.easeInOut(duration: 0.2), value: isBusy)
@@ -48,6 +41,8 @@ struct SocialSignInRow: View {
                 Text(name)
                     .font(AppTypography.bodySemiBold)
                     .foregroundStyle(Color.asphyrTextPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity, minHeight: 52)
             .background(Color.asphyrSurface, in: RoundedRectangle(cornerRadius: 14))
@@ -58,7 +53,7 @@ struct SocialSignInRow: View {
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(PressableButtonStyle())
-        .accessibilityLabel("Continue with \(name)")
+        .accessibilityLabel(name)
     }
 
     private func signIn(with provider: SocialProvider) {

@@ -4,7 +4,7 @@ Read this first when picking up the project on another Mac or in a new session. 
 
 ## Where things stand
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
-- **Backend:** all six steps of `BACKEND-SPEC.md` are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone: accounts, the saved profile and photo, quests and rewards checked by the server, and Delete Account. Apple and Google sign-in wait on the paid Apple Developer account and a Google Cloud project (see `BACKEND-SPEC.md`, Step 6 notes).
+- **Backend:** all six steps of `BACKEND-SPEC.md` are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone: accounts, the saved profile and photo, quests and rewards checked by the server, and Delete Account. Google sign-in waits on a Google Cloud project; the Apple button was removed (see `BACKEND-SPEC.md`, Step 6 notes).
 - **Store and Inventory:** built on 12 Nov 2026, merged to `main` and deployed. The server side is tested (159 database checks). See `IMPLEMENTATION-NOTES.md`, Store and inventory.
 - **Next:** the Reward redesign. Ask the developer what feels wrong first.
 - **After that:** the Figma prototype, and the Figma frames listed under "Figma updates for later".
