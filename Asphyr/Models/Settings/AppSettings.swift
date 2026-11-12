@@ -38,8 +38,6 @@ final class AppSettings {
     var reminderMinute: Int { didSet { defaults.set(reminderMinute, forKey: "reminderMinute") } }
     var reminderDays: Set<Int> { didSet { defaults.set(Array(reminderDays), forKey: "reminderDays") } }
     var streakAlerts: Bool { didSet { defaults.set(streakAlerts, forKey: "streakAlerts") } }
-    /// Stored for when the backend can send email.
-    var weeklySummary: Bool { didSet { defaults.set(weeklySummary, forKey: "weeklySummary") } }
 
     @ObservationIgnored private let defaults: UserDefaults
 
@@ -59,7 +57,6 @@ final class AppSettings {
         reminderMinute = defaults.object(forKey: "reminderMinute") as? Int ?? 0
         reminderDays = (defaults.array(forKey: "reminderDays") as? [Int]).map(Set.init) ?? [0, 1, 2, 3, 4]
         streakAlerts = flag("streakAlerts", false)
-        weeklySummary = flag("weeklySummary", false)
     }
 
     var reminderTime: Date {

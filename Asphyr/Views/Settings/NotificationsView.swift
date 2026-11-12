@@ -7,7 +7,6 @@ import SwiftUI
 
 struct NotificationsView: View {
     @Environment(AppSettings.self) private var settings
-    @Environment(OnboardingProfile.self) private var profile
 
     @State private var isShowingReminderTime = false
     @State private var toast: String?
@@ -77,19 +76,6 @@ struct NotificationsView: View {
                         ) {
                             SettingsToggle(title: "Streak alerts", isOn: $settings.streakAlerts)
                         }
-                    }
-                    .settingsCard()
-                    .padding(.top, 12)
-
-                    SectionDivider(sectionTitle: "EMAIL")
-                        .padding(.top, 26)
-
-                    SettingsRow(
-                        icon: "iconSettingsMail",
-                        title: "Weekly progress summary",
-                        subtitle: profile.email.isEmpty ? nil : "Sent to \(profile.email)"
-                    ) {
-                        SettingsToggle(title: "Weekly progress summary", isOn: $settings.weeklySummary)
                     }
                     .settingsCard()
                     .padding(.top, 12)
