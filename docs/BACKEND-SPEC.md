@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. **Step 5 is written, 12 Nov 2026:** photos and Delete Account. The database rules and the Edge Function are tested; the app's side isn't built yet. **Step 6's code is written, 12 Nov 2026:** Apple and Google sign-in. Neither works until the developer sets up the accounts below, and it isn't built in Xcode yet.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Steps 4 to 6 are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone:** quests and rewards on the server, photos, Delete Account, and the Apple and Google sign-in code. Apple and Google stay unavailable until their accounts are set up (see Step 6 notes). Every backend step is done.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -80,7 +80,7 @@ Each is its own branch, and the next starts only after approval.
 5. **Photos and Delete Account:** Storage, the Edge Function, and real deletion.
 6. **Apple and Google sign-in:** needs the paid Apple Developer account and a Google Cloud project.
 
-After step 6, the developer is taught how to deploy to their iPhone. The Store comes next.
+After step 6 the Store comes next. The developer already runs the app on their iPhone from Xcode.
 
 ## Step 1 results
 Checked with two throwaway users, which the test then removed:

@@ -4,13 +4,9 @@ Read this first when picking up the project on another Mac or in a new session. 
 
 ## Where things stand
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
-- **Backend:** steps 1 to 3 of `BACKEND-SPEC.md` are done: Supabase project, email accounts, password reset, staying signed in, and the saved profile. Checked by the developer on their iPhone.
-- **Backend step 4a:** the server functions for quests and rewards, written in a cloud session on 12 Nov 2026 and tested on a local database. Not on `main` yet: the migration deploys when it's merged.
-- **Backend step 4b:** the app connected to those functions, written in the same session. **Not built yet:** the session had no Swift compiler, so the first job on the Mac is to build, fix anything the compiler finds, and test on the iPhone.
-- **Backend step 5:** photos and Delete Account, written in the same session. The database rules and the `delete-account` Edge Function are tested; the app's side isn't built yet. After merging, check the function deployed (see `BACKEND-SPEC.md`, Step 5 notes).
-- **Backend step 6:** Apple and Google sign-in, code written in the same session. They work once the developer sets up the paid Apple Developer account and a Google Cloud project (see `BACKEND-SPEC.md`, Step 6 notes).
-- **First job on the Mac:** build in Xcode and fix anything the compiler finds, as steps 4b to 6 were written without a Swift compiler. Run both test scripts, then test every flow on the iPhone.
-- **Then:** teach the developer to deploy to their iPhone, then Store and Inventory, the Reward redesign, and the Figma prototype.
+- **Backend:** all six steps of `BACKEND-SPEC.md` are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone: accounts, the saved profile and photo, quests and rewards checked by the server, and Delete Account. Apple and Google sign-in wait on the paid Apple Developer account and a Google Cloud project (see `BACKEND-SPEC.md`, Step 6 notes).
+- **Next:** Store and Inventory. See `IMPLEMENTATION-NOTES.md`, Store and inventory (planned).
+- **After that:** the Reward redesign, then the Figma prototype.
 
 ## Services
 - **Figma:** file key `27W7B4MhKAFJ8LwiWJgcmD`, page `06 — Hi-Fi v3 (App revisions)`.
@@ -20,7 +16,7 @@ Read this first when picking up the project on another Mac or in a new session. 
 
 ## How the developer works
 These are on top of `WORKFLOW.md`:
-- **Git:** the developer runs every commit, push, merge and branch command. Give exact commands, each in its own block. Claude only uses read-only git. In a cloud session, whose files are temporary, Claude commits and pushes only to that session's own branch, and the developer still does every merge.
+- **Git:** the developer runs every merge to `main`. Give exact commands, each in its own block. In a cloud session, whose files are temporary, Claude commits and pushes only to that session's own branch. Commits are credited to the developer (Angelo Buedo) with no Claude co-author lines, so Claude isn't listed as a contributor.
 - **Steps:** one step per branch, and never start the next one without approval. When told to "take note" of something, record it and don't build it.
 - **Tokens:** keep usage and messages short. Don't check the whole Figma file until asked, probably after the backend.
 - **Figma:** edit it only when asked. List anything the app has that Figma doesn't under "Figma updates for later".
