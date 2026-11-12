@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// The sheet behind the quest log's + button.
+/// The sheet behind the quest log's + button, and Edit quest on a long press.
 struct CreateQuestView: View {
     private enum Field: Hashable {
         case title
@@ -71,6 +71,31 @@ struct CreateQuestView: View {
 
     @FocusState private var focus: Field?
 
+    /// The quest being edited, or nil when creating one.
+    private let editingQuest: Quest?
+
+    init(editing quest: Quest? = nil) {
+        editingQuest = quest
+        guard let quest else { return }
+
+        _title = State(initialValue: quest.title)
+        _description = State(initialValue: quest.description ?? "")
+        _questType = State(initialValue: quest.type)
+        _duration = State(initialValue: Duration.allCases.first { $0.minutes == quest.durationMinutes } ?? .thirtyMinutes)
+        _category = State(initialValue: Self.categories.first { $0.uppercased() == quest.category?.uppercased() } ?? "Other")
+        _steps = State(initialValue: quest.steps)
+    }
+
+    private var isEditing: Bool {
+        editingQuest != nil
+    }
+
+    /// A started quest, or one with a ticked step, only changes its title and
+    /// description, and keeps its rewards. The server enforces the same.
+    private var isLocked: Bool {
+        editingQuest.map { !questStore.isUntouched($0) } ?? false
+    }
+
     private var difficulty: QuestDifficulty {
         DifficultyEstimator.estimate(title: title, description: description)
     }
@@ -110,7 +135,7 @@ struct CreateQuestView: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            PrimaryButton(title: "CREATE QUEST", action: create)
+            PrimaryButton(title: isEditing ? "SAVE CHANGES" : "CREATE QUEST", action: create)
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .padding(.bottom, 16)
@@ -142,7 +167,7 @@ struct CreateQuestView: View {
         .animation(.easeInOut(duration: 0.2), value: steps.count)
         .onAppear {
             // Personal is the default unless its limit has been reached
-            if !questStore.canCreate(.personalQuest), questStore.canCreate(.mainQuest) {
+            if !isEditing, !questStore.canCreate(.personalQuest), questStore.canCreate(.mainQuest) {
                 questType = .mainQuest
             }
         }
@@ -197,29 +222,53 @@ struct CreateQuestView: View {
             descriptionField
                 .padding(.top, 10)
 
-            completionReward
-                .padding(.top, 12)
-
-            sectionLabel("QUEST TYPE")
-                .padding(.top, 22)
-
-            // Stacks at large text sizes so the titles don't break mid-word
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 8) {
-                    questTypeCards
-                }
-
-                VStack(spacing: 8) {
-                    questTypeCards
-                }
-            }
-            .padding(.top, 10)
-
-            if !canCreateAnyType {
-                FieldErrorRow(message: "Finish a quest to create a new one.")
-                    .padding(.top, 8)
+            if isLocked {
+                Text("This quest has started, so only its title and description can change. Its rewards stay as they are.")
+                    .font(AppTypography.bodySecondary)
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 12)
+                    .padding(.bottom, 12)
+            } else {
+                completionReward
+                    .padding(.top, 12)
             }
 
+            // A quest's type can't change once it's made
+            if !isEditing {
+                sectionLabel("QUEST TYPE")
+                    .padding(.top, 22)
+
+                // Stacks at large text sizes so the titles don't break mid-word
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        questTypeCards
+                    }
+
+                    VStack(spacing: 8) {
+                        questTypeCards
+                    }
+                }
+                .padding(.top, 10)
+
+                if !canCreateAnyType {
+                    FieldErrorRow(message: "Finish a quest to create a new one.")
+                        .padding(.top, 8)
+                }
+            }
+
+            if !isLocked {
+                editableDetails
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 37)
+    }
+
+    /// Steps, duration and category, which set the rewards, so they're only shown
+    /// while a quest is new or untouched.
+    private var editableDetails: some View {
+        VStack(alignment: .leading, spacing: 0) {
             if questType == .mainQuest {
                 stepsSection
                     .padding(.top, 22)
@@ -254,8 +303,6 @@ struct CreateQuestView: View {
             .padding(.top, 10)
             .padding(.bottom, 12)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 37)
     }
 
     private var header: some View {
@@ -283,7 +330,7 @@ struct CreateQuestView: View {
     }
 
     private var headerTitle: some View {
-        Text("CREATE QUEST")
+        Text(isEditing ? "EDIT QUEST" : "CREATE QUEST")
             .font(AppTypography.subheading)
             .foregroundStyle(Color.asphyrTextPrimary)
     }
@@ -634,10 +681,10 @@ struct CreateQuestView: View {
     }
 
     private func create() {
-        guard questStore.canCreate(questType) else { return }
+        guard isEditing || questStore.canCreate(questType) else { return }
 
         // A step still in the field counts, so it isn't lost
-        if questType == .mainQuest {
+        if questType == .mainQuest, !isLocked {
             addStep()
         }
 
@@ -652,6 +699,19 @@ struct CreateQuestView: View {
         // The server works out difficulty, XP and attributes itself
         Task {
             do {
+                if let editingQuest {
+                    try await questStore.updateQuest(
+                        editingQuest,
+                        title: trimmedTitle,
+                        description: trimmedDescription.isEmpty ? nil : trimmedDescription,
+                        category: category,
+                        durationMinutes: questType == .mainQuest ? nil : duration.minutes,
+                        steps: steps.map(\.title)
+                    )
+                    dismiss()
+                    return
+                }
+
                 try await questStore.createQuest(
                     type: questType,
                     title: trimmedTitle,

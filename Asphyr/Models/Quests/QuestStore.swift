@@ -201,6 +201,17 @@ final class QuestStore {
         }
     }
 
+    /// Daily quests are written by the app, and completed quests stay as a record.
+    func canEdit(_ quest: Quest) -> Bool {
+        quest.type != .dailyQuest && quest.status != .completed
+    }
+
+    /// Whether everything about a quest can still change. Once it's started or a step is
+    /// ticked, only its title and description can, as on the server.
+    func isUntouched(_ quest: Quest) -> Bool {
+        quest.status == .available && quest.completedStepCount == 0
+    }
+
     /// Daily quests renew on their own, and completed quests stay as a record.
     func canDelete(_ quest: Quest) -> Bool {
         quest.type != .dailyQuest && quest.status != .completed

@@ -33,6 +33,27 @@ extension QuestStore {
         }
     }
 
+    func updateQuest(
+        _ quest: Quest,
+        title: String,
+        description: String?,
+        category: String,
+        durationMinutes: Int?,
+        steps: [String]
+    ) async throws {
+        try await send {
+            try await QuestService.update(
+                quest.id,
+                type: quest.type,
+                title: title,
+                description: description,
+                category: category,
+                durationMinutes: durationMinutes,
+                steps: steps
+            )
+        }
+    }
+
     func startQuest(_ quest: Quest) async throws {
         try await send { try await QuestService.start(quest.id) }
     }

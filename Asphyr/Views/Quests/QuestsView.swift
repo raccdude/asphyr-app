@@ -57,6 +57,7 @@ struct QuestsView: View {
     @State private var selectedFilter: QuestFilter = .all
     @State private var isShowingCreateQuest = false
     @State private var questToDelete: Quest?
+    @State private var questToEdit: Quest?
     @State private var selectedQuestID: UUID?
     @State private var errorMessage: String?
     @Namespace private var filterNamespace
@@ -117,6 +118,9 @@ struct QuestsView: View {
         }
         .sheet(isPresented: $isShowingCreateQuest) {
             CreateQuestView()
+        }
+        .sheet(item: $questToEdit) { quest in
+            CreateQuestView(editing: quest)
         }
         .alert(
             "Delete this quest?",
@@ -179,6 +183,7 @@ struct QuestsView: View {
                 filterRow(QuestFilter.allCases)
             }
         }
+        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selectedFilter)
         // 4pt plus Figma's 1pt border
         .padding(5)
         .frame(minHeight: 44)
@@ -201,9 +206,9 @@ struct QuestsView: View {
         let isSelected = selectedFilter == filter
 
         return Button {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                selectedFilter = filter
-            }
+            // Only the pill animates (see filterBar). Animating the list as well
+            // cross-faded the active quest's green card on quick switches.
+            selectedFilter = filter
         } label: {
             Text(filter.rawValue)
                 .font(AppTypography.captionMedium)
@@ -254,6 +259,14 @@ struct QuestsView: View {
                             QuestLogCard(quest: questStore.withCurrentRewards(quest))
                         }
                         .buttonStyle(.plain)
+                        // Hold a quest to edit it
+                        .contextMenu {
+                            if questStore.canEdit(quest) {
+                                Button("Edit quest", systemImage: "pencil") {
+                                    questToEdit = quest
+                                }
+                            }
+                        }
                         .questLogRow(top: 6)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 if questStore.canDelete(quest) {

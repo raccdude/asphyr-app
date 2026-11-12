@@ -29,6 +29,7 @@ struct HomeView: View {
 
     @State private var isShowingSettings = false
     @State private var isShowingStore = false
+    @State private var questToEdit: Quest?
     @State private var storeTab: StoreView.Tab = .store
 
     /// Rises each time Reward asks for the Inventory, which opens it here.
@@ -116,6 +117,14 @@ struct HomeView: View {
                             QuestCard(quest: questStore.withCurrentRewards(quest))
                         }
                         .buttonStyle(.plain)
+                        // Hold the quest to edit it, as in the quest log
+                        .contextMenu {
+                            if questStore.canEdit(quest) {
+                                Button("Edit quest", systemImage: "pencil") {
+                                    questToEdit = quest
+                                }
+                            }
+                        }
                         .padding(.top, 14)
                     } else if !questStore.completedQuests.isEmpty {
                         SectionDivider(sectionTitle: "TODAY’S PROGRESS")
@@ -191,6 +200,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $isShowingCreateQuest) {
             CreateQuestView()
+        }
+        .sheet(item: $questToEdit) { quest in
+            CreateQuestView(editing: quest)
         }
     }
 

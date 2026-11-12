@@ -92,8 +92,8 @@ struct ProfileIdentityView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 16)
         }
-        // The button stays at the bottom, behind the keyboard, instead of rising with it
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        // Save Changes rises above the keyboard, as on Create Quest and as iOS sheets do,
+        // so it can be tapped without closing the keyboard first
         .background {
             Color.asphyrBackground
                 .ignoresSafeArea()
