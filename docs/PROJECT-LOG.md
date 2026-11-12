@@ -107,4 +107,4 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Cause:** Supabase's API logs showed `/rest/v1/rpc/update_quest` answering 404, ten times. The edit's migration was still only on the branch, so Supabase hadn't applied it. Same cause as the earlier login error.
 - **Fix:** merge to `main`. The app now says "This needs a server update that isn't live yet" for this case (PostgREST code `PGRST202`) instead of "Something went wrong".
 - **Rule recorded** in `HANDOFF.md`: when a branch adds a migration, merge before testing on the phone.
-
+- **Merged:** at the developer's request, Claude fast-forwarded `main` to `1d0ecf0` (no merge commit). Supabase had already applied `20261112130000_edit_quest` from the developer's earlier merge. Checked live: `update_quest` is open to signed-in users only.
