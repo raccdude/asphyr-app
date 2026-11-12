@@ -214,6 +214,13 @@ The rules and their numbers are in [XP-SYSTEM-SPEC.md](XP-SYSTEM-SPEC.md).
 - **Store cloaks:** Green, Yellow, Snow and Teal are sold in the Store for Embers. Their colors still need checking on screen.
 - **Redesign planned:** the character art will be redesigned. Nothing is decided yet. New art should keep the same layers (base, cloak back, tunic, cloak front, details, hands), so `CharacterArt` and the cloak colors keep working.
 
+## Editing quests
+Added 12 Nov 2026. Hold a quest in the quest log or on Home and choose **Edit quest**. It opens Create Quest filled in, titled EDIT QUEST, with SAVE CHANGES.
+- **Untouched quests** (available, no steps ticked): everything can change except the type, and the server works out difficulty, XP and attributes again.
+- **Started quests, or a ticked step:** only the title and description. The rewards and steps stay, so a quest can't be renamed into a harder one for more XP. The sheet says so in place of the reward preview.
+- **Not editable:** daily quests and completed quests.
+- **Server:** `update_quest` in `supabase/migrations/20261112130000_edit_quest.sql`, with tests.
+
 ## Store and inventory
 Built on 12 Nov 2026 from `docs/superpowers/specs/2026-11-12-store-and-inventory-design.md`, which records every choice and why. The server side is tested; the app side was written without a Swift compiler.
 - **Embers:** 1 for every 10 XP a quest gives, rounded down, paid when it's completed. Steps pay nothing, so ticking and deleting earns nothing. A bonus quest gives 1. Existing accounts were paid once for quests they had already completed. The server keeps the balance in `player_progress.embers`.
@@ -373,7 +380,10 @@ After the backend is implemented, Claude walks the user through putting the app 
 Checked by reading every screen on 12 Nov 2026, after layouts looked cropped on an iPhone 12 Pro Max (428pt wide) when they had been tuned on an iPhone 18 Pro (402pt). Not checked on screen in that session.
 - **Journey:** the constellation is drawn for 402pt and scales down on narrower phones. On wider ones it stays full size and centered.
 - **Sheets:** `settingsSheet(height:)` keeps each sheet's designed height, and scrolls its content when the screen or text size doesn't leave room.
-- **Tab bar:** the backdrop is solid from the bar down to the screen's edge, and fades in above it.
+- **Tab bar:** `TabBarMetrics` places it from the phone's own bottom safe area, read once: 12pt above the edge on Face ID iPhones (just above the home indicator), 10pt on an iPhone SE. Content stops 12pt above the bar. The backdrop is solid behind and below the bar with a 14pt fade above, so nothing above the bar is dimmed. Before, a fixed 22pt gap and a 150pt backdrop covered Journey's guide card and the last cards.
+- **Keyboard:** pinned buttons (Create Quest, Profile & Identity) rise above the keyboard, as iOS sheets do, so they can be tapped without closing it.
+- **Back swipe:** every pushed screen can be swiped back. Screens with the app's own top bar turn it back on with `SwipeBackEnabler`. Kept on purpose: it's standard iOS.
+- **Text limits:** `Components/Inputs/TextLimits.swift`. Names 20 characters, aspirations 30, quest titles 40, descriptions 150, steps 60, emails 254, passwords 72. The server allows more, so older text still loads.
 - **Long names:** wrap on Home, Character, Settings and Reward.
 - **Rule for new screens:** no fixed widths over about 340pt, scroll anything that might not fit, and let one-line text shrink (`minimumScaleFactor`) rather than cut off.
 

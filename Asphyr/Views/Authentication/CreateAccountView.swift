@@ -151,7 +151,7 @@ struct CreateAccountView: View {
             OrDivider()
                 .padding(.top, 22)
 
-            SocialSignInRow(errorMessage: $accountError)
+            SocialSignInRow()
                 .padding(.top, 22)
 
             Spacer(minLength: 24)
