@@ -125,6 +125,10 @@ Supabase's security and performance advisors reported nothing.
 - **Email confirmation:** off during development, and on before release.
 
 ## Before release, not in these steps
+Noted on 12 Nov 2026 at the developer's request, to do once testing is finished:
+- **Email confirmation on:** in Supabase, **Authentication → Sign In / Providers → Email**, turn **Confirm email** back on, so every new account proves its email and no throwaway accounts get in. **The app must change first:** with it on, `signUp` returns no session, so Create Account needs a "check your email" screen, and the confirmation link needs handling like the reset link (`asphyr://` plus an allowed redirect). Build that before turning the setting on, or sign-up will break.
+- **Remove the test accounts:** delete every account made while testing, in **Authentication → Users**, or with Delete Account in the app, which also removes their photos. Check **Table Editor → profiles** is empty of test data afterwards.
+- **Leaked password protection on:** **Authentication → Password security** (Supabase's security advisor flags it as off). It checks new passwords against known leaked passwords. It may need a paid Supabase plan; check the current pricing.
 - Set `private.settings.minimum_time_fraction` to `0.5`, to match the app's Release builds.
 - Custom email sending for sign-up and reset emails, as Supabase's built-in sender is limited.
 - A privacy policy, from the developer.
