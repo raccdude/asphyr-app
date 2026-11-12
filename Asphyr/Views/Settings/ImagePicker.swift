@@ -55,3 +55,20 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
+
+extension UIImage {
+    /// Profile photos show small, so they're saved at most 1024 pixels on the long side.
+    /// A full camera photo would be several megabytes, over the bucket's 2 MB limit.
+    func scaledForProfile() -> UIImage {
+        let longestSide = max(size.width, size.height) * scale
+        guard longestSide > 1024 else { return self }
+
+        let ratio = 1024 / longestSide
+        let target = CGSize(width: size.width * scale * ratio, height: size.height * scale * ratio)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: target, format: format).image { _ in
+            draw(in: CGRect(origin: .zero, size: target))
+        }
+    }
+}

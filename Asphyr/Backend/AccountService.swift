@@ -105,6 +105,15 @@ enum AccountService {
         try? await Backend.client.auth.signOut(scope: .local)
     }
 
+    /// Deletes the login and everything saved with it, through the `delete-account`
+    /// Edge Function, then signs out on this device.
+    static func deleteAccount() async throws {
+        try await perform { () async throws -> Void in
+            try await Backend.client.functions.invoke("delete-account")
+        }
+        await logOut()
+    }
+
     static func sendPasswordReset(email: String) async throws {
         try await perform {
             try await Backend.client.auth.resetPasswordForEmail(cleaned(email), redirectTo: Backend.passwordResetURL)

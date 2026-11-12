@@ -122,19 +122,27 @@ struct ProfileIdentityView: View {
         }
         .fullScreenCover(isPresented: $isShowingCamera) {
             ImagePicker(source: .camera) { image in
-                profile.photoData = image.jpegData(compressionQuality: 0.8)
+                profile.photoData = image.scaledForProfile().jpegData(compressionQuality: 0.8)
             }
             .ignoresSafeArea()
         }
         .sheet(isPresented: $isShowingLibrary) {
             ImagePicker(source: .photoLibrary) { image in
-                profile.photoData = image.jpegData(compressionQuality: 0.8)
+                profile.photoData = image.scaledForProfile().jpegData(compressionQuality: 0.8)
             }
             .ignoresSafeArea()
         }
         // The photo applies straight away, without Save Changes
         .onChange(of: profile.photoData) {
-            toast = profile.photoData == nil ? "Using your character." : "Profile photo updated."
+            let photo = profile.photoData
+            Task {
+                do {
+                    try await ProfileService.savePhoto(photo)
+                    toast = photo == nil ? "Using your character." : "Profile photo updated."
+                } catch {
+                    toast = (error as? AccountError ?? .unknown).message
+                }
+            }
         }
         .settingsToast($toast, icon: "iconCheck")
     }

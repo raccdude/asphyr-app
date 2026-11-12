@@ -241,15 +241,19 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    /// Not complete yet: this only signs out and clears the device. Backend step 5
-    /// must also delete the login and its data on the server.
+    /// Deletes the login and its data on the server. If that fails, the user stays
+    /// signed in and can try again.
     private func deleteAccount() {
-        ReminderNotifications.cancelAll()
-        questStore.resetProgress()
-        profile.clear()
-        router.logOut()
         Task {
-            await AccountService.logOut()
+            do {
+                try await AccountService.deleteAccount()
+                ReminderNotifications.cancelAll()
+                questStore.clear()
+                profile.clear()
+                router.logOut()
+            } catch {
+                toast = (error as? AccountError ?? .unknown).message
+            }
         }
     }
 

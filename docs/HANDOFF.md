@@ -7,7 +7,8 @@ Read this first when picking up the project on another Mac or in a new session. 
 - **Backend:** steps 1 to 3 of `BACKEND-SPEC.md` are done: Supabase project, email accounts, password reset, staying signed in, and the saved profile. Checked by the developer on their iPhone.
 - **Backend step 4a:** the server functions for quests and rewards, written in a cloud session on 12 Nov 2026 and tested on a local database. Not on `main` yet: the migration deploys when it's merged.
 - **Backend step 4b:** the app connected to those functions, written in the same session. **Not built yet:** the session had no Swift compiler, so the first job on the Mac is to build, fix anything the compiler finds, and test on the iPhone.
-- **Next:** backend steps 5 and 6, in the same session.
+- **Backend step 5:** photos and Delete Account, written in the same session. The database rules and the `delete-account` Edge Function are tested; the app's side isn't built yet. After merging, check the function deployed (see `BACKEND-SPEC.md`, Step 5 notes).
+- **Next:** backend step 6, in the same session.
 - **After the backend:** teach the developer to deploy to their iPhone, then Store and Inventory, the Reward redesign, and the Figma prototype.
 
 ## Services

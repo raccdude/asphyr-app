@@ -43,7 +43,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
 | Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
 | Backend step 4: quests and rewards on the server | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
-| Backend steps 5 and 6 | See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
+| Backend step 5: photos and Delete Account | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
+| Backend step 6 | See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -246,7 +247,7 @@ The developer still doesn't like the Reward screen, even after option B, so it n
 - **Log out:** returns to Welcome and clears the profile. A sheet in the Reset Progress style warns that progress will be lost, since nothing is saved yet.
 - **Profile & Identity:** name, aspiration and archetype apply on Save Changes. The photo applies immediately, with a toast, because Save Changes only covers the fields below it. Email is read-only until real accounts exist. Changing aspiration changes Journey's constellations right away, keeping quest progress. Changing aspiration or archetype also swaps a daily quest that hasn't been started. One that's started or finished today stays, so it can't earn a second daily quest.
 - **Sheets:** partial-height sheets float with side margins on iOS 26, which is the system's own style, so they don't reach the screen's edges as in Figma.
-- **Photo:** Take photo is hidden where there's no camera, such as the simulator. Remove photo only shows when there's a photo. The photo is in memory only.
+- **Photo:** Take photo is hidden where there's no camera, such as the simulator. Remove photo only shows when there's a photo. The photo is saved in Storage from backend step 5, shrunk to 1024 pixels on the long side, and a failed upload shows a toast.
 
 ## Streaks
 - **What counts:** a day with any finished quest, including bonus-reward ones. Ticking a main quest's step doesn't count, as Figma says "Finish any quest". Rules are in `StreakRules`, counted from the finished quests, so resetting progress clears them.
@@ -381,7 +382,7 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
 - **Fixed in backend step 4, not built in Xcode yet:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
-- **Low, until backend step 5:** the profile photo isn't saved.
+- **Fixed in backend step 5, not built in Xcode yet:** the profile photo is saved in Storage.
 - **Low:** if a profile change fails to save in the tabs, nothing tells the user. It saves with the next change.
-- **High, until backend step 5:** Delete Account only signs out and clears the device. The login stays on the server.
+- **Fixed in backend step 5, not built in Xcode yet:** Delete Account deletes the login and its data through the `delete-account` Edge Function, once it's deployed.
 - **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.

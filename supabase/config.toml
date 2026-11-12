@@ -1,0 +1,11 @@
+# Read by the Supabase GitHub integration when changes reach `main`. With "Deploy to
+# production" on, it applies new migrations and deploys the Edge Functions declared
+# here. Other settings in this file are ignored for production by default, so the
+# project's Auth and API settings stay as set in the dashboard.
+project_id = "asphyr"
+
+# Delete Account. Only called by signed-in users, so the platform checks their session
+# first, and the function checks it again.
+[functions.delete-account]
+verify_jwt = true
+entrypoint = "./functions/delete-account/index.ts"

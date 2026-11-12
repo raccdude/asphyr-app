@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. Step 5 is next.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. **Step 5 is written, 12 Nov 2026:** photos and Delete Account. The database rules and the Edge Function are tested; the app's side isn't built yet. Step 6 is next.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -101,6 +101,13 @@ Supabase's security and performance advisors reported nothing.
 - **Launch time:** adding the library took the simulator from 0.30s to about 1.17s to Splash, because it needs `AuthenticationServices`. Opened from the Home Screen on the developer's iPhone, launch felt fast with no still flame, so nothing needs changing.
 - **Unknown emails:** a reset request for an email with no account still returns success, sends nothing, and shows the same success screen, so the screen can't reveal who has an account.
 - **Email limits:** Supabase's built-in sender is limited, so a reset email may not arrive at every address until custom email sending is set up.
+
+## Step 5 notes
+- **Photos:** a private `avatars` bucket, JPEG only, up to 2 MB, from `supabase/migrations/20261112110000_profile_photos.sql`. Each person has one photo at `<their id>/avatar.jpg`, and Storage policies let only them read, add, replace or remove it. `profiles.photo_path` can only point at that path. The app shrinks photos to 1024 pixels on the long side before uploading.
+- **Profile limits:** the name and aspiration are at most 100 characters. The app had no limit, so this is generous.
+- **Delete Account:** `supabase/functions/delete-account`. It checks the caller's session, removes their photo, then deletes their login, which removes every row of theirs. If the photo can't be removed, the login stays so the user can try again. It reads the new secret key from `SUPABASE_SECRET_KEYS`, falling back to the older service role key, which Supabase retires at the end of 2026.
+- **Deploying the function:** `supabase/config.toml` declares it, so the GitHub integration deploys it when it reaches `main`, as long as **Deploy to production** is on. Supabase ignores the file's other settings for production by default. After merging, check **Edge Functions** in the dashboard lists `delete-account`. If it doesn't, deploy it once with `supabase functions deploy delete-account`.
+- **Tests:** `scripts/db-tests/run.sh` also runs `deno test` on the function, with fake Supabase clients, when Deno is installed.
 
 ## Defaults, unless the developer says otherwise
 - **Project:** a new project called ASPHYR, in the developer's own Supabase account.

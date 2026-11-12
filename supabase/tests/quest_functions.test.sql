@@ -707,6 +707,63 @@ begin
 end;
 $$;
 
+-- Profile photos and limits ----------------------------------------------------------
+
+do $$
+declare
+  a uuid := tests.new_user();
+  b uuid := tests.new_user();
+  v text;
+  n int;
+begin
+  perform set_config('request.jwt.claim.sub', a::text, false);
+  set role authenticated;
+
+  insert into storage.objects (bucket_id, name) values ('avatars', a || '/avatar.jpg');
+  begin
+    insert into storage.objects (bucket_id, name) values ('avatars', b || '/avatar.jpg');
+    v := 'other folder allowed';
+  exception when others then v := 'other folder refused';
+  end;
+  begin
+    insert into storage.objects (bucket_id, name) values ('avatars', a || '/extra.jpg');
+    v := v || ', other name allowed';
+  exception when others then v := v || ', other name refused';
+  end;
+  update public.profiles set photo_path = a || '/avatar.jpg' where id = a;
+  begin
+    update public.profiles set photo_path = b || '/avatar.jpg' where id = a;
+    v := v || ', other photo allowed';
+  exception when others then v := v || ', other photo refused';
+  end;
+  begin
+    update public.profiles set name = repeat('x', 101) where id = a;
+    v := v || ', long name allowed';
+  exception when others then v := v || ', long name refused';
+  end;
+
+  perform set_config('request.jwt.claim.sub', b::text, false);
+  select count(*) into n from storage.objects where bucket_id = 'avatars';
+  delete from storage.objects where name = a || '/avatar.jpg';
+  reset role;
+
+  perform tests.check('a photo can be saved in the user''s own folder',
+    exists (select 1 from storage.objects where name = a || '/avatar.jpg'));
+  perform tests.check('a photo can''t be saved in another user''s folder', v like 'other folder refused%');
+  perform tests.check('each user has one photo, at avatar.jpg', v like '%other name refused%');
+  perform tests.check('the profile points at its own photo',
+    (select photo_path from public.profiles where id = a) = a || '/avatar.jpg');
+  perform tests.check('a profile can''t point at another user''s photo', v like '%other photo refused%');
+  perform tests.check('names are at most 100 characters', v like '%long name refused%');
+  perform tests.check('another user can''t see the photo', n = 0);
+  perform tests.check('another user can''t delete the photo',
+    exists (select 1 from storage.objects where name = a || '/avatar.jpg'));
+  perform tests.check('the photo bucket is private and takes JPEGs up to 2 MB',
+    (select not public and file_size_limit = 2097152 and allowed_mime_types = array['image/jpeg']
+     from storage.buckets where id = 'avatars'));
+end;
+$$;
+
 -- Result ------------------------------------------------------------------------------
 
 do $$
