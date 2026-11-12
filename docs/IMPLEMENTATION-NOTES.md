@@ -369,6 +369,14 @@ Figma doesn't have these yet, because the app doesn't either.
 ## Deploying to a phone (teach at the end)
 After the backend is implemented, Claude walks the user through putting the app on their own iPhone, step by step. Not before then.
 
+## Screen sizes
+Checked by reading every screen on 12 Nov 2026, after layouts looked cropped on an iPhone 12 Pro Max (428pt wide) when they had been tuned on an iPhone 18 Pro (402pt). Not checked on screen in that session.
+- **Journey:** the constellation is drawn for 402pt and scales down on narrower phones. On wider ones it stays full size and centered.
+- **Sheets:** `settingsSheet(height:)` keeps each sheet's designed height, and scrolls its content when the screen or text size doesn't leave room.
+- **Tab bar:** the backdrop is solid from the bar down to the screen's edge, and fades in above it.
+- **Long names:** wrap on Home, Character, Settings and Reward.
+- **Rule for new screens:** no fixed widths over about 340pt, scroll anything that might not fit, and let one-line text shrink (`minimumScaleFactor`) rather than cut off.
+
 ## Known issues
 From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 
@@ -376,12 +384,12 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Fixed in backend step 4:** the minimum time and daily limits use the server's clock, so changing the phone's date no longer gets around them. Checked by the database tests.
 - **Fixed on 12 Nov 2026, not built in Xcode yet:** a profile change made in the tabs that fails to save is tried three more times, then a toast says it wasn't saved. Before, it failed silently.
 - **Low:** a word in the title can still make a quest Hard, so a title can be inflated. The daily limits cap what that earns, and proper checking waits for better difficulty judging.
-- **Low:** typing immediately after pressing return in the step field can drop characters. Seen at automated typing speed only; a 2-second gap was fine.
-- **Low:** a newly added step field on Create Quest can be partly hidden behind the button.
-- **Low:** at large text sizes, words break mid-word on Home's attribute cards ("KNOWLED / GE", "CREATIVIT / Y"). Seen at Accessibility Large on 3 Nov 2026.
-- **Low:** `CreateAspirationView`'s header uses the same stacked layout Create Quest had, so Cancel can overlap its title at large text sizes. Inferred from the code; not checked on screen.
-- **Low:** using the eye button while a password field is focused briefly drops focus, so "Passwords don't match" can appear while the user is still typing. The error clears on the next edit.
-- **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
+- **Low, left as is:** typing immediately after pressing return in the step field can drop characters. Seen at automated typing speed only. Return always ends editing in a SwiftUI text field and focus comes back a moment later, so a full fix needs a UIKit text field, which isn't worth it for this.
+- **Fixed on 12 Nov 2026:** Create Quest scrolls the step field back into view after each step, so it isn't hidden behind the button.
+- **Fixed on 12 Nov 2026:** attribute names stay on one line and shrink a little at large text sizes, instead of breaking mid-word.
+- **Fixed on 12 Nov 2026:** Create Aspiration's header stacks at large text sizes, like Create Quest's, so Cancel doesn't overlap the title.
+- **Fixed on 12 Nov 2026:** the eye button no longer makes "Passwords don't match" appear. Create Account waits a moment before checking a field the user seems to have left.
+- **Fixed on 12 Nov 2026:** a revealed password turns off autocorrect and capitals, so the suggestion bar has no words to offer.
 
 - **Fixed in backend step 3:** onboarding answers are saved to the account.
 - **Fixed in backend step 4:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.

@@ -22,7 +22,7 @@ These are on top of `WORKFLOW.md`:
 - **Tokens:** keep usage and messages short. Don't check the whole Figma file until asked, probably after the backend.
 - **Figma:** edit it only when asked. List anything the app has that Figma doesn't under "Figma updates for later".
 - **Testing:** the developer tests. Judge launch speed on a real iPhone opened from the Home Screen, as the simulator and Xcode's debugger add about a second. Report only what was actually run and seen.
-- **Scope:** iPhone portrait, dark-first. VoiceOver, Reduce Motion and large text aren't in scope. Light mode only needs the essential screens.
+- **Scope:** iPhone portrait, dark-first, on every current iPhone size (checked against 375pt to 440pt wide). Large text bugs get fixed when found, since 12 Nov 2026; VoiceOver and Reduce Motion aren't in scope. Light mode only needs the essential screens.
 - **Previews:** use `#Preview(traits: .dark)`.
 - **Sample data:** Figma examples must match the app's code for Lou, The Strategist, Game Developer.
 - **Decisions:** from 12 Nov 2026, Claude goes with its own recommendation instead of asking, and records the choice and its trade-offs in the spec and `PROJECT-LOG.md`. The developer's design direction still wins: anything they've already decided stands, and they can overrule a choice afterwards.

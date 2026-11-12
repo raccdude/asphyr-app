@@ -82,3 +82,14 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Also corrected** in the notes: the known issue about the phone's clock was fixed by backend step 4.
 - **Tidied** the known issues: onboarding answers have been saved since backend step 3, and the duplicate silent-save entry was removed.
 
+### Developer's batch of changes (12 Nov 2026)
+- **Google only:** removed the Apple button, `SocialSignIn.swift`'s Apple code and `iconAppleLogo`. The button reads "Continue with Google". Recorded an App Review risk in `BACKEND-SPEC.md` (guideline 4.8).
+- **Weekly email removed:** the EMAIL section in Notifications and `AppSettings.weeklySummary`.
+- **Small bugs:** step field kept in view on Create Quest, no "Passwords don't match" flash from the eye button, no suggestions for a revealed password. The fast-typing drop was left, with the reason in Known issues.
+- **Tab bar:** solid backdrop from the bar down, fading in above it.
+- **Long names** wrap on Home, Character, Settings and Reward.
+- **Screen sizes:** every screen was read for fixed sizes and offsets. Fixed: Journey's 402pt canvas now scales to narrower phones; sheets scroll when they don't fit (Reset Progress was 700pt, taller than an iPhone SE); Home's wordmark shrinks instead of cutting off. Splash and Account Loading keep their offsets, which match the launch screen.
+- **Large text:** attribute names no longer break mid-word, and Create Aspiration's header stacks instead of overlapping.
+- **Noted, not done:** turn email confirmation on (after building a check-your-email screen), delete the test accounts, and turn on leaked-password protection. See `BACKEND-SPEC.md`, Before release.
+- **Not tested:** no Swift compiler or simulator here. Check on the iPhone 12 Pro Max, and on a small simulator such as iPhone SE or 13 mini: Journey, Reset Progress, the Home header, the tab bar, Create Quest's steps and Create Account's password fields.
+
