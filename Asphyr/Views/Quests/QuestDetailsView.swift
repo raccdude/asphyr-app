@@ -55,7 +55,7 @@ struct QuestDetailsView: View {
         .alert("Abandon this quest?", isPresented: $isConfirmingAbandon) {
             Button("Abandon", role: .destructive) {
                 if let quest {
-                    questStore.abandon(quest)
+                    send { try await questStore.abandonQuest(quest) }
                 }
             }
             Button("Cancel", role: .cancel) {}
@@ -212,7 +212,7 @@ struct QuestDetailsView: View {
 
     private func pauseButton(_ quest: Quest) -> some View {
         Button {
-            questStore.togglePause(quest)
+            send { try await questStore.togglePauseQuest(quest) }
         } label: {
             HStack(spacing: 6) {
                 if quest.isPaused {
@@ -261,7 +261,7 @@ struct QuestDetailsView: View {
                 ForEach(quest.steps) { step in
                     Button {
                         if questStore.canToggle(step) {
-                            questStore.toggleStep(step, in: quest)
+                            send { try await questStore.toggleStepOnServer(step) }
                         } else {
                             showToast("That’s today’s \(RewardRules.maxStepsPerDay) steps. More tomorrow.")
                         }
@@ -298,7 +298,7 @@ struct QuestDetailsView: View {
 
                 PrimaryButton(title: "ACCEPT QUEST") {
                     if canStart {
-                        questStore.start(quest)
+                        send { try await questStore.startQuest(quest) }
                     } else {
                         nudgeBlocker()
                     }
@@ -315,7 +315,7 @@ struct QuestDetailsView: View {
 
                         PrimaryButton(title: "COMPLETE QUEST") {
                             if blocker == nil {
-                                completion = questStore.complete(quest)
+                                send { completion = try await questStore.completeQuest(quest) }
                             } else {
                                 nudgeBlocker()
                             }
@@ -445,6 +445,19 @@ struct QuestDetailsView: View {
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+        }
+    }
+
+    /// Sends a quest action to the server, and says what went wrong if it fails.
+    private func send(_ action: @escaping () async throws -> Void) {
+        Task {
+            do {
+                try await action()
+            } catch {
+                if let message = (error as? QuestError)?.message {
+                    showToast(message)
+                }
+            }
         }
     }
 

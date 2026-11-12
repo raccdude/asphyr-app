@@ -1,6 +1,6 @@
 # ASPHYR — Backend plan (Supabase)
 
-Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. Step 4b, connecting `QuestStore`, is next.
+Approved on 4 Nov 2026. **Step 1 is done:** project `qnotkiivqelufrqcnquu` (ASPHYR, Singapore, Free plan), with the tables and security rules applied. **Steps 2 and 3 are done, and checked by the developer on their iPhone on 4 Nov 2026:** email accounts, password reset, staying signed in, and the profile saved to the account. Settings are saved on the device. **Step 4a is written and tested on a local database, 12 Nov 2026:** the server functions below. **Step 4b is written, 12 Nov 2026, but not built in Xcode yet:** the cloud session had no Swift compiler. Step 5 is next.
 
 ## Goal
 Real accounts, with progress that survives relaunches and moves between devices, and rewards the server checks so they can't be earned by changing the phone's clock.
@@ -63,6 +63,7 @@ These replace `QuestStore`'s rules, using the same numbers as `docs/XP-SYSTEM-SP
 Streaks are still counted from finished quests, and Journey from the number completed, so neither needs its own table.
 
 ## In the app
+- **Step 4b:** `RootView` owns `QuestStore` and loads it from `get_player_state` while Splash shows, which also saves the phone's time zone. Every quest action is in `Backend/QuestStore+Server.swift` and calls `Backend/QuestService.swift`. Replies are decoded by `Models/Quests/QuestRecords.swift`. A failed action shows a toast, and if the device was out of step it reloads. The worn cloak is saved with the profile.
 - `QuestStore` keeps its job, but each action calls the server and updates from the reply. Screens change as little as possible.
 - Login, Create Account and Account Recovery use real accounts. Onboarding answers are saved at the end of onboarding.
 - Opening the app while signed in skips Splash's tap and auth, and goes to the tabs.

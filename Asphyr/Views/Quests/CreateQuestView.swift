@@ -634,26 +634,24 @@ struct CreateQuestView: View {
 
         guard !showsTitleError, !showsStepsError else { return }
 
-        questStore.quests.append(
-            Quest(
-                type: questType,
-                title: trimmedTitle.uppercased(),
-                description: trimmedDescription.isEmpty ? nil : trimmedDescription,
-                iconName: questType.iconName,
-                category: category.uppercased(),
-                difficulty: difficulty,
-                durationMinutes: questType == .mainQuest ? nil : duration.minutes,
-                xpReward: xpReward,
-                attributeRewards: RewardRules.attributes(
+        // The server works out difficulty, XP and attributes itself
+        Task {
+            do {
+                try await questStore.createQuest(
+                    type: questType,
+                    title: trimmedTitle,
+                    description: trimmedDescription.isEmpty ? nil : trimmedDescription,
                     category: category,
-                    difficulty: difficulty,
-                    minutes: questType == .mainQuest ? nil : duration.minutes
-                ),
-                status: .available,
-                steps: questType == .mainQuest ? steps : []
-            )
-        )
-        dismiss()
+                    durationMinutes: questType == .mainQuest ? nil : duration.minutes,
+                    steps: questType == .mainQuest ? steps.map(\.title) : []
+                )
+                dismiss()
+            } catch {
+                if let message = (error as? QuestError)?.message {
+                    showToast(message)
+                }
+            }
+        }
     }
 }
 

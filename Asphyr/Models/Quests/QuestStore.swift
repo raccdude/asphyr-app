@@ -5,9 +5,11 @@
 
 import Foundation
 
-/// The quests shared by Home and the quest log. Kept in memory until a backend
-/// exists, so they reset when the app relaunches. Everyone starts with only the
-/// daily quest, because main and personal quests are created by the user.
+/// The quests shared by Home and the quest log. The server owns them: the app's
+/// actions are in `QuestStore+Server.swift`, which calls the server and updates from
+/// its reply. The `can…` checks here decide what screens show before a tap. The
+/// actions in this file are the device copy of the server's rules, kept for previews
+/// and `scripts/rule-tests`, so both copies stay in step.
 @Observable
 final class QuestStore {
     static let maxOpenPersonalQuests = 5
@@ -23,8 +25,69 @@ final class QuestStore {
     /// Every attribute starts at 10.
     private var attributeGains: [String: Int] = [:]
 
+    /// True once the account's quests have loaded from the server.
+    private(set) var isLoaded = false
+    /// True while a request is on its way, so a second tap waits for it.
+    var isBusy = false
+
     init(quests: [Quest] = [Quest.sampleDaily]) {
         self.quests = quests
+    }
+
+    // MARK: Server replies
+
+    func load(_ state: PlayerStateRecord) {
+        quests = state.quests.map(Quest.init(record:))
+        apply(state.player)
+        isLoaded = true
+    }
+
+    /// Forgets the account, after logging out.
+    func clear() {
+        resetProgress()
+        isLoaded = false
+        isBusy = false
+    }
+
+    func apply(_ player: PlayerRecord) {
+        earnedXP = player.earnedXp
+        attributeGains = player.attributeGains
+        announcedLevel = player.announcedLevel
+        seenLitStarCount = player.seenLitStarCount
+        unlockedCloaks = player.unlockedCloaks.compactMap(CloakReward.init(serverName:))
+        earnedAchievements = Set(player.earnedAchievements.compactMap(Achievement.init(serverName:)))
+    }
+
+    /// Puts the changed quest in place, or adds it if it's new.
+    func apply(_ record: QuestRecord) {
+        let quest = Quest(record: record)
+
+        if let index = quests.firstIndex(where: { $0.id == quest.id }) {
+            quests[index] = quest
+        } else {
+            // A new daily quest replaces the untouched one the server removed
+            if quest.type == .dailyQuest {
+                quests.removeAll { $0.type == .dailyQuest && $0.status == .available }
+            }
+            quests.append(quest)
+        }
+    }
+
+    func remove(questID: UUID) {
+        quests.removeAll { $0.id == questID }
+    }
+
+    /// What the Reward screen shows, from the server's reply.
+    func completion(from reward: RewardRecord, quest: Quest) -> QuestCompletion {
+        QuestCompletion(
+            quest: quest,
+            elapsed: reward.elapsedSeconds,
+            levelBefore: reward.levelBefore,
+            levelAfter: reward.levelAfter,
+            xpIntoLevel: reward.xpIntoLevel,
+            xpForLevel: reward.xpForLevel,
+            newCloaks: reward.newCloaks.compactMap(CloakReward.init(serverName:))
+        )
     }
 
     var level: Int {

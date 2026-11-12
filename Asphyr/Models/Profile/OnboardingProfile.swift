@@ -9,7 +9,7 @@ import Foundation
 import Observation
 
 /// The answers given during onboarding, saved to the account by `ProfileService`.
-/// The photo and worn cloak stay in memory for now, so they reset on relaunch.
+/// The photo stays in memory until backend step 5, so it resets on relaunch.
 @Observable
 final class OnboardingProfile {
     var name: String = ""

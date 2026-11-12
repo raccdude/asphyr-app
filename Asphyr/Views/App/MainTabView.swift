@@ -37,8 +37,7 @@ struct MainTabView: View {
     @Environment(OnboardingProfile.self) private var profile
     @Environment(AppSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
-
-    @State private var questStore = QuestStore(quests: [])
+    @Environment(QuestStore.self) private var questStore
 
     var body: some View {
         TabView(selection: $selection) {
@@ -67,7 +66,6 @@ struct MainTabView: View {
                     .mainTabBar(selection: $selection)
             }
         }
-        .environment(questStore)
         .environment(\.openCharacter) { selection = .character }
         .environment(\.openQuests) { selection = .quests }
         .onAppear(perform: refreshDailyQuest)
@@ -96,8 +94,14 @@ struct MainTabView: View {
         ReminderNotifications.updateStreakAlert(from: settings, completions: questStore.completionDates)
     }
 
+    /// A failure is ignored, as it's asked again each time the app comes back.
     private func refreshDailyQuest() {
-        questStore.refreshDailyQuest(aspiration: profile.aspiration, archetype: profile.archetype)
+        Task {
+            try? await questStore.refreshDailyQuestOnServer(
+                aspiration: profile.aspiration,
+                archetype: profile.archetype
+            )
+        }
     }
 }
 
@@ -178,4 +182,5 @@ private extension View {
     MainTabView()
         .environment(OnboardingProfile())
         .environment(AppSettings())
+        .environment(QuestStore())
 }

@@ -158,6 +158,7 @@ struct SettingsView: View {
         .sheet(isPresented: $isShowingLogOut) {
             LogOutSheet {
                 profile.clear()
+                questStore.clear()
                 router.logOut()
                 Task {
                     await AccountService.logOut()
@@ -253,11 +254,20 @@ struct SettingsView: View {
     }
 
     private func resetProgress() {
-        questStore.resetProgress()
-        questStore.refreshDailyQuest(aspiration: profile.aspiration, archetype: profile.archetype)
-        // Cloaks are earned again from level 3
-        profile.cloak = nil
-        toast = "Your progress has been reset."
+        Task {
+            do {
+                try await questStore.resetProgressOnServer()
+                // Cloaks are earned again from level 3
+                profile.cloak = nil
+                toast = "Your progress has been reset."
+                try? await questStore.refreshDailyQuestOnServer(
+                    aspiration: profile.aspiration,
+                    archetype: profile.archetype
+                )
+            } catch {
+                toast = (error as? QuestError)?.message ?? AccountError.unknown.message
+            }
+        }
     }
 }
 

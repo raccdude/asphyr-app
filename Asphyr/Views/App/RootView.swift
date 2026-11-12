@@ -13,6 +13,8 @@ struct RootView: View {
     @State private var router = AppRouter(isSignedIn: AccountService.isSignedIn)
     @State private var profile = OnboardingProfile()
     @State private var settings = AppSettings()
+    @State private var questStore = QuestStore(quests: [])
+    @State private var questError: String?
 
     /// Hides the tabs until the account's profile has loaded.
     @State private var isLoadingAccount = AccountService.isSignedIn
@@ -23,7 +25,7 @@ struct RootView: View {
 
     /// What's saved to the account, so a change can be saved once.
     private var savedProfile: [String?] {
-        [profile.name, profile.color.rawValue, profile.aspiration, profile.archetype?.rawValue]
+        [profile.name, profile.color.rawValue, profile.aspiration, profile.archetype?.rawValue, profile.cloak?.rawValue]
     }
 
     var body: some View {
@@ -39,9 +41,19 @@ struct RootView: View {
                 SplashView(isReturningUser: true) {
                     isSplashTapped = true
                 }
-            } else if router.isInApp {
+            } else if router.isInApp, questStore.isLoaded {
                 MainTabView()
                     .transition(.opacity)
+            } else if router.isInApp, let questError {
+                AccountLoadingView(errorMessage: questError) {
+                    self.questError = nil
+                    loadAttempt += 1
+                } onLogOut: {
+                    logOut()
+                }
+            } else if router.isInApp {
+                // After login or onboarding, while the quests load
+                SplashView(isReturningUser: true)
             } else {
                 NavigationStack(path: $router.path) {
                     SplashView()
@@ -73,6 +85,7 @@ struct RootView: View {
         .environment(router)
         .environment(profile)
         .environment(settings)
+        .environment(questStore)
         .environment(\.hapticsEnabled, settings.soundsAndHaptics)
         .preferredColorScheme(settings.appearance.colorScheme)
         .overlay(alignment: .top) {
@@ -90,11 +103,16 @@ struct RootView: View {
                 isLoadingAccount = false
                 accountError = nil
                 profile.clear()
+                questStore.clear()
                 router.logOut()
             }
         }
         .task(id: loadAttempt) {
             await loadAccount()
+        }
+        // Login, onboarding and a password reset reach the tabs without loadAccount
+        .task(id: QuestLoadKey(isInApp: router.isInApp, attempt: loadAttempt)) {
+            await loadQuests()
         }
         .task(id: savedProfile) {
             await saveProfileChanges()
@@ -117,6 +135,7 @@ struct RootView: View {
         do {
             let start = Date.now
             try await ProfileService.load(into: profile)
+            try await questStore.loadFromServer()
 
             // Lets Splash's animation play, unless the user taps to move on
             while !isSplashTapped, Date.now.timeIntervalSince(start) < Self.minimumSplashTime {
@@ -126,7 +145,19 @@ struct RootView: View {
             router.showAccount(isOnboarded: profile.isComplete)
             isLoadingAccount = false
         } catch {
-            accountError = (error as? AccountError ?? .unknown).message
+            accountError = (error as? AccountError)?.message
+                ?? (error as? QuestError)?.message
+                ?? AccountError.unknown.message
+        }
+    }
+
+    private func loadQuests() async {
+        guard router.isInApp, !questStore.isLoaded, !isLoadingAccount else { return }
+
+        do {
+            try await questStore.loadFromServer()
+        } catch {
+            questError = (error as? QuestError)?.message ?? AccountError.unknown.message
         }
     }
 
@@ -159,12 +190,20 @@ struct RootView: View {
     private func logOut() {
         isLoadingAccount = false
         accountError = nil
+        questError = nil
         profile.clear()
+        questStore.clear()
         router.logOut()
         Task {
             await AccountService.logOut()
         }
     }
+}
+
+/// Reloads the quests when the tabs appear, or when Try Again is tapped.
+private struct QuestLoadKey: Equatable {
+    let isInApp: Bool
+    let attempt: Int
 }
 
 #Preview(traits: .dark) {

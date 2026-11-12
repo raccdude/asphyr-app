@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/../.."
 out="$(mktemp -d)"
 models=(
-  Asphyr/Models/Quests/Quest.swift Asphyr/Models/Quests/QuestStore.swift
+  Asphyr/Models/Quests/Quest.swift Asphyr/Models/Quests/QuestStore.swift Asphyr/Models/Quests/QuestRecords.swift
   Asphyr/Models/Quests/RewardRules.swift Asphyr/Models/Quests/DailyQuests.swift
   Asphyr/Models/Quests/DifficultyEstimator.swift Asphyr/Models/Profile/UserAttribute.swift
   Asphyr/Models/Profile/Achievement.swift Asphyr/Models/Profile/Archetype.swift

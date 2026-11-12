@@ -58,6 +58,7 @@ struct QuestsView: View {
     @State private var isShowingCreateQuest = false
     @State private var questToDelete: Quest?
     @State private var selectedQuestID: UUID?
+    @State private var errorMessage: String?
     @Namespace private var filterNamespace
 
     private var filteredQuests: [Quest] {
@@ -86,6 +87,25 @@ struct QuestsView: View {
             header
         }
         .toolbar(.hidden, for: .navigationBar)
+        .overlay(alignment: .top) {
+            if let errorMessage {
+                AsphyrToast(icon: "iconAlert", message: errorMessage)
+                    .padding(.horizontal, 20)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .onTapGesture {
+                        self.errorMessage = nil
+                    }
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: errorMessage)
+        .task(id: errorMessage) {
+            guard errorMessage != nil else { return }
+
+            try? await Task.sleep(for: .seconds(3))
+            if !Task.isCancelled {
+                errorMessage = nil
+            }
+        }
         .overlay(alignment: .bottomTrailing) {
             createQuestButton
                 .padding(.trailing, 20)
@@ -107,8 +127,12 @@ struct QuestsView: View {
             presenting: questToDelete
         ) { quest in
             Button("Delete", role: .destructive) {
-                withAnimation {
-                    questStore.delete(quest)
+                Task {
+                    do {
+                        try await questStore.deleteQuest(quest)
+                    } catch {
+                        errorMessage = (error as? QuestError)?.message
+                    }
                 }
             }
             Button("Cancel", role: .cancel) {}

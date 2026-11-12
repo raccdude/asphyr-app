@@ -8,7 +8,8 @@
 import Foundation
 
 struct Quest: Identifiable {
-    let id = UUID()
+    /// The server's id once saved. Samples and previews make their own.
+    var id = UUID()
     let type: QuestType
     let title: String
     var description: String?
@@ -113,7 +114,7 @@ extension TimeInterval {
 }
 
 struct QuestStep: Identifiable {
-    let id = UUID()
+    var id = UUID()
     let title: String
     var isDone = false
     var doneAt: Date?
@@ -124,6 +125,20 @@ enum QuestType: CaseIterable {
     case mainQuest
     case dailyQuest
     case personalQuest
+
+    /// The name the server uses.
+    var serverName: String {
+        switch self {
+        case .mainQuest: "main"
+        case .dailyQuest: "daily"
+        case .personalQuest: "personal"
+        }
+    }
+
+    init?(serverName: String) {
+        guard let type = Self.allCases.first(where: { $0.serverName == serverName }) else { return nil }
+        self = type
+    }
 
     var title: String {
         switch self {

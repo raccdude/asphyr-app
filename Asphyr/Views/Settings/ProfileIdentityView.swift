@@ -290,15 +290,24 @@ struct ProfileIdentityView: View {
 
     private func save() {
         isNameFocused = false
-        if aspiration != profile.aspiration || archetype != profile.archetype {
-            questStore.renewDailyQuest(aspiration: aspiration, archetype: archetype)
-        }
+        let isNewIdentity = aspiration != profile.aspiration || archetype != profile.archetype
 
         name = trimmedName
         profile.name = trimmedName
         profile.aspiration = aspiration
         profile.archetype = archetype
         toast = "Changes saved."
+
+        guard isNewIdentity else { return }
+
+        // The server reads the archetype from the saved profile
+        Task {
+            try? await ProfileService.save(profile)
+            try? await questStore.renewDailyQuestOnServer(
+                aspiration: profile.aspiration,
+                archetype: profile.archetype
+            )
+        }
     }
 
     private func openPendingPhotoChoice() {

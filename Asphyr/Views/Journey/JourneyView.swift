@@ -220,7 +220,7 @@ struct JourneyView: View {
             // The new star's message shows once, so it only counts as seen if
             // the constellation was showing
             if !isShowingSky, viewedChapter == nil {
-                questStore.seenLitStarCount = totalLitStars
+                questStore.markJourneySeen(litStarCount: totalLitStars)
             }
             isShowingSky = false
             viewedChapter = nil

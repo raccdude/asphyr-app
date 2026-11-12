@@ -308,7 +308,7 @@ begin
   update public.quests set paused_at = paused_at - interval '5 minutes' where id = p1;
   r := tests.act(a, format('public.pause_quest(%L, true)', p1));
   perform tests.check('pausing twice changes nothing',
-    (r -> 'quest' ->> 'paused_at')::timestamptz < now() - interval '4 minutes');
+    to_timestamp((r -> 'quest' ->> 'paused_at')::float) < now() - interval '4 minutes');
   r := tests.act(a, format('public.pause_quest(%L, false)', p1));
   perform tests.check('resuming adds the paused time',
     r -> 'quest' ->> 'paused_at' is null and (r -> 'quest' ->> 'paused_duration')::float between 299 and 301);
@@ -668,6 +668,42 @@ begin
   perform tests.check('Journey stars seen are saved', (r -> 'player' ->> 'seen_lit_star_count')::int = 7);
   r := tests.act(a, 'public.mark_journey_seen(-3)');
   perform tests.check('Journey stars seen can''t go below 0', (r -> 'player' ->> 'seen_lit_star_count')::int = 0);
+end;
+$$;
+
+-- Loading an account ------------------------------------------------------------------
+
+do $$
+declare
+  a uuid := tests.new_user();
+  b uuid := tests.new_user();
+  m uuid := tests.main(a, 'Learn Swift', 3);
+  p uuid := tests.personal(a);
+  r jsonb;
+begin
+  perform tests.act(a, format('public.start_quest(%L)', m));
+  perform tests.act(a, format('public.set_step_done(%L, true)', tests.step(m, 1)));
+  perform tests.personal(b);
+  -- Everything in this block shares one clock reading, unlike the app's separate requests
+  update public.quests set created_at = now() - interval '1 hour' where id = m;
+
+  r := tests.act(a, 'public.get_player_state(''Asia/Manila'')');
+  perform tests.check('loading returns only the user''s own quests, oldest first',
+    jsonb_array_length(r -> 'quests') = 2 and (r -> 'quests' -> 0 ->> 'id')::uuid = m
+    and (r -> 'quests' -> 1 ->> 'id')::uuid = p);
+  perform tests.check('loading includes the steps in order with their tick times',
+    r -> 'quests' -> 0 -> 'steps' -> 0 ->> 'title' = 'Step 1'
+    and r -> 'quests' -> 0 -> 'steps' -> 0 -> 'done_at' = 'null'::jsonb
+    and abs((r -> 'quests' -> 0 -> 'steps' -> 1 ->> 'done_at')::float - extract(epoch from now())) < 5);
+  perform tests.check('loading includes the player', (r -> 'player' ->> 'earned_xp')::int = 100);
+  perform tests.check('loading saves the phone''s time zone',
+    (select time_zone from public.profiles where id = a) = 'Asia/Manila');
+  perform tests.act(a, 'public.get_player_state(''Mars/Olympus'')');
+  perform tests.check('an unknown time zone is ignored',
+    (select time_zone from public.profiles where id = a) = 'Asia/Manila');
+  perform tests.check('loading needs a signed-in user',
+    tests.error(null, 'public.get_player_state()') = 'not_signed_in'
+    and tests.error(null, 'public.get_player_state()', 'anon') like 'permission denied%');
 end;
 $$;
 

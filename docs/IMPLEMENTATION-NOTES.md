@@ -42,7 +42,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
 | Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
 | Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
-| Backend steps 4 to 6 | Next. See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
+| Backend step 4: quests and rewards on the server | Written in a cloud session, not built in Xcode yet | `claude/gifted-archimedes-l90m2f` |
+| Backend steps 5 and 6 | See [BACKEND-SPEC.md](BACKEND-SPEC.md) | — |
 | Store, Inventory and currency | After the backend | — |
 
 ## Navigation
@@ -114,7 +115,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Who creates each quest type:**
   - **Daily:** system generated. It renews every 24 hours and is based on the user's aspiration and archetype. This isn't built yet; `Quest.sampleDaily` is a fixed placeholder.
   - **Main and personal:** user generated, through Create Quest. Neither appears by default. The developer stated this for main quests; personal is treated the same because it's also offered on Create Quest.
-- **Data:** `QuestStore` is created in `MainTabView` and read from the environment. It starts with only the daily quest and is kept in memory, so changes will reset on relaunch. Replace it when the backend arrives.
+- **Data:** `QuestStore` is created in `RootView`, loaded from the server with the profile while Splash shows, and read from the environment. Every action goes through `Backend/QuestStore+Server.swift`, which calls the server and updates from its reply. A failed action shows a toast, and if the device was out of step it reloads. `QuestStore`'s own actions are the device copy of the rules, for previews and `scripts/rule-tests`.
 - **Filters:** ALL shows every open quest, available or active, and completed quests appear only under Completed so they don't pile up. The others match on status. Sections with no matching quests are hidden. Each filter has its own empty state.
 - **Testing other states:** by default ALL and Available show the daily quest, and Active and Completed show their empty states. `QuestsView` has "All quest types", "No quests" and "Completed quest" previews for the rest.
 
@@ -126,7 +127,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Main quest steps:** our own version. A STEPS section appears on this screen when Main is selected, with 3 to 10 steps that can be removed before saving. Text left in the step field is added on submit. Checking steps off comes with Quest Details.
 - **Quest limits:** one open main quest and five open personal quests at a time; completed quests don't count. A card at its limit is dimmed and reads "Already created" or "Limit reached", and tapping it shows a toast explaining the limit. If Personal is at its limit, Main is selected instead. If both are, "Finish a quest to create a new one." appears and Create Quest does nothing.
 - **Main quests have no time limit:** Estimated Duration is hidden when Main is selected, and they save with no duration. Users go at their own pace.
-- **Saving:** adds an available quest to `QuestStore` and closes the sheet. Titles and categories are stored in capitals to match the other quests.
+- **Saving:** sends the quest to the server, which works out its difficulty, XP and attributes, then closes the sheet. A failure keeps the sheet open with a toast. Titles and categories are stored in capitals to match the other quests.
 - **Placeholders:** main quests use the book icon and personal quests the hammer.
 
 ## Quest Details
@@ -143,7 +144,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 
 ## Reward
 - **Presentation:** a full-screen cover over Quest Details. Continue closes it and returns to where the quest was opened, so back can't reach it again.
-- **Data:** `QuestStore.complete` returns a `QuestCompletion`, which holds the quest, time taken, levels and XP at that moment.
+- **Data:** `QuestStore.completeQuest` returns a `QuestCompletion` built from the server's reply, which holds the quest, time taken, levels, XP and new cloaks at that moment.
 - **Loot cards:** XP in the middle, with up to two attributes tilted beside it. A quest with no attribute rewards shows XP alone. They fade and pop in one by one when the screen opens, XP first, then left, then right, with a success haptic.
 - **Level up:** the banner appears when a completion finds a level Reward hasn't shown yet, including one reached earlier by ticking steps. Each level is announced once.
 - **New Reward Unlocked:** appears only when a cloak unlocks, and expands in place, as in DESIGN-DECISIONS.md. "View in Character" sits under the expanded card and opens the Character tab.
@@ -162,7 +163,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Paths (`JourneyPath`):** each aspiration has its own seven star names and goals: the 5 listed on Identity and the 7 others in Create Aspiration's popular choices. Matching ignores capitals and spacing. A custom aspiration, or none after Login, gets the general path. All of this copy is ours; Figma's "Swift" stars were samples. Add new aspirations to `paths`.
 - **Destination:** the last star masters one skill, like "Anatomy Master", as Figma's "Swift Master" does. It's never the aspiration itself, because no one becomes a doctor in 20 quests.
 - **States:** new user, on the way, star unlocked (shown once, until leaving the tab), welcome back (no completed quest for 3 days) and all lit. All lit is ours; Figma has no frame. There's no next chapter yet.
-- **Welcome back can't appear in the app yet:** progress resets on relaunch. Check it in the preview.
+- **Welcome back:** progress is saved on the server from backend step 4, so it can now appear in the app.
 - **Sky:** `StarField` fills the screen with small stars that stay put, and the sky map adds more.
 - **Layout (`JourneyLayout`):** the constellation is 340pt across and centered in the space above the guide card, the header is pinned, and the rest scrolls. The flame spirit stays in a guide card under the constellation, replacing Figma's following spirit, speech bubble and banner. Its top line is the spirit's message, up to two lines, and its bottom line is the next star, or that star's goal right after one lights. Other goals appear when a star is tapped. The current star and destination always get a label; other labels only show if they have room.
 - **Figma:** frames `14` to `14.8` on `06` follow the app, with Lou's Game Developer path. Star field positions use the same seeds as the app. `21.5 - Journey (Light)` still shows the old design and waits for light mode. The star shake and sky map zoom are motion, so Figma can't show them.
@@ -379,7 +380,7 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Low:** the keyboard's suggestion bar can still offer words for a revealed password.
 
 - **High:** onboarding answers are only kept in memory, so they reset on relaunch. Fix when the backend arrives.
-- **High, until backend step 4:** quests, XP, attributes, cloaks and badges aren't saved, so they reset on relaunch and after logging out. The name, color, aspiration and archetype are saved.
+- **Fixed in backend step 4, not built in Xcode yet:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
 - **Low, until backend step 5:** the profile photo isn't saved.
 - **Low:** if a profile change fails to save in the tabs, nothing tells the user. It saves with the next change.
 - **High, until backend step 5:** Delete Account only signs out and clears the device. The login stays on the server.
