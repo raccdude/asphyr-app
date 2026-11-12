@@ -120,19 +120,44 @@ struct CreateAspirationView: View {
         .padding(.top, 37)
     }
 
+    /// Stacks at large text sizes so Cancel doesn't overlap the title, as on Create Quest.
     private var header: some View {
-        ZStack {
-            Text("CREATE ASPIRATION")
-                .font(AppTypography.subheading)
-                .foregroundStyle(Color.asphyrTextPrimary)
-
-            Button("Cancel") {
-                dismiss()
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                cancelButton
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                headerTitle
+                    .lineLimit(1)
+                    .fixedSize()
+                // Keeps the title centered
+                cancelButton
+                    .hidden()
+                    .accessibilityHidden(true)
+                    .frame(maxWidth: .infinity)
             }
-            .font(AppTypography.body)
-            .foregroundStyle(Color.asphyrTextSecondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 12) {
+                cancelButton
+                headerTitle
+                    .frame(maxWidth: .infinity)
+            }
         }
+    }
+
+    private var headerTitle: some View {
+        Text("CREATE ASPIRATION")
+            .font(AppTypography.subheading)
+            .foregroundStyle(Color.asphyrTextPrimary)
+    }
+
+    private var cancelButton: some View {
+        Button("Cancel") {
+            dismiss()
+        }
+        .font(AppTypography.body)
+        .foregroundStyle(Color.asphyrTextSecondary)
+        .lineLimit(1)
+        .fixedSize()
     }
 
     private func sectionLabel(_ title: String) -> some View {
