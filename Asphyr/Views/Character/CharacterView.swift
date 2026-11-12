@@ -132,6 +132,8 @@ struct CharacterView: View {
             Text(displayName)
                 .font(AppTypography.screenTitle)
                 .foregroundStyle(Color.asphyrTextPrimary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
             if let archetype = profile.archetype {
                 Text("THE \(archetype.title.uppercased())")

@@ -43,7 +43,13 @@ struct CreateAccountView: View {
         .animation(.easeInOut(duration: 0.2), value: showsMismatchError)
         .animation(.easeInOut(duration: 0.2), value: isPasswordChecklistVisible)
         .onChange(of: focus) { oldValue, _ in
-            validateOnLeaving(oldValue)
+            Task {
+                // The eye button swaps the field and hands focus back a moment later,
+                // so only check a field the user has really left
+                try? await Task.sleep(for: .milliseconds(150))
+                guard focus != oldValue else { return }
+                validateOnLeaving(oldValue)
+            }
         }
         .onChange(of: email) {
             accountError = nil

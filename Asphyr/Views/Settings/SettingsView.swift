@@ -202,6 +202,7 @@ struct SettingsView: View {
                         Text(profile.name.isEmpty ? "Traveler" : profile.name)
                             .font(AppTypography.sectionTitle)
                             .foregroundStyle(Color.asphyrTextPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         if let identityLine {
                             Text(identityLine)
