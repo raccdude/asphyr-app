@@ -118,6 +118,7 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 - **Unused now:** the `Character` component is left over from the old Home and Your Character. Delete it in a cleanup.
 
 ## Quests list
+- **ALL leaves out completed quests, on purpose** (developer, 16 Nov 2026): it keeps the log uncluttered. Completed quests are under COMPLETED.
 - **Who creates each quest type:**
   - **Daily:** system generated. It renews every 24 hours and is based on the user's aspiration and archetype. This isn't built yet; `Quest.sampleDaily` is a fixed placeholder.
   - **Main and personal:** user generated, through Create Quest. Neither appears by default. The developer stated this for main quests; personal is treated the same because it's also offered on Create Quest.
@@ -245,7 +246,9 @@ Built on 12 Nov 2026 from `docs/superpowers/specs/2026-11-12-store-and-inventory
 | Snow | `#8B90A3` | `#3A3D4A` |
 | Teal | `#12565E` | `#06252A` |
 
-## Reward redesign (planned)
+## Reward redesign (done)
+Done on 15 Nov 2026: the spotlight band, a filling XP bar, rolling numbers, tap to skip, "Find another quest" and the streak line. See `PROJECT-LOG.md`. The note below is kept for history.
+
 The developer still doesn't like the Reward screen, even after option B, so it needs another redesign. Nothing is decided and nothing is built. Start by asking what feels wrong, then propose options before changing Figma or the app.
 
 ## Settings
@@ -296,16 +299,14 @@ The developer still doesn't like the Reward screen, even after option B, so it n
 - **Green bars:** every `XPBar` uses the primary button's gradient, `#00E63B` to `#7DFF9B`, with a rounded end. The comet uses the same two colors, so they read as one. Most bars flow slowly. The timer bar stops flowing when paused, and Character's four attribute bars fill once when they appear, so that screen stays calm. A cyan version was tried and dropped.
 
 ## Character evolution (later)
-The character should change as the user levels up, as in Figma's section 11 (`20.2 - Hooded traveler / Stages`). Only Novice is built, so nothing changes with level yet.
+The character should change as the user levels up. Only Novice is built, so nothing changes with level yet. Figma's section 11 (`20.2 - Hooded traveler / Stages`) has a 4-stage version: Novice 1–4, Apprentice 5–9, Adept 10–19, Ascended 20+ (hood off and circlet).
 
-| Stage | Levels | Figma's description |
-|---|---|---|
-| Novice | 1–4 | Trim and sash |
-| Apprentice | 5–9 | Mantle and core |
-| Adept | 10–19 | |
-| Ascended | 20+ | Hood off and circlet |
-
-Plan this together with the character art redesign, and keep the layers so cloaks still work. Ascended's hood off will need the cloak layers rethought.
+**Recommended plan** (16 Nov 2026, the developer asked Claude to decide; build after the presentation, not before it):
+- **Three stages,** at the levels the developer asked for: Novice 1–9, Adept 10–19, Ascended 20+. Figma's Apprentice drops out, because three clear jumps read better than four small ones.
+- **Adept (10):** Figma's Adept look: trim and sash, a glowing core, and a ring of light at the feet in the user's color.
+- **Ascended (20):** a circlet and a floating halo of sparkles over the hood, and a stronger glow. The hood stays on, unlike Figma, so the cloak layers keep working and every cloak fits every stage.
+- **Moment:** reaching level 10 or 20 shows the new look on Reward, after the level-up pop.
+- **Figma:** update `20.2` to the three stages when the art is built.
 
 ## Gender (idea)
 Whether users can choose a gender is undecided, and nothing is built. The character is hooded and reads as neutral today, so this would mostly affect the art. Decide with the character art redesign. If it's added, it should be optional.
@@ -384,9 +385,10 @@ Figma doesn't have these yet, because the app doesn't either.
 - **Stale launch screens:** iOS caches them. If an old one shows, delete the app from the device and run it again.
 
 ## Deploying to a phone (teach at the end)
-After the backend is implemented, Claude walks the user through putting the app on their own iPhone, step by step. Not before then.
+- **TestFlight is on hold** (16 Nov 2026): the Apple Developer Program costs $99 a year, which isn't in the budget yet. Until then the app goes on phones straight from Xcode with a free Apple ID, which expires after 7 days. Teach TestFlight when the developer asks.
 
 ## Screen sizes
+- **iPhone SE:** not checked, at the developer's call on 16 Nov 2026. The 12 Pro Max size was checked in the Simulator, and the tab bar on the developer's own 12 Pro Max.
 Checked by reading every screen on 12 Nov 2026, after layouts looked cropped on an iPhone 12 Pro Max (428pt wide) when they had been tuned on an iPhone 18 Pro (402pt). Not checked on screen in that session.
 - **Journey:** the constellation is drawn for 402pt and scales down on narrower phones. On wider ones it stays full size and centered.
 - **Sheets:** `settingsSheet(height:)` keeps each sheet's designed height, and scrolls its content when the screen or text size doesn't leave room.

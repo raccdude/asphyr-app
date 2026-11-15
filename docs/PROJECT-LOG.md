@@ -154,3 +154,9 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Tab bar on the developer's iPhone 12 Pro Max:** the bar sat about 34pt too high, content showed and could be tapped below it, and it covered Journey's message. The bar was an overlay told to ignore the bottom safe area, which that phone's iOS didn't honor; the iOS 27.2 Simulator did, so it looked right there. It now lives in a bottom safe-area inset, lowered toward the edge with an offset, on a solid background that reaches the edge. Checked on the iPhone 18 Pro Simulator.
 - **Home spacing:** the character sat 6pt over the name, as in Figma, so a long name like the demo account's nearly touched it. It now starts 12pt below the name.
 - **Demo account:** `supabase/demo/demo-account.sql` fills one account with 100 finished quests with real titles (all Journey chapters, a 100-day streak), one quest in progress with steps, two waiting, level 20 (43,700 XP), 2,500 Embers, and every cloak and achievement. Nothing in the app unlocks above level 8, so the higher level is for show. The developer signs up the account in the app and runs the script in the SQL Editor. Not run yet, and not tested against a database, since there's no local Postgres here.
+
+### After the presentation prep (16 Nov 2026)
+- **Decided by the developer:** TestFlight waits (no budget for the $99 Apple Developer Program); the iPhone SE check is skipped; Quests' ALL filter leaves out completed quests on purpose.
+- **Later:** the before-friends steps in `RELEASE-CHECKLIST.md`, the Figma updates and the prototype.
+- **Next:** character stages at levels 10 and 20, with new designs.
+- **Character stages:** recommended three stages (Novice 1–9, Adept 10–19, Ascended 20+, hood kept on so cloaks still fit), to build after the presentation. Recorded in `IMPLEMENTATION-NOTES.md`, Character evolution.

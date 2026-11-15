@@ -6,7 +6,7 @@ Read this first when picking up the project on another Mac or in a new session. 
 - **Screens, Figma revisions and cleanup:** done, apart from the small list under "Figma updates for later" in `IMPLEMENTATION-NOTES.md`.
 - **Backend:** all six steps of `BACKEND-SPEC.md` are done, merged to `main` and deployed on 12 Nov 2026, and checked by the developer on their iPhone: accounts, the saved profile and photo, quests and rewards checked by the server, and Delete Account. Google sign-in works, confirmed on the developer's iPhone on 15 Nov 2026; the Apple button was removed (see `BACKEND-SPEC.md`, Step 6 notes).
 - **Store and Inventory:** built on 12 Nov 2026, merged to `main` and deployed. The server side is tested (159 database checks). See `IMPLEMENTATION-NOTES.md`, Store and inventory.
-- **Next:** the developer's list of issues. After that, the before-release steps in `RELEASE-CHECKLIST.md`, then teaching the developer to deploy with TestFlight.
+- **Next:** after the presentation, character stages at levels 10 and 20 (plan in `IMPLEMENTATION-NOTES.md`, Character evolution). Waiting for later, at the developer's request: the before-friends steps in `RELEASE-CHECKLIST.md`, the Figma updates and the prototype. TestFlight is on hold until there's budget for the Apple Developer Program.
 - **After that:** the Figma prototype, and the Figma frames listed under "Figma updates for later".
 
 ## Services
