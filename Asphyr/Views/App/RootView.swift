@@ -88,7 +88,9 @@ struct RootView: View {
         .environment(settings)
         .environment(questStore)
         .environment(\.hapticsEnabled, settings.soundsAndHaptics)
-        .preferredColorScheme(settings.appearance.colorScheme)
+        // Sign-in and onboarding stay dark, the brand's first impression; the
+        // chosen appearance applies once inside the app
+        .preferredColorScheme(router.isInApp ? settings.appearance.colorScheme : .dark)
         .overlay(alignment: .top) {
             if let alertMessage {
                 AsphyrToast(icon: "iconAlert", message: alertMessage)

@@ -132,6 +132,8 @@ struct MainTabView: View {
 private struct MainTabBar: View {
     @Binding var selection: MainTab
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         HStack(spacing: 0) {
             ForEach(MainTab.allCases) { tab in
@@ -162,7 +164,8 @@ private struct MainTabBar: View {
         .background {
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.asphyrSurface)
-                .shadow(color: .black.opacity(0.5), radius: 7.5, x: 0, y: 10)
+                // A dark shadow reads as a smudge on Light's pale background
+                .shadow(color: .black.opacity(colorScheme == .dark ? 0.5 : 0.1), radius: 7.5, x: 0, y: 10)
         }
         .overlay {
             RoundedRectangle(cornerRadius: 24)

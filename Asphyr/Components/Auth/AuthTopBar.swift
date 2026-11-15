@@ -52,8 +52,6 @@ struct AuthTopBar: View {
                         .contentShape(Circle())
                 }
                 .glassEffect(.regular.interactive(), in: Circle())
-                // Dark glass until the app's light colors exist
-                .environment(\.colorScheme, .dark)
                 .accessibilityLabel("Back")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(SwipeBackEnabler().frame(width: 0, height: 0))

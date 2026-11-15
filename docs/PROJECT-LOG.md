@@ -139,3 +139,8 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Back from Reward:** Reward was presented by Quest Details, and SwiftUI only runs a cover's dismiss handler after it has slid away, so Quest Details (or, after a first fix, its empty background) flashed by. Reward is now presented by the tabs through `TabNavigator.rewardCompletion`, and Quest Details closes underneath it straight away, so Continue reveals the screen the quest was opened from.
 - **Streak line:** on the day's first finished quest, Reward shows the flame and "N-day streak", arriving with the Embers. It follows the Show streaks setting.
 - **Not tested:** only the build was checked.
+
+### Light mode colors
+- **Decision:** at the developer's question, Light applies only inside the app. Sign-in and onboarding stay dark: they're the brand's first impression, and the appearance is chosen in Settings, after them.
+- **Fixed:** glass buttons followed Dark only, the Light border was nearly invisible, Light amber text was too faint on white, and the tab bar's shadow was a smudge on Light.
+- **Checked:** in the iPhone 18 Pro Simulator, in Light, signed in by the developer. Settings, Quest Details, Reward and the Store weren't checked in Light.

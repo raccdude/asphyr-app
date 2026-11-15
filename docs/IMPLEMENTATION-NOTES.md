@@ -48,8 +48,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Store, Inventory and Embers | Merged and deployed 12 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
 | Build warnings and notes cleanup | Merged | `chore/cleanup-warnings` |
 | Reward redesign | Merged | `feat/reward-redesign` |
-| Reward next steps | In review | `feat/reward-next-steps` |
-| Light mode colors | Next | — |
+| Reward next steps | Merged | `feat/reward-next-steps` |
+| Light mode colors | In review | `feat/light-mode` |
+| Before-release items | Next | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -309,14 +310,17 @@ Plan this together with the character art redesign, and keep the layers so cloak
 ## Gender (idea)
 Whether users can choose a gender is undecided, and nothing is built. The character is hooded and reads as neutral today, so this would mostly affect the art. Decide with the character art redesign. If it's added, it should be optional.
 
-## Light mode (later)
-Light mode works but needs its own design pass. Nothing here is built yet. Figma only needs Light versions of the essential screens: Home, Quests, Quest Details, Reward, Journey, Character, Settings and Appearance, not every screen. When a Dark frame changes, copy it again, because copies lose the opacity of colors bound to variables and must have it restored.
-- **Components:** review every screen's components and designs in Light.
-- **Settings icon:** the gear on Home looks off.
-- **Outlines:** many are hard to see. The Light border `#DCDFE6` is very close to the Light background `#F3F4F7`.
-- **Colors in screens:** colors written directly into screens, like the character art and star fields, don't change with the mode.
+## Light mode
+- **Where it applies:** inside the app only. Splash, Welcome, sign-in and onboarding always stay dark, as the brand's first impression and because the appearance is chosen inside the app. `RootView` sets this.
+- **Glass buttons:** the back button, Home's gear and Journey's sky button follow the mode. They were forced dark.
+- **Outlines:** the Light border is `#C9CED8`, darker than Figma's `#DCDFE6`, which nearly disappeared on the `#F3F4F7` background.
+- **Amber text:** Light `StatusWarning` is `#B26B00`. Figma's `#FFB547` was too faint on white for XP, Embers and the Journey reward star.
+- **Tab bar shadow:** 10% black in Light, 50% in Dark, where it was a grey smudge on Light.
+- **Checked in the Simulator:** Splash, Welcome, Home, Quests, Journey and Character. The character art, star field and Journey's spirit read well in Light, so they're unchanged.
+- **Not checked:** Settings and its sheets, Quest Details, Reward and the Store in Light.
 
 ## Figma updates for later
+- **Light mode:** border `#C9CED8` and amber `#B26B00` in the Light color mode, and keep auth and onboarding frames dark.
 - **Reward:** add the spotlight band, a full-width faint green band behind the title, a 150pt spirit and the message. See `docs/superpowers/specs/2026-11-15-reward-header-design.md`.
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
@@ -410,4 +414,3 @@ From the codebase inspection on 2 Nov 2026. Remove each one when it is fixed.
 - **Fixed in backend step 4:** quests, XP, attributes, cloaks, badges and the worn cloak are saved on the server.
 - **Fixed in backend step 5:** the profile photo is saved in Storage.
 - **Fixed in backend step 5:** Delete Account deletes the login and its data through the `delete-account` Edge Function.
-- **Medium:** Light mode has Figma's values for the main color sets, but colors written directly in screens, like the character art and star fields, don't change with it. Check each screen and add to UI polish.

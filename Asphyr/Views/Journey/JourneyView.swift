@@ -285,8 +285,6 @@ struct JourneyView: View {
                     .contentShape(Circle())
             }
             .glassEffect(.regular.interactive(), in: Circle())
-            // Dark glass until the app's light colors exist
-            .environment(\.colorScheme, .dark)
             .accessibilityLabel(isShowingSky ? "Back to this constellation" : "See the whole sky")
         }
         .padding(.horizontal, 20)
