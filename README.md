@@ -8,7 +8,7 @@
 
 *Become who you aspire to be, one quest at a time.*
 
-ASPHYR turns real-world self-improvement into a game-inspired journey. You create a character that stands for the person you want to become, then grow it by finishing real quests: studying, practising a skill, training or finishing a task. Each quest earns XP, attributes and Embers, lights a star on your Journey, and keeps your streak going.
+ASPHYR turns real-world self-improvement into a game-inspired journey. You create a character that stands for the person you want to become, then grow it by finishing real quests: studying, practicing a skill, training or finishing a task. Each quest earns XP, attributes and Embers, lights a star on your Journey, and keeps your streak going.
 
 [![Platform](https://img.shields.io/badge/iOS-26.5%2B-0B0D12?style=flat-square&logo=apple&logoColor=white)](#run-the-app)
 [![Swift](https://img.shields.io/badge/Swift-SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white)](#architecture)
