@@ -91,7 +91,8 @@ struct HomeView: View {
                         mood: $characterMood,
                         restingMood: isResting ? .sleepy : .idle
                     )
-                    .padding(.top, -6)
+                    // Clear of the name, which can be long; Figma overlaps them by 6pt
+                    .padding(.top, 12)
 
                     identity
                         .padding(.top, 18)

@@ -320,6 +320,7 @@ Whether users can choose a gender is undecided, and nothing is built. The charac
 - **Not checked:** Settings and its sheets, Quest Details, Reward and the Store in Light.
 
 ## Figma updates for later
+- **Home:** the character starts 12pt below the name instead of overlapping it by 6pt.
 - **Light mode:** border `#C9CED8` and amber `#B26B00` in the Light color mode, and keep auth and onboarding frames dark.
 - **Reward:** add the spotlight band, a full-width faint green band behind the title, a 150pt spirit and the message. See `docs/superpowers/specs/2026-11-15-reward-header-design.md`.
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
