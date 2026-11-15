@@ -93,7 +93,34 @@ Commit messages follow Conventional Commits: `feat`, `fix`, `refactor`, `docs`, 
 | `git log --oneline -3` | See recent commits | Lists the last 3 commits, one line each. |
 | `git log origin/<branch>..HEAD --oneline` | Check what's not uploaded | Lists local commits that GitHub doesn't have. Nothing printed means everything is uploaded. |
 
+**Identity and history**
+
+| Command | Purpose | What it does |
+|---|---|---|
+| `git config user.name "Angelo Buedo"` | Sign commits as you | Sets the author name for this repo only. Run it, and the email line below, right after `git init` or `git clone` on a Mac that isn't yours. |
+| `git config user.email "$(git -C ../asphyr-app config user.email)"` | Link commits to your GitHub | Copies ASPHYR's email into this repo. GitHub links a commit to your account by its email. |
+| `git commit --amend --reset-author --no-edit` | Fix the last commit's author | Rewrites the last commit with the current name and email, keeping its message. |
+| `git branch backup-before-squash` | Safety net | Saves the current commit under a name before rewriting history. Delete it once all is well. |
+| `git reset --soft <commit>` | Undo commits, keep the work | Removes the commits after `<commit>` but leaves every change staged in the files. |
+| `git reset` | Unstage everything | Keeps the changes in the files but unstages them, so they can be regrouped into new commits. |
+| `git push --force-with-lease` | Replace history on GitHub | Pushes rewritten commits, but refuses if GitHub has commits this Mac doesn't. The safe force push. |
+| `git branch -D <branch>` | Delete a local branch | Removes a branch from this Mac. `-D` is needed when Git can't tell it was merged, such as after a squash. |
+| `git branch -a` | List every branch | Shows local branches and the ones on GitHub (`remotes/origin/...`). |
+
 **If a push fails:** `Internal Server Error` from GitHub is on their side. The commit is still safe locally, so wait a minute and run `git push` again. Check githubstatus.com if it keeps failing.
+
+## Git and GitHub notes
+
+Learned on 16 Nov 2026.
+
+- **Set your identity in every new repo.** This Mac's account is Sofia's and has no global Git name, so a new repo signs commits as "Sofia Senters". ASPHYR has its own setting. After `git init` or `git clone`, run the two `git config` lines above. If the commit is already pushed, amend it with `--reset-author` and push with `--force-with-lease`.
+- **Squashing pushed commits.** Several commits can become one or a few clean ones: make a backup branch, `git reset --soft <last good commit>`, `git reset`, then add and commit the files in groups, check `git status` and `git log`, and `git push --force-with-lease`. It's safe on a repo only you work on. Every rewritten commit gets a new ID.
+- **Delete branches once merged.** The work lives on in `main`. Keep a branch only while its work isn't merged, or briefly as a backup during something risky.
+- **Branch, fork or clone.** A branch is a separate line of work in the same repo. A fork is your own copy of someone else's repo on GitHub, used when you can't push to it, such as open source. A clone is a copy on your computer.
+- **Team projects on your profile.** Repos you don't own, such as NEPHLUX, don't appear under Repositories. Pin them instead (profile, Customize your pins), rather than forking: a fork is a frozen copy. Commits count in the contribution graph when they're on the default branch and use an email linked to your GitHub.
+- **Profile README.** A repo named exactly `raccdude` shows its README at the top of the GitHub profile. Its draft lives in `~/Documents/ILO/raccdude`.
+- **README style.** Every project's README follows the NEPHLUX layout (github.com/jhonlloydval/NEPHLUX-PJDSC2026): a centred header with the app icon, tagline and badges, a stat strip, a collapsible table of contents, problem and solution, features, honest limits, an architecture diagram, the repository tree, how to run it and tests. Next to add: screenshots, a demo GIF and a licence. Never publish real passwords.
+- **Employers and GitHub.** For students, GitHub is the proof you can build. Reviewers skim pinned repos, READMEs and commit history, so keep those neat, and say your own role on team projects.
 
 ## Lessons learned
 
