@@ -44,10 +44,10 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend steps 2 and 3: email accounts and profile | Merged | `feat/backend-accounts` |
 | Backend step 4: quests and rewards on the server | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 5: photos and Delete Account | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
-| Backend step 6: Google sign-in (Apple removed) | Merged. Waits on a Google Cloud project | `claude/gifted-archimedes-l90m2f` |
+| Backend step 6: Google sign-in (Apple removed) | Merged. Works, checked on iPhone 15 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
 | Store, Inventory and Embers | Merged and deployed 12 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
-| Build warnings and notes cleanup | In review | `chore/cleanup-warnings` |
-| Reward redesign | Next | — |
+| Build warnings and notes cleanup | Merged | `chore/cleanup-warnings` |
+| Reward redesign | In review | `feat/reward-redesign` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.
@@ -315,6 +315,7 @@ Light mode works but needs its own design pass. Nothing here is built yet. Figma
 - **Colors in screens:** colors written directly into screens, like the character art and star fields, don't change with the mode.
 
 ## Figma updates for later
+- **Reward:** add the spotlight band, a full-width faint green band behind the title, a 150pt spirit and the message. See `docs/superpowers/specs/2026-11-15-reward-header-design.md`.
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
 Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 — Hi-Fi v2 (Polished)`, one group at a time. `05` stays untouched. Each item leaves this list once it's done.

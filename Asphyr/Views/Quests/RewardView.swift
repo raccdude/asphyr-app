@@ -16,7 +16,15 @@ struct RewardView: View {
     /// Missing outside the tabs, such as in previews, where the link does nothing.
     @Environment(TabNavigator.self) private var navigator: TabNavigator?
 
-    @State private var isRevealed = false
+    /// How far the reveal has got. Each part appears once its step is reached,
+    /// so a tap can jump straight to the end.
+    @State private var revealStep = 0
+    @State private var barProgress: CGFloat = 0
+    /// After a level up, the bar refills and the new level pops.
+    @State private var isNewLevelShown = false
+    @State private var cardLandings = 0
+    @State private var revealTask: Task<Void, Never>?
+    @State private var barTask: Task<Void, Never>?
     @State private var isShowingUnlockedReward = false
     /// Surprised as the rewards appear, then settles on how the quest went.
     @State private var spiritMood: SpiritView.Mood = .surprised
@@ -45,6 +53,8 @@ struct RewardView: View {
                 rewardContent
                     // Centered, so a short reward doesn't leave a gap above the button
                     .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+                    .contentShape(Rectangle())
+                    .onTapGesture(perform: skipReveal)
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
@@ -59,38 +69,130 @@ struct RewardView: View {
             .background(Color.asphyrBackground)
         }
         .background(Color.asphyrBackground.ignoresSafeArea())
-        .hapticFeedback(.success, trigger: isRevealed)
+        .hapticFeedback(.success, trigger: shows(Reveal.spirit))
+        .hapticFeedback(.impact(weight: .light), trigger: cardLandings)
         .onAppear {
-            isRevealed = true
+            revealTask = Task { await reveal() }
         }
-        .task {
-            try? await Task.sleep(for: .seconds(0.9))
-            spiritMood = quest.isBonusReward ? .happy : .cheer
+        .onDisappear {
+            revealTask?.cancel()
+            barTask?.cancel()
+        }
+    }
+
+    // MARK: Reveal
+
+    private enum Reveal {
+        static let spirit = 1
+        static let words = 2
+        static let xpCard = 3
+        static let firstAttribute = 4
+        static let bar = 5
+        static let secondAttribute = 6
+        static let embers = 7
+        static let done = 8
+    }
+
+    private func shows(_ step: Int) -> Bool {
+        revealStep >= step
+    }
+
+    private var finalMood: SpiritView.Mood {
+        quest.isBonusReward ? .happy : .cheer
+    }
+
+    /// Where the bar starts: the XP before this quest, in the level it was earned in.
+    private var barStart: CGFloat {
+        let earned = quest.xpReward
+        guard completion.didLevelUp else {
+            return CGFloat(max(0, completion.xpIntoLevel - earned)) / CGFloat(completion.xpForLevel)
+        }
+        let needed = RewardRules.xpNeeded(forLevel: completion.levelBefore)
+        return CGFloat(max(0, needed - max(0, earned - completion.xpIntoLevel))) / CGFloat(needed)
+    }
+
+    private var barEnd: CGFloat {
+        CGFloat(completion.xpIntoLevel) / CGFloat(completion.xpForLevel)
+    }
+
+    private func reveal() async {
+        barProgress = barStart
+        let timeline: [(seconds: Double, step: Int)] = [
+            (0, Reveal.spirit),
+            (0.08, Reveal.words),
+            (0.15, Reveal.xpCard),
+            (0.6, Reveal.firstAttribute),
+            (0.9, Reveal.bar),
+            (1.05, Reveal.secondAttribute),
+            (1.3, Reveal.embers)
+        ]
+        var elapsed = 0.0
+
+        for moment in timeline {
+            try? await Task.sleep(for: .seconds(moment.seconds - elapsed))
+            elapsed = moment.seconds
+            guard !Task.isCancelled else { return }
+
+            revealStep = moment.step
+            if [Reveal.xpCard, Reveal.firstAttribute, Reveal.secondAttribute].contains(moment.step) {
+                cardLandings += 1
+            }
+            if moment.step == Reveal.bar {
+                spiritMood = finalMood
+                barTask = Task { await fillBar() }
+            }
+        }
+        revealStep = Reveal.done
+    }
+
+    /// Fills from the old XP to the new. A level up fills the old level first,
+    /// then starts the new one.
+    private func fillBar() async {
+        if completion.didLevelUp {
+            withAnimation(.easeIn(duration: 0.5)) {
+                barProgress = 1
+            }
+            try? await Task.sleep(for: .seconds(0.55))
+            guard !Task.isCancelled else { return }
+
+            barProgress = 0
+            // Lets the empty bar draw before it fills again
+            try? await Task.sleep(for: .milliseconds(30))
+            guard !Task.isCancelled else { return }
+
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                isNewLevelShown = true
+            }
+        }
+        withAnimation(.easeOut(duration: 0.6)) {
+            barProgress = barEnd
+        }
+    }
+
+    /// A tap anywhere shows the finished screen at once.
+    private func skipReveal() {
+        guard revealStep < Reveal.done || barProgress != barEnd else { return }
+        revealTask?.cancel()
+        barTask?.cancel()
+
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            revealStep = Reveal.done
+            barProgress = barEnd
+            isNewLevelShown = completion.didLevelUp
+            spiritMood = finalMood
         }
     }
 
     private var rewardContent: some View {
+        VStack(spacing: 0) {
+            spotlight
+
             VStack(alignment: .leading, spacing: 0) {
-                VStack(spacing: 3) {
-                    Text("QUEST COMPLETE")
-                        .font(AppTypography.screenTitle)
-                        .foregroundStyle(Color.asphyrAccentPrimary)
-                        .accessibilityAddTraits(.isHeader)
-
-                    Text(quest.title)
-                        .font(AppTypography.subheading)
-                        .foregroundStyle(Color.asphyrTextPrimary)
-                }
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-
-                spiritMessage
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 10)
-
                 lootCards
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 17)
+                    .padding(.top, 24)
 
                 if completion.embersEarned > 0 {
                     embersEarned
@@ -125,16 +227,51 @@ struct RewardView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 8)
             .padding(.bottom, 16)
+        }
+        .padding(.top, 8)
+    }
+
+    /// A band across the full width, so the win fills the screen like the cards below.
+    private var spotlight: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 3) {
+                Text("QUEST COMPLETE")
+                    .font(AppTypography.screenTitle)
+                    .foregroundStyle(Color.asphyrAccentPrimary)
+                    .accessibilityAddTraits(.isHeader)
+
+                Text(quest.title)
+                    .font(AppTypography.subheading)
+                    .foregroundStyle(Color.asphyrTextPrimary)
+            }
+            .multilineTextAlignment(.center)
+
+            spiritMessage
+                .padding(.top, 10)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 18)
+        .frame(maxWidth: .infinity)
+        .background(Color.asphyrAccentPrimary.opacity(0.06))
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color.asphyrAccentPrimary.opacity(0.18))
+                .frame(height: 1)
+        }
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.asphyrAccentPrimary.opacity(0.18))
+                .frame(height: 1)
+        }
     }
 
     private var spiritMessage: some View {
         VStack(spacing: 2) {
-            SpiritView(mood: spiritMood, size: 120)
-                .scaleEffect(isRevealed ? 1 : 0.6)
-                .opacity(isRevealed ? 1 : 0)
-                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isRevealed)
+            SpiritView(mood: spiritMood, size: 150)
+                .scaleEffect(shows(Reveal.spirit) ? 1 : 0.6)
+                .opacity(shows(Reveal.spirit) ? 1 : 0)
+                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: shows(Reveal.spirit))
 
             // Pops in after the spirit, like the reward cards
             VStack(spacing: 4) {
@@ -148,9 +285,9 @@ struct RewardView: View {
                     .foregroundStyle(completion.didLevelUp ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
             }
             .multilineTextAlignment(.center)
-            .scaleEffect(isRevealed ? 1 : 0.6)
-            .opacity(isRevealed ? 1 : 0)
-            .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(0.08), value: isRevealed)
+            .scaleEffect(shows(Reveal.words) ? 1 : 0.6)
+            .opacity(shows(Reveal.words) ? 1 : 0)
+            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: shows(Reveal.words))
         }
     }
 
@@ -164,8 +301,8 @@ struct RewardView: View {
         .foregroundStyle(Color.asphyrWarning)
         .accessibilityElement(children: .combine)
         // Arrives after the loot cards
-        .opacity(isRevealed ? 1 : 0)
-        .animation(.easeOut(duration: 0.3).delay(1.3), value: isRevealed)
+        .opacity(shows(Reveal.embers) ? 1 : 0)
+        .animation(.easeOut(duration: 0.3), value: shows(Reveal.embers))
     }
 
     private var lootCards: some View {
@@ -178,7 +315,7 @@ struct RewardView: View {
                     label: attribute.name,
                     iconName: attribute.iconName,
                     color: .asphyrAccentPrimary,
-                    delay: 0.6
+                    step: Reveal.firstAttribute
                 )
                 .rotationEffect(.degrees(6))
                 .offset(y: 5)
@@ -190,7 +327,7 @@ struct RewardView: View {
                 iconName: "iconQuestReward",
                 color: .asphyrWarning,
                 isLarge: true,
-                delay: 0.15
+                step: Reveal.xpCard
             )
 
             if attributes.count > 1 {
@@ -199,7 +336,7 @@ struct RewardView: View {
                     label: attributes[1].name,
                     iconName: attributes[1].iconName,
                     color: .asphyrAccentPrimary,
-                    delay: 1.05
+                    step: Reveal.secondAttribute
                 )
                 .rotationEffect(.degrees(-6))
             }
@@ -212,7 +349,7 @@ struct RewardView: View {
         iconName: String,
         color: Color,
         isLarge: Bool = false,
-        delay: Double
+        step: Int
     ) -> some View {
         VStack(spacing: 0) {
             Image(iconName)
@@ -224,9 +361,12 @@ struct RewardView: View {
                 .background(color.opacity(0.2), in: Circle())
                 .accessibilityHidden(true)
 
-            Text("+\(value)")
+            // Rolls up from zero as the card lands
+            Text("+\(shows(step) ? value : 0)")
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(color)
+                .contentTransition(.numericText(value: Double(shows(step) ? value : 0)))
+                .animation(.easeOut(duration: 0.6), value: shows(step))
                 .padding(.top, 14)
 
             Text(label)
@@ -250,19 +390,19 @@ struct RewardView: View {
         }
         .accessibilityElement(children: .combine)
         // The one moment of motion: each card fades and pops in, XP first
-        .scaleEffect(isRevealed ? 1 : 0.6)
-        .opacity(isRevealed ? 1 : 0)
-        .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(delay), value: isRevealed)
+        .scaleEffect(shows(step) ? 1 : 0.6)
+        .opacity(shows(step) ? 1 : 0)
+        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: shows(step))
     }
 
     private var experience: some View {
         VStack(spacing: 5) {
             HStack {
-                Text("LEVEL \(completion.levelAfter)")
-                    .foregroundStyle(completion.didLevelUp ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
-                    // A level up gets its own pop, after the reward cards
-                    .scaleEffect(completion.didLevelUp && isRevealed ? 1.25 : 1, anchor: .leading)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.5).delay(0.9), value: isRevealed)
+                // A level up gets its own pop once the old level fills
+                Text("LEVEL \(isNewLevelShown || !completion.didLevelUp ? completion.levelAfter : completion.levelBefore)")
+                    .foregroundStyle(isNewLevelShown ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
+                    .contentTransition(.numericText())
+                    .scaleEffect(isNewLevelShown ? 1.25 : 1, anchor: .leading)
 
                 Spacer()
                 Text("\(completion.xpIntoLevel) / \(completion.xpForLevel) XP")
@@ -270,7 +410,7 @@ struct RewardView: View {
             .font(AppTypography.captionMedium)
             .foregroundStyle(Color.asphyrTextSecondary)
 
-            XPBar(progress: CGFloat(completion.xpIntoLevel) / CGFloat(completion.xpForLevel))
+            XPBar(progress: barProgress)
         }
     }
 

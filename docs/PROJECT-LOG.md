@@ -124,3 +124,12 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
   - Tab switching from Reward and the Streak sheet goes through a `TabNavigator` object instead of closures in the environment, which SwiftUI couldn't compare. The unused `openCharacter` is gone.
 - **Notes:** the progress table no longer lists merged work as unmerged.
 - **Not tested:** only the build was checked. The developer tests in Xcode.
+
+### Reward redesign
+- **Why:** the developer felt Reward was empty, with a narrow header above full-width cards.
+- **Options shown:** a hero card, a spotlight band and a summary card. The developer picked the band and kept the tilted loot cards. Design in `docs/superpowers/specs/2026-11-15-reward-header-design.md`.
+- **Built:** the spotlight band. Option A, a hero card, was tried and dropped: its compact card left more empty space, which was the original complaint.
+- **Added:** the XP bar fills from the old XP to the new (through a level up), each loot card's number rolls up with a light haptic as it lands, and a tap anywhere skips to the finished screen. The reveal now runs on steps, so skipping can jump straight to the end.
+- **Known limit:** the bar's starting point assumes the quest's full XP was earned. If a daily limit cut the XP, the bar starts a little low.
+- **Google sign-in:** confirmed working by the developer on their iPhone.
+- **Not tested:** only the build was checked.
