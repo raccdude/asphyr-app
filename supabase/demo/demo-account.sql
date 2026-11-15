@@ -10,7 +10,7 @@
 --   - 100 finished quests over the last 100 days, with real titles across
 --     development, learning, creative, health and career, so the quest log,
 --     every Journey chapter and a 100-day streak look lived in
---   - one quest in progress with steps, and two waiting to start
+--   - the main quest in progress with steps, and two personal quests waiting
 --   - level 20 (43,700 XP), strong attributes and 2,500 Embers
 --   - every cloak and every achievement
 -- Safe to run again: it replaces the account's quests each time.
@@ -35,12 +35,11 @@ declare
     'health', 'career', 'learning', 'career', 'creative', 'learning',
     'creative', 'career'
   ];
-  v_icons text[] := array['iconQuestHammer', 'iconQuestBook', 'iconQuestAtom', 'iconQuestGamepad'];
-  v_difficulties text[] := array['EASY', 'MODERATE', 'MODERATE', 'HARD'];
-  v_xp integer[] := array[50, 100, 100, 150];
-  v_minutes integer[] := array[15, 30, 45, 60];
+  -- The durations Create Quest offers
+  v_minutes integer[] := array[15, 30, 60, 120];
   v_category text;
-  v_attribute text;
+  v_difficulty text;
+  v_duration integer;
   v_day timestamptz;
   v_quest uuid;
   i integer;
@@ -57,36 +56,35 @@ begin
   for i in 1..100 loop
     k := 1 + (i - 1) % 20;
     v_category := v_categories[k];
-    v_attribute := case v_category
-      when 'development' then 'PROBLEM SOLVING'
-      when 'learning' then 'KNOWLEDGE'
-      when 'creative' then 'CREATIVITY'
-      else 'DISCIPLINE'
-    end;
+    v_duration := v_minutes[1 + i % 4];
+    v_difficulty := private.estimate_difficulty(v_titles[k], null);
     v_day := now() - make_interval(days => i, hours => i % 5);
     insert into public.quests (
       user_id, type, title, description, icon_name, category, difficulty,
       duration_minutes, xp_reward, attribute_rewards, status,
       started_at, completed_at, created_at
     ) values (
-      v_user, 'personal', v_titles[k], 'One small step, done.',
-      v_icons[1 + i % 4], v_category, v_difficulties[1 + i % 4],
-      v_minutes[1 + i % 4], v_xp[1 + i % 4],
-      jsonb_build_array(jsonb_build_object('name', v_attribute, 'value', 5)),
+      v_user, 'personal', v_titles[k], null,
+      'iconQuestHammer', v_category, v_difficulty, v_duration,
+      private.timed_xp(v_duration, v_difficulty),
+      private.quest_attributes(v_category, v_difficulty, v_duration),
       'COMPLETED',
-      v_day - make_interval(mins => v_minutes[1 + i % 4]), v_day,
+      v_day - make_interval(mins => v_duration), v_day,
       v_day - interval '2 hours'
     );
   end loop;
 
-  -- One quest in progress, with its steps, to show Quest Details live
+  -- The main quest in progress, with 3 steps (main quests take 3 to 10 and no
+  -- duration), to show Quest Details live
+  v_difficulty := private.estimate_difficulty('Build the boss fight', 'Make the first boss fight playable.');
   insert into public.quests (
     user_id, type, title, description, icon_name, category, difficulty,
     duration_minutes, xp_reward, attribute_rewards, status, started_at
   ) values (
-    v_user, 'personal', 'Build the boss fight', 'Make the first boss fight playable.',
-    'iconQuestGamepad', 'development', 'HARD', 60, 150,
-    '[{"name": "PROBLEM SOLVING", "value": 8}, {"name": "KNOWLEDGE", "value": 3}]'::jsonb,
+    v_user, 'main', 'Build the boss fight', 'Make the first boss fight playable.',
+    'iconQuestBook', 'development', v_difficulty, null,
+    private.xp_per_step(v_difficulty) * 3,
+    private.quest_attributes('development', v_difficulty, null),
     'ACTIVE', now() - interval '20 minutes'
   ) returning id into v_quest;
 
@@ -95,17 +93,21 @@ begin
     (v_quest, v_user, 1, 'Code the first attack', null),
     (v_quest, v_user, 2, 'Playtest and tune', null);
 
-  -- Two waiting to start
+  -- Two personal quests waiting to start: a duration and no steps
   insert into public.quests (
     user_id, type, title, description, icon_name, category, difficulty,
     duration_minutes, xp_reward, attribute_rewards, status
-  ) values
-    (v_user, 'personal', 'Read about juicy feedback', 'Find three ideas to try.',
-     'iconQuestBook', 'learning', 'EASY', 20, 50,
-     '[{"name": "KNOWLEDGE", "value": 2}, {"name": "DISCIPLINE", "value": 1}]'::jsonb, 'AVAILABLE'),
-    (v_user, 'personal', 'Design the title screen', 'Make the first screen players see.',
-     'iconQuestAtom', 'creative', 'MODERATE', 45, 100,
-     '[{"name": "CREATIVITY", "value": 5}]'::jsonb, 'AVAILABLE');
+  )
+  select v_user, 'personal', q.title, q.description, 'iconQuestHammer', q.category, d.difficulty,
+    q.minutes, private.timed_xp(q.minutes, d.difficulty),
+    private.quest_attributes(q.category, d.difficulty, q.minutes), 'AVAILABLE'
+  from (values
+    ('Read about juicy feedback', 'Find three ideas to try.', 'learning', 30),
+    ('Design the title screen', 'Make the first screen players see.', 'creative', 60)
+  ) as q(title, description, category, minutes)
+  cross join lateral (
+    select private.estimate_difficulty(q.title, q.description) as difficulty
+  ) d;
 
   update public.player_progress set
     earned_xp = 43700,
