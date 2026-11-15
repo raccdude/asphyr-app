@@ -308,6 +308,12 @@ The character should change as the user levels up. Only Novice is built, so noth
 - **Moment:** reaching level 10 or 20 shows the new look on Reward, after the level-up pop.
 - **Figma:** update `20.2` to the three stages when the art is built.
 
+## Quest log and redesign ideas (later)
+Noted on 16 Nov 2026 at the developer's request. Nothing is designed or built.
+- **Search and filters:** search the quest log by title, and filter by category or type.
+- **A log that doesn't pile up:** after a while, finished quests leave the main log or fold into a compact summary, such as one row per week or month.
+- **Premium UI/UX redesign:** the developer plans a full redesign to make the app feel more premium. Start with brainstorming before changing Figma or the app.
+
 ## Gender (idea)
 Whether users can choose a gender is undecided, and nothing is built. The character is hooded and reads as neutral today, so this would mostly affect the art. Decide with the character art redesign. If it's added, it should be optional.
 
