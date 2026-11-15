@@ -148,3 +148,8 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 ### Before-release plan
 - **Decision:** Google first for the friends test. Supabase's built-in email only reaches the project's team, so email confirmation stays off and custom email waits for the public release. Leaked password protection needs the Pro plan, so it's skipped.
 - **Not done yet**, at the developer's request: they have issues to fix first. Their how-to is `docs/RELEASE-CHECKLIST.md`.
+
+### Fixes for the presentation (15 Nov 2026)
+- **Splash went Light on relaunch:** a returning user counts as "in the app" while the splash loads, so the Light setting applied to the splash. Dark now holds until the tabs show.
+- **Tab bar on the developer's iPhone 12 Pro Max:** the bar sat about 34pt too high, content showed and could be tapped below it, and it covered Journey's message. The bar was an overlay told to ignore the bottom safe area, which that phone's iOS didn't honor; the iOS 27.2 Simulator did, so it looked right there. It now lives in a bottom safe-area inset, lowered toward the edge with an offset, on a solid background that reaches the edge. Checked on the iPhone 18 Pro Simulator.
+- **Demo account:** `supabase/demo/demo-account.sql` fills one account with 100 finished quests (all Journey chapters), level 9, 1,000 Embers, every cloak and achievement. The developer signs up the account in the app and runs the script in the SQL Editor. Not run yet, and not tested against a database, since there's no local Postgres here.

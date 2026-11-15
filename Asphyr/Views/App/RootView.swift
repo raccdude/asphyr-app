@@ -29,6 +29,10 @@ struct RootView: View {
         [profile.name, profile.color.rawValue, profile.aspiration, profile.archetype?.rawValue, profile.cloak?.rawValue]
     }
 
+    private var showsTabs: Bool {
+        !isLoadingAccount && router.isInApp && questStore.isLoaded
+    }
+
     var body: some View {
         Group {
             if isLoadingAccount, let accountError {
@@ -88,9 +92,10 @@ struct RootView: View {
         .environment(settings)
         .environment(questStore)
         .environment(\.hapticsEnabled, settings.soundsAndHaptics)
-        // Sign-in and onboarding stay dark, the brand's first impression; the
-        // chosen appearance applies once inside the app
-        .preferredColorScheme(router.isInApp ? settings.appearance.colorScheme : .dark)
+        // Splash, sign-in and onboarding stay dark, the brand's first impression;
+        // the chosen appearance applies once the tabs show. A returning user is
+        // already "in the app" while the splash loads, so the check is the tabs.
+        .preferredColorScheme(showsTabs ? settings.appearance.colorScheme : .dark)
         .overlay(alignment: .top) {
             if let alertMessage {
                 AsphyrToast(icon: "iconAlert", message: alertMessage)

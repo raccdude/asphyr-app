@@ -180,7 +180,7 @@ struct TabBarMetrics: Equatable {
     static let barHeight: CGFloat = 64
     /// Clear space between the end of the content and the top of the bar.
     static let contentGap: CGFloat = 12
-    /// How far the backdrop fades in above the bar.
+    /// How far the backdrop fades in above the solid part.
     static let fadeHeight: CGFloat = 14
 
     /// The home indicator's area: 34pt on Face ID iPhones, 0 on an iPhone SE.
@@ -194,8 +194,6 @@ struct TabBarMetrics: Equatable {
     /// The room content leaves above the safe area, so it ends just above the bar.
     var contentInset: CGFloat { max(0, barTop - deviceBottomInset) + Self.contentGap }
 
-    var backdropHeight: CGFloat { barTop + Self.fadeHeight }
-
     /// The key window's bottom safe area. Read once, so the keyboard doesn't move the bar.
     static func windowBottomInset() -> CGFloat {
         UIApplication.shared.connectedScenes
@@ -207,34 +205,35 @@ struct TabBarMetrics: Equatable {
 }
 
 private extension View {
+    /// The bar sits in a bottom safe-area inset, so content scrolls to just above
+    /// it on every iPhone and iOS version. The backdrop is solid from just above
+    /// the bar to the screen's edge, so nothing shows or can be tapped under it.
     func mainTabBar(selection: Binding<MainTab>, metrics: TabBarMetrics) -> some View {
         toolbar(.hidden, for: .tabBar)
-            // Lets scrolling content end just above the floating bar
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Color.clear.frame(height: metrics.contentInset)
-            }
-            .overlay(alignment: .bottom) {
-                ZStack(alignment: .bottom) {
-                    // Solid behind and below the bar, so nothing shows through or under
-                    // it, with a short fade above. Content above the bar isn't covered.
-                    LinearGradient(
-                        stops: [
-                            .init(color: Color.asphyrBackground.opacity(0), location: 0),
-                            .init(color: Color.asphyrBackground, location: TabBarMetrics.fadeHeight / metrics.backdropHeight),
-                            .init(color: Color.asphyrBackground, location: 1)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: metrics.backdropHeight)
-                    .allowsHitTesting(false)
-
-                    MainTabBar(selection: selection)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, metrics.barBottom)
-                }
-                // Measured from the screen's edge, and the keyboard never pushes it up
-                .ignoresSafeArea(edges: .bottom)
+                MainTabBar(selection: selection)
+                    .padding(.horizontal, 16)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: metrics.contentInset, alignment: .bottom)
+                    // Lowers the bar into the home indicator's area, measured from the screen's edge
+                    .offset(y: metrics.deviceBottomInset - metrics.barBottom)
+                    .background(alignment: .top) {
+                        LinearGradient(
+                            stops: [
+                                .init(color: Color.asphyrBackground.opacity(0), location: 0),
+                                .init(color: Color.asphyrBackground, location: 1)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: TabBarMetrics.fadeHeight)
+                        .offset(y: -TabBarMetrics.fadeHeight)
+                        .allowsHitTesting(false)
+                    }
+                    .background {
+                        Color.asphyrBackground
+                            .ignoresSafeArea(edges: .bottom)
+                    }
             }
     }
 }
