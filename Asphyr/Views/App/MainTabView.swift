@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private enum MainTab: String, CaseIterable, Identifiable {
+enum MainTab: String, CaseIterable, Identifiable {
     case home = "HOME"
     case quests = "QUESTS"
     case journey = "JOURNEY"
@@ -25,59 +25,62 @@ private enum MainTab: String, CaseIterable, Identifiable {
     }
 }
 
-extension EnvironmentValues {
-    /// Switches to the Character tab, for screens that link to it.
-    @Entry var openCharacter: () -> Void = {}
-    /// Switches to the Quests tab.
-    @Entry var openQuests: () -> Void = {}
-    /// Opens the Inventory, from Home.
-    @Entry var openInventory: () -> Void = {}
+/// Lets screens inside the tabs switch tabs. An object rather than closures in
+/// the environment, which SwiftUI can't compare and would treat as always changed.
+@Observable
+final class TabNavigator {
+    var selection: MainTab = .home
+    /// Bumped to make Home open the Inventory.
+    private(set) var inventoryRequest = 0
+
+    func openQuests() {
+        selection = .quests
+    }
+
+    func openInventory() {
+        selection = .home
+        inventoryRequest += 1
+    }
 }
 
 struct MainTabView: View {
-    @State private var selection: MainTab = .home
+    @State private var navigator = TabNavigator()
     @Environment(OnboardingProfile.self) private var profile
     @Environment(AppSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
     @Environment(QuestStore.self) private var questStore
 
-    @State private var inventoryRequest = 0
     /// Read from the phone once, so the bar sits the same way on every iPhone.
     @State private var tabBarMetrics = TabBarMetrics(deviceBottomInset: 34)
 
     var body: some View {
-        TabView(selection: $selection) {
+        TabView(selection: $navigator.selection) {
             Tab(value: MainTab.home) {
                 // The bar sits inside the stack so pushed screens cover it
                 NavigationStack {
-                    HomeView(inventoryRequest: inventoryRequest)
-                        .mainTabBar(selection: $selection, metrics: tabBarMetrics)
+                    HomeView(inventoryRequest: navigator.inventoryRequest)
+                        .mainTabBar(selection: $navigator.selection, metrics: tabBarMetrics)
                 }
             }
 
             Tab(value: MainTab.quests) {
                 NavigationStack {
                     QuestsView()
-                        .mainTabBar(selection: $selection, metrics: tabBarMetrics)
+                        .mainTabBar(selection: $navigator.selection, metrics: tabBarMetrics)
                 }
             }
 
             Tab(value: MainTab.journey) {
                 JourneyView()
-                    .mainTabBar(selection: $selection, metrics: tabBarMetrics)
+                    .mainTabBar(selection: $navigator.selection, metrics: tabBarMetrics)
             }
 
             Tab(value: MainTab.character) {
                 CharacterView()
-                    .mainTabBar(selection: $selection, metrics: tabBarMetrics)
+                    .mainTabBar(selection: $navigator.selection, metrics: tabBarMetrics)
             }
         }
-        .environment(\.openCharacter) { selection = .character }
-        .environment(\.openQuests) { selection = .quests }
-        .environment(\.openInventory) {
-            selection = .home
-            inventoryRequest += 1
-        }
+        .environment(navigator)
         .onAppear {
             tabBarMetrics = TabBarMetrics(deviceBottomInset: TabBarMetrics.windowBottomInset())
         }

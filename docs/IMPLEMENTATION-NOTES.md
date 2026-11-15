@@ -39,13 +39,15 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Streaks | Merged | `feat/streaks-v2` |
 | Figma revisions | Merged. Prototype and a few small items remain, listed under Figma updates | `docs/figma-revisions` |
 | Code cleanup, file grouping and launch speed | Merged | `docs/figma-revisions` |
-| Reward rules and Delete Account | On a branch, not merged | `feat/reward-rules-delete-account` |
-| Backend step 1: project and tables | Done, not merged | `feat/backend-setup` |
-| Backend steps 2 and 3: email accounts and profile | Done, ready to merge | `feat/backend-accounts` |
+| Reward rules and Delete Account | Merged | `feat/reward-rules-delete-account` |
+| Backend step 1: project and tables | Merged | `feat/backend-setup` |
+| Backend steps 2 and 3: email accounts and profile | Merged | `feat/backend-accounts` |
 | Backend step 4: quests and rewards on the server | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 5: photos and Delete Account | Merged and deployed, checked on iPhone | `claude/gifted-archimedes-l90m2f` |
 | Backend step 6: Google sign-in (Apple removed) | Merged. Waits on a Google Cloud project | `claude/gifted-archimedes-l90m2f` |
 | Store, Inventory and Embers | Merged and deployed 12 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
+| Build warnings and notes cleanup | In review | `chore/cleanup-warnings` |
+| Reward redesign | Next | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.

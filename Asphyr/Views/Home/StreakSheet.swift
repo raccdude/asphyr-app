@@ -11,7 +11,8 @@ struct StreakSheet: View {
 
     @Environment(AppSettings.self) private var settings
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openQuests) private var openQuests
+    /// Missing outside the tabs, such as in previews, where the link does nothing.
+    @Environment(TabNavigator.self) private var navigator: TabNavigator?
 
     @State private var spiritMood: SpiritView.Mood = .happy
 
@@ -85,7 +86,7 @@ struct StreakSheet: View {
             PrimaryButton(title: isResting ? "FIND A QUEST" : "GOT IT") {
                 dismiss()
                 if isResting {
-                    openQuests()
+                    navigator?.openQuests()
                 }
             }
         }

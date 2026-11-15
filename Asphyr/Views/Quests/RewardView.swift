@@ -13,7 +13,8 @@ struct RewardView: View {
 
     @Environment(OnboardingProfile.self) private var profile
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openInventory) private var openInventory
+    /// Missing outside the tabs, such as in previews, where the link does nothing.
+    @Environment(TabNavigator.self) private var navigator: TabNavigator?
 
     @State private var isRevealed = false
     @State private var isShowingUnlockedReward = false
@@ -114,7 +115,7 @@ struct RewardView: View {
 
                     if isShowingUnlockedReward {
                         Button("VIEW IN INVENTORY") {
-                            openInventory()
+                            navigator?.openInventory()
                             dismiss()
                         }
                         .font(AppTypography.captionMedium)

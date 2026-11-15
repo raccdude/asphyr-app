@@ -111,7 +111,7 @@ extension Quest {
                     doneAt: step.doneAt.map(Date.init(timeIntervalSince1970:))
                 )
             },
-            generatedOn: record.generatedOn.flatMap(Self.serverDay),
+            generatedOn: record.generatedOn.flatMap { Self.serverDay($0) },
             startedAt: record.startedAt.map(Date.init(timeIntervalSince1970:)),
             pausedAt: record.pausedAt.map(Date.init(timeIntervalSince1970:)),
             pausedDuration: record.pausedDuration,

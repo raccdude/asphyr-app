@@ -9,7 +9,8 @@ import Supabase
 /// Saves the profile to the account, including the worn cloak and photo. The server
 /// refuses a cloak that isn't unlocked.
 enum ProfileService {
-    private struct Row: Codable {
+    // Nonisolated so Supabase can decode it off the main actor
+    private nonisolated struct Row: Codable {
         var name: String
         var color: String
         var aspiration: String?
@@ -95,8 +96,8 @@ enum ProfileService {
 
             if let data {
                 _ = try await photos.upload(
-                    path: path,
-                    file: data,
+                    path,
+                    data: data,
                     options: FileOptions(contentType: "image/jpeg", upsert: true)
                 )
             } else {

@@ -108,3 +108,19 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Fix:** merge to `main`. The app now says "This needs a server update that isn't live yet" for this case (PostgREST code `PGRST202`) instead of "Something went wrong".
 - **Rule recorded** in `HANDOFF.md`: when a branch adds a migration, merge before testing on the phone.
 - **Merged:** at the developer's request, Claude fast-forwarded `main` to `1d0ecf0` (no merge commit). Supabase had already applied `20261112130000_edit_quest` from the developer's earlier merge. Checked live: `update_quest` is open to signed-in users only.
+
+### Back on the MacBook (15 Nov 2026)
+- **Setup:** the repo is cloned to `~/Documents/ILO/asphyr-app` on the MacBook, and work continues in the Claude desktop app, which edits these files directly. The lab sessions ran in the browser, on a temporary cloud copy that only reached the Mac through GitHub.
+- **Inspection:** the Mac's `main` matched GitHub. The app built and the rule tests passed. No secrets are in the repo; the only key is Supabase's publishable key.
+- **History:** the 19 commits from 12 Nov were replayed without the cloud session's signatures (`git rebase --force-rebase --committer-date-is-author-date --no-gpg-sign e4a2e54`), so every commit reads the same. `main` was force-pushed by the developer, and `claude/gifted-archimedes-l90m2f` was deleted.
+- **Workflow:** back to approving each step first. Recorded in `HANDOFF.md`.
+
+### Build warnings and notes cleanup
+- **Warnings:** the build's 11 distinct warnings are fixed, and it now builds without warnings from the app's code.
+  - Passing `Quest.init(record:)` and similar straight to `map` made them nonisolated function values. They're closures now, which keep the main actor.
+  - `CharacterPortrait` reads its ripple color before the keyframe closure, which runs off the main actor.
+  - `ProfileService.Row` is `nonisolated`, so Supabase can decode it in the background.
+  - The photo upload uses Supabase's renamed `upload(_:data:options:)`.
+  - Tab switching from Reward and the Streak sheet goes through a `TabNavigator` object instead of closures in the environment, which SwiftUI couldn't compare. The unused `openCharacter` is gone.
+- **Notes:** the progress table no longer lists merged work as unmerged.
+- **Not tested:** only the build was checked. The developer tests in Xcode.

@@ -18,14 +18,14 @@ Read this first when picking up the project on another Mac or in a new session. 
 ## How the developer works
 These are on top of `WORKFLOW.md`:
 - **Git:** the developer runs every merge to `main`. Give exact commands, each in its own block. In a cloud session, whose files are temporary, Claude commits and pushes only to that session's own branch. Commits are credited to the developer (Angelo Buedo) with no Claude co-author lines, so Claude isn't listed as a contributor.
-- **Steps:** one commit per step, with its docs. Since 12 Nov 2026, Claude carries on to the next step without waiting for approval, and the developer tests on the iPhone and merges to `main`. When told to "take note" of something, record it and don't build it.
+- **Steps:** one commit per step, with its docs. Since 15 Nov 2026, Claude proposes each step and waits for the developer's approval before starting it, as before 12 Nov. The developer tests in Xcode and on the iPhone and merges to `main`. When told to "take note" of something, record it and don't build it.
 - **Tokens:** keep usage and messages short. Don't check the whole Figma file until asked, probably after the backend.
 - **Figma:** edit it only when asked. List anything the app has that Figma doesn't under "Figma updates for later".
 - **Testing:** when a branch adds a database migration, merge it to `main` before testing on the phone, because the app's new calls only work once Supabase has applied it. Migrations here only add things, so merging first is safe. The app says "This needs a server update that isn't live yet" when it calls a function that isn't there. The developer tests. Judge launch speed on a real iPhone opened from the Home Screen, as the simulator and Xcode's debugger add about a second. Report only what was actually run and seen.
 - **Scope:** iPhone portrait, dark-first, on every current iPhone size (checked against 375pt to 440pt wide). Large text bugs get fixed when found, since 12 Nov 2026; VoiceOver and Reduce Motion aren't in scope. Light mode only needs the essential screens.
 - **Previews:** use `#Preview(traits: .dark)`.
 - **Sample data:** Figma examples must match the app's code for Lou, The Strategist, Game Developer.
-- **Decisions:** from 12 Nov 2026, Claude goes with its own recommendation instead of asking, and records the choice and its trade-offs in the spec and `PROJECT-LOG.md`. The developer's design direction still wins: anything they've already decided stands, and they can overrule a choice afterwards.
+- **Decisions:** since 15 Nov 2026, Claude recommends and the developer decides before work starts. Record each choice and its trade-offs in the spec and `PROJECT-LOG.md`. The developer's design direction still wins: anything they've already decided stands, and they can overrule a choice afterwards.
 - **Record keeping:** log every step, command and decision that matters to the project in `PROJECT-LOG.md`, on the same branch as the work.
 
 ## Checking the rules

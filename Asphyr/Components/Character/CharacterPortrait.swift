@@ -42,6 +42,9 @@ struct CharacterPortrait: View {
     var tapCount = 0
 
     var body: some View {
+        // Read here because the keyframe closure below runs off the main actor
+        let rippleColor = color.faceColor
+
         ZStack {
             if mood == .angry {
                 AngryFlames(color: color)
@@ -72,7 +75,7 @@ struct CharacterPortrait: View {
                 .scaleEffect(effect.scale)
                 .background {
                     Circle()
-                        .stroke(color.faceColor, lineWidth: 2)
+                        .stroke(rippleColor, lineWidth: 2)
                         .scaleEffect(effect.rippleScale)
                         .opacity(effect.rippleOpacity)
                 }

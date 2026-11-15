@@ -44,7 +44,7 @@ final class QuestStore {
     // MARK: Server replies
 
     func load(_ state: PlayerStateRecord) {
-        quests = state.quests.map(Quest.init(record:))
+        quests = state.quests.map { Quest(record: $0) }
         apply(state.player)
         storeItems = state.store ?? []
         isLoaded = true
@@ -63,8 +63,8 @@ final class QuestStore {
         attributeGains = player.attributeGains
         announcedLevel = player.announcedLevel
         seenLitStarCount = player.seenLitStarCount
-        unlockedCloaks = player.unlockedCloaks.compactMap(CloakReward.init(serverName:))
-        earnedAchievements = Set(player.earnedAchievements.compactMap(Achievement.init(serverName:)))
+        unlockedCloaks = player.unlockedCloaks.compactMap { CloakReward(serverName: $0) }
+        earnedAchievements = Set(player.earnedAchievements.compactMap { Achievement(serverName: $0) })
         embers = player.embers ?? 0
         ownedCloakNames = Set(player.ownedCloaks ?? player.unlockedCloaks)
     }
@@ -106,7 +106,7 @@ final class QuestStore {
             levelAfter: reward.levelAfter,
             xpIntoLevel: reward.xpIntoLevel,
             xpForLevel: reward.xpForLevel,
-            newCloaks: reward.newCloaks.compactMap(CloakReward.init(serverName:)),
+            newCloaks: reward.newCloaks.compactMap { CloakReward(serverName: $0) },
             embersEarned: reward.embersEarned ?? 0
         )
     }
