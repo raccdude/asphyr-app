@@ -49,8 +49,8 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Build warnings and notes cleanup | Merged | `chore/cleanup-warnings` |
 | Reward redesign | Merged | `feat/reward-redesign` |
 | Reward next steps | Merged | `feat/reward-next-steps` |
-| Light mode colors | In review | `feat/light-mode` |
-| Before-release items | Next | — |
+| Light mode colors | Merged | `feat/light-mode` |
+| Before-release items | Planned, waiting | see `RELEASE-CHECKLIST.md` |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.

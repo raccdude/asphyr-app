@@ -144,3 +144,7 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Decision:** at the developer's question, Light applies only inside the app. Sign-in and onboarding stay dark: they're the brand's first impression, and the appearance is chosen in Settings, after them.
 - **Fixed:** glass buttons followed Dark only, the Light border was nearly invisible, Light amber text was too faint on white, and the tab bar's shadow was a smudge on Light.
 - **Checked:** in the iPhone 18 Pro Simulator, in Light, signed in by the developer. Settings, Quest Details, Reward and the Store weren't checked in Light.
+
+### Before-release plan
+- **Decision:** Google first for the friends test. Supabase's built-in email only reaches the project's team, so email confirmation stays off and custom email waits for the public release. Leaked password protection needs the Pro plan, so it's skipped.
+- **Not done yet**, at the developer's request: they have issues to fix first. Their how-to is `docs/RELEASE-CHECKLIST.md`.

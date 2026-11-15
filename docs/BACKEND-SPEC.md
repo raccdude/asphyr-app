@@ -125,7 +125,21 @@ Supabase's security and performance advisors reported nothing.
 - **Email confirmation:** off during development, and on before release.
 
 ## Before release, not in these steps
-Noted on 12 Nov 2026 at the developer's request, to do once testing is finished:
+Noted on 12 Nov 2026 at the developer's request, to do once testing is finished.
+
+**Decided on 15 Nov 2026: Google first for the friends test (TestFlight).** Checked against Supabase's docs that day:
+- Supabase's built-in email only sends to members of the project's Supabase team, a few emails an hour. Friends couldn't confirm an account or reset a password. Custom SMTP (an email service such as Resend or Brevo, ideally with an owned domain) fixes this.
+- So, for the friends test: friends sign in with Google, email confirmation stays off, and custom email plus confirmation wait for the public App Store release. Password reset won't reach friends until then.
+- Leaked password protection needs Supabase's Pro plan ($25 a month). Skipped on the Free plan; the app's own rules (8+ characters with a number) stay.
+- Nothing below is done yet. The developer has issues to fix first. Step-by-step instructions are in `RELEASE-CHECKLIST.md`.
+
+Before inviting friends:
+- **Google consent screen to production:** while it's in Testing, only listed test users can sign in with Google.
+- **Minimum quest time to 0.5** (below), right before inviting, so the developer's own testing stays quick until then.
+- **Remove the test accounts** (below), last.
+- **Privacy policy:** App Store Connect may need one before external testers can join. Check in the TestFlight step.
+
+The full list:
 - **Email confirmation on:** in Supabase, **Authentication → Sign In / Providers → Email**, turn **Confirm email** back on, so every new account proves its email and no throwaway accounts get in. **The app must change first:** with it on, `signUp` returns no session, so Create Account needs a "check your email" screen, and the confirmation link needs handling like the reset link (`asphyr://` plus an allowed redirect). Build that before turning the setting on, or sign-up will break.
 - **Remove the test accounts:** delete every account made while testing, in **Authentication → Users**, or with Delete Account in the app, which also removes their photos. Check **Table Editor → profiles** is empty of test data afterwards.
 - **Leaked password protection on:** **Authentication → Password security** (Supabase's security advisor flags it as off). It checks new passwords against known leaked passwords. It may need a paid Supabase plan; check the current pricing.
