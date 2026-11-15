@@ -15,6 +15,9 @@ struct RewardView: View {
     @Environment(\.dismiss) private var dismiss
     /// Missing outside the tabs, such as in previews, where the link does nothing.
     @Environment(TabNavigator.self) private var navigator: TabNavigator?
+    /// Optional so previews without them still open.
+    @Environment(QuestStore.self) private var questStore: QuestStore?
+    @Environment(AppSettings.self) private var settings: AppSettings?
 
     /// How far the reveal has got. Each part appears once its step is reached,
     /// so a tap can jump straight to the end.
@@ -60,12 +63,26 @@ struct RewardView: View {
             .scrollIndicators(.hidden)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            PrimaryButton(title: "CONTINUE") {
-                dismiss()
+            VStack(spacing: 0) {
+                PrimaryButton(title: "CONTINUE") {
+                    dismiss()
+                }
+
+                // Lets one finished quest lead straight into the next
+                if navigator != nil {
+                    Button("FIND ANOTHER QUEST") {
+                        navigator?.openQuests()
+                        dismiss()
+                    }
+                    .font(AppTypography.captionMedium)
+                    // Gray, so it reads as the second choice under the green button
+                    .foregroundStyle(Color.asphyrTextSecondary)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 12)
-            .padding(.bottom, 16)
+            .padding(.bottom, navigator != nil ? 4 : 16)
             .background(Color.asphyrBackground)
         }
         .background(Color.asphyrBackground.ignoresSafeArea())
@@ -200,6 +217,12 @@ struct RewardView: View {
                         .padding(.top, 16)
                 }
 
+                if let streak = firstQuestStreak {
+                    streakLine(streak)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 10)
+                }
+
                 if quest.isBonusReward {
                     Text("Small progress is still progress.")
                         .font(AppTypography.bodySecondary)
@@ -289,6 +312,28 @@ struct RewardView: View {
             .opacity(shows(Reveal.words) ? 1 : 0)
             .animation(.spring(response: 0.4, dampingFraction: 0.6), value: shows(Reveal.words))
         }
+    }
+
+    /// Only on the day's first quest, which is the one that grows the streak.
+    private var firstQuestStreak: StreakStatus? {
+        guard let questStore, settings?.showsStreaks ?? true else { return nil }
+        let dates = questStore.completionDates
+        guard dates.filter({ Calendar.current.isDateInToday($0) }).count == 1 else { return nil }
+        let streak = StreakRules.status(completions: dates)
+        return streak.state == .active ? streak : nil
+    }
+
+    private func streakLine(_ streak: StreakStatus) -> some View {
+        HStack(spacing: 6) {
+            Image("iconFlame")
+            Text(streak.title)
+                .font(AppTypography.bodySemiBold)
+        }
+        .foregroundStyle(Color.asphyrAccentPrimary)
+        .accessibilityElement(children: .combine)
+        // Arrives with the Embers
+        .opacity(shows(Reveal.embers) ? 1 : 0)
+        .animation(.easeOut(duration: 0.3), value: shows(Reveal.embers))
     }
 
     /// The XP card sits in the middle, with up to two attributes tilted beside it.

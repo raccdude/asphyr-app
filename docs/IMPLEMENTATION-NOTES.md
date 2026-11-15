@@ -47,7 +47,9 @@ See [WORKFLOW.md](WORKFLOW.md) for how we work. Screens are implemented one at a
 | Backend step 6: Google sign-in (Apple removed) | Merged. Works, checked on iPhone 15 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
 | Store, Inventory and Embers | Merged and deployed 12 Nov 2026 | `claude/gifted-archimedes-l90m2f` |
 | Build warnings and notes cleanup | Merged | `chore/cleanup-warnings` |
-| Reward redesign | In review | `feat/reward-redesign` |
+| Reward redesign | Merged | `feat/reward-redesign` |
+| Reward next steps | In review | `feat/reward-next-steps` |
+| Light mode colors | Next | — |
 
 ## Navigation
 - `RootView` owns the auth and onboarding `NavigationStack`. `AppRouter` owns its path and is read with `@Environment(AppRouter.self)`.

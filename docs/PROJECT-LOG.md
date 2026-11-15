@@ -133,3 +133,9 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Known limit:** the bar's starting point assumes the quest's full XP was earned. If a daily limit cut the XP, the bar starts a little low.
 - **Google sign-in:** confirmed working by the developer on their iPhone.
 - **Not tested:** only the build was checked.
+
+### Reward next steps
+- **Find another quest:** a gray text button under Continue opens the Quests tab, gray so it reads as the second choice. It only shows inside the tabs, so previews don't offer it.
+- **Back from Reward:** Reward was presented by Quest Details, and SwiftUI only runs a cover's dismiss handler after it has slid away, so Quest Details (or, after a first fix, its empty background) flashed by. Reward is now presented by the tabs through `TabNavigator.rewardCompletion`, and Quest Details closes underneath it straight away, so Continue reveals the screen the quest was opened from.
+- **Streak line:** on the day's first finished quest, Reward shows the flame and "N-day streak", arriving with the Embers. It follows the Show streaks setting.
+- **Not tested:** only the build was checked.

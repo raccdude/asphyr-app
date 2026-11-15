@@ -12,6 +12,7 @@ struct QuestDetailsView: View {
 
     @Environment(QuestStore.self) private var questStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(TabNavigator.self) private var navigator: TabNavigator?
 
     @State private var isConfirmingAbandon = false
     @State private var toastMessage: String?
@@ -21,6 +22,23 @@ struct QuestDetailsView: View {
 
     private var quest: Quest? {
         questStore.quests.first { $0.id == questID }
+    }
+
+    /// The tabs show Reward, and this screen closes underneath it at once, so
+    /// Continue lands on the screen the quest was opened from.
+    private func showReward(_ result: QuestCompletion?) {
+        guard let result else { return }
+        guard let navigator else {
+            completion = result
+            return
+        }
+        navigator.rewardCompletion = result
+
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            dismiss()
+        }
     }
 
     var body: some View {
@@ -49,6 +67,7 @@ struct QuestDetailsView: View {
             await hideToastAfterDelay()
         }
         // Continue goes back past this screen to where the quest was opened
+        // Only used outside the tabs, such as in previews
         .fullScreenCover(item: $completion, onDismiss: { dismiss() }) { completion in
             RewardView(completion: completion)
         }
@@ -315,7 +334,7 @@ struct QuestDetailsView: View {
 
                         PrimaryButton(title: "COMPLETE QUEST") {
                             if blocker == nil {
-                                send { completion = try await questStore.completeQuest(quest) }
+                                send { showReward(try await questStore.completeQuest(quest)) }
                             } else {
                                 nudgeBlocker()
                             }

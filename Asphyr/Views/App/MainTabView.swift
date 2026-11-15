@@ -32,6 +32,9 @@ final class TabNavigator {
     var selection: MainTab = .home
     /// Bumped to make Home open the Inventory.
     private(set) var inventoryRequest = 0
+    /// Shown over the tabs, so closing it reveals the screen the quest was opened
+    /// from rather than Quest Details.
+    var rewardCompletion: QuestCompletion?
 
     func openQuests() {
         selection = .quests
@@ -79,6 +82,9 @@ struct MainTabView: View {
                 CharacterView()
                     .mainTabBar(selection: $navigator.selection, metrics: tabBarMetrics)
             }
+        }
+        .fullScreenCover(item: $navigator.rewardCompletion) { completion in
+            RewardView(completion: completion)
         }
         .environment(navigator)
         .onAppear {
