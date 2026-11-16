@@ -160,3 +160,8 @@ What was done, in order, with the commands that matter. Newest at the bottom. Fo
 - **Later:** the before-friends steps in `RELEASE-CHECKLIST.md`, the Figma updates and the prototype.
 - **Next:** character stages at levels 10 and 20, with new designs.
 - **Character stages:** recommended three stages (Novice 1–9, Adept 10–19, Ascended 20+, hood kept on so cloaks still fit), to build after the presentation. Recorded in `IMPLEMENTATION-NOTES.md`, Character evolution.
+
+### Profile icon (17 Nov 2026)
+- **Problem:** on the GitHub profile, ASPHYR's icon looked smaller than NEPHLUX's at the same 72px width. `asphyr-icon.png` is 640×640 with a transparent margin and shadow, so the rounded square fills only about 75% of it; NEPHLUX's icon fills its whole frame.
+- **Decision (developer):** add a separate copy instead of changing the original, so this README's header keeps its look. `docs/assets/logo/asphyr-icon-square.png` is the 480×480 rounded square, cut from the original without resizing, with the faint corner shadow cleared.
+- **Profile README:** point the ASPHYR `<img>` at `https://raw.githubusercontent.com/raccdude/asphyr-app/main/docs/assets/logo/asphyr-icon-square.png`, width 72. The link works once this is merged to `main`.
