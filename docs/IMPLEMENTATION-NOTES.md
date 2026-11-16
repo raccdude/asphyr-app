@@ -328,9 +328,6 @@ Whether users can choose a gender is undecided, and nothing is built. The charac
 - **Not checked:** Settings and its sheets, Quest Details, Reward and the Store in Light.
 
 ## Figma updates for later
-- **Home:** the character starts 12pt below the name instead of overlapping it by 6pt.
-- **Light mode:** border `#C9CED8` and amber `#B26B00` in the Light color mode, and keep auth and onboarding frames dark.
-- **Reward:** add the spotlight band, a full-width faint green band behind the title, a 150pt spirit and the message. See `docs/superpowers/specs/2026-11-15-reward-header-design.md`.
 Every place the app has moved ahead of Figma, by screen. Development comes first, so make these only when asked, and add to this list as the code changes.
 
 Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 — Hi-Fi v2 (Polished)`, one group at a time. `05` stays untouched. Each item leaves this list once it's done.
@@ -344,6 +341,12 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 **Prototype later:** the screens are numbered and organized. Build the interactive prototype when the developer asks.
 
 **Copying a page:** Figma's page copy lost the opacity of colors bound to variables, so see-through fills turned solid and bright on 167 layers. These were restored from `05`, and a fingerprint of fills, strokes and effects then matched on every frame. Copying frames loses them too, and so does binding a new color to a variable, so set the opacity afterwards and check after any copy.
+
+**Done on 16 Nov 2026 (Figma brought in line with the app):** the Quests search button on `10` to `10.12`, with `10.13` Search and `10.14` Search (no results); crossed-out done steps; the OPTIONAL tag on Create Quest `11` to `11.7`; the 24pt gap above the Quest Details divider; main quest details `12.9` and `12.10` reordered to pill, divider, steps (no objective); Home's character 12pt below the name; the Reward spotlight band, 150pt spirit, Embers and streak lines and Find another quest on `13` to `13.4`; the Ember chip on Home; Store and Inventory `22` to `22.3`; the CLOAKS grid removed from Character; Light mode border `#C9CED8` and amber `#B26B00`; `1.1` Loading (no connection) and `5.5` Set New Password. New library pieces on `03`: `icon/search`, `icon/clear`, `icon/ember`, `icon/flame`, `Tag / Optional` and `Chip / Embers`. Copied frames lost the opacity of variable-bound colors again, so check opacity after any copy.
+
+**Prototype (16 Nov 2026):** wired on `06`, starting at Splash (flow "ASPHYR"): onboarding, the tab bar on every frame (invisible `Hotspot /` layers), Home, Quests and search, Create Quest, Quest Details, Reward, Streaks, Settings, Profile, Store and Inventory. Back buttons go back.
+
+**Cleanup (16 Nov 2026, later):** `15.3` deleted (its locked-cloak toast lives in `22.3`); Apple buttons removed from Create Account and Login, with Google full width; the email section removed from Notifications `19` and `19.1`; the Journey toast in `14.8` moved to the top like every other toast; `21.1` to `21.7` rebuilt from the current Dark frames in the Light mode, with round glass buttons given a surface fill and border so they show on light backgrounds. Setting a variable mode also drops opacity, so restore it after the mode switch. `1.1` and the app's `AccountLoadingView` now say "Every step you’ve taken is safe." under the flame.
 
 **Frame numbers on `06`:** organized in app-flow order, one row per section, with each section's notes at the end of its row.
 
@@ -366,18 +369,16 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 | 15 Notifications | `19` to `19.2` |
 | 16 Character art | `20.1` to `20.8` |
 | 17 Light mode | `21.1` to `21.8`: only the essential screens, copied from the current Dark frames and set to the Light color mode |
+| 18 Store & Inventory | `22` Store, `22.1` buy confirmation, `22.2` Inventory, `22.3` Inventory (locked cloak) |
 
 **Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 
 ### Accounts
-- Add a Set New Password frame, matching `SetNewPasswordView`, and the busy state on the primary button.
-- Add the no-connection screen, matching `AccountLoadingView`.
+- Add the busy state on the primary button.
 - Add the new account errors on Create Account, Login and Account Recovery if they should have frames.
 
 ### Planned designs
 Figma doesn't have these yet, because the app doesn't either.
-- **Store and Inventory:** built in the app first, so Figma needs: the Store and Inventory frames, the Ember chip on Home's frames, the CLOAKS grid removed from Character (`15` to `15.5`), the Embers line and "VIEW IN INVENTORY" on Reward (`13` to `13.4`), and the `iconEmber` icon. See Store and inventory.
-- **Reward:** new frames for `13` to `13.4` once a redesign is chosen. See Reward redesign.
 - **Character art:** new art and the level stages, when that work starts, keeping its layers. See Character evolution.
 
 **Full Figma checks:** the developer will ask for a pass over the whole file, probably after the backend. Don't run one before then, because it uses a lot of tokens.
