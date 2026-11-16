@@ -216,8 +216,12 @@ struct CreateQuestView: View {
                     .padding(.top, 8)
             }
 
-            sectionLabel("DESCRIPTION")
-                .padding(.top, 22)
+            HStack(spacing: 8) {
+                sectionLabel("DESCRIPTION")
+                optionalTag
+            }
+            .padding(.top, 22)
+            .accessibilityElement(children: .combine)
 
             descriptionField
                 .padding(.top, 10)
@@ -554,6 +558,21 @@ struct CreateQuestView: View {
         Text(title)
             .font(AppTypography.captionMedium)
             .foregroundStyle(Color.asphyrTextSecondary)
+    }
+
+    /// A small neutral pill, so "optional" stands apart from the grey label
+    /// without looking like a quest status.
+    private var optionalTag: some View {
+        Text("OPTIONAL")
+            .font(AppTypography.captionRegular)
+            .foregroundStyle(Color.asphyrTextPrimary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(Color.asphyrSurfaceElevated, in: Capsule())
+            .overlay {
+                Capsule()
+                    .strokeBorder(Color.asphyrBorder, lineWidth: 1)
+            }
     }
 
     private func questTypeCard(_ type: QuestType) -> some View {

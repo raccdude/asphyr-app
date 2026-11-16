@@ -235,6 +235,9 @@ private extension View {
                             .ignoresSafeArea(edges: .bottom)
                     }
             }
+            // The keyboard covers the bar and the create button, as in other apps,
+            // rather than pushing them up the screen
+            .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
 

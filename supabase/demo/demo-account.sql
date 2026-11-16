@@ -1,4 +1,5 @@
--- Fills one account with everything unlocked, for demos.
+-- Fills one account with everything unlocked, for demos. Titles are stored in
+-- capitals, as the server does for quests made in the app.
 --
 -- 1. In the app, sign up with the demo email and finish onboarding.
 -- 2. Put that email on the line marked "change this" below.
@@ -64,7 +65,7 @@ begin
       duration_minutes, xp_reward, attribute_rewards, status,
       started_at, completed_at, created_at
     ) values (
-      v_user, 'personal', v_titles[k], null,
+      v_user, 'personal', upper(v_titles[k]), null,
       'iconQuestHammer', v_category, v_difficulty, v_duration,
       private.timed_xp(v_duration, v_difficulty),
       private.quest_attributes(v_category, v_difficulty, v_duration),
@@ -81,7 +82,7 @@ begin
     user_id, type, title, description, icon_name, category, difficulty,
     duration_minutes, xp_reward, attribute_rewards, status, started_at
   ) values (
-    v_user, 'main', 'Build the boss fight', 'Make the first boss fight playable.',
+    v_user, 'main', 'BUILD THE BOSS FIGHT', 'Make the first boss fight playable.',
     'iconQuestBook', 'development', v_difficulty, null,
     private.xp_per_step(v_difficulty) * 3,
     private.quest_attributes('development', v_difficulty, null),
@@ -98,7 +99,7 @@ begin
     user_id, type, title, description, icon_name, category, difficulty,
     duration_minutes, xp_reward, attribute_rewards, status
   )
-  select v_user, 'personal', q.title, q.description, 'iconQuestHammer', q.category, d.difficulty,
+  select v_user, 'personal', upper(q.title), q.description, 'iconQuestHammer', q.category, d.difficulty,
     q.minutes, private.timed_xp(q.minutes, d.difficulty),
     private.quest_attributes(q.category, d.difficulty, q.minutes), 'AVAILABLE'
   from (values

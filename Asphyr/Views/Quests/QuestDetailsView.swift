@@ -97,7 +97,7 @@ struct QuestDetailsView: View {
                 Rectangle()
                     .fill(Color.asphyrBorder)
                     .frame(height: 1)
-                    .padding(.top, quest.hasTimer ? 24 : 8)
+                    .padding(.top, 24)
 
                 if let objective = quest.objective {
                     sectionLabel("OBJECTIVE")
@@ -416,7 +416,7 @@ struct QuestDetailsView: View {
             rows.append(("DIFFICULTY", difficulty.rawValue))
         }
         if let category = quest.category {
-            rows.append(("CATEGORY", category))
+            rows.append(("CATEGORY", category.uppercased()))
         }
 
         return rows

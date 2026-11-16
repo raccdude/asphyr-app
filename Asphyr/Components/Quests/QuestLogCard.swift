@@ -158,6 +158,8 @@ struct QuestStepRow: View {
             Text(step.title)
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(step.isDone ? Color.asphyrTextSecondary : Color.asphyrTextPrimary)
+                // Crossed out as well as grey, so done doesn't rely on color alone
+                .strikethrough(step.isDone, color: Color.asphyrTextSecondary)
                 .multilineTextAlignment(.leading)
         }
         .accessibilityElement(children: .combine)

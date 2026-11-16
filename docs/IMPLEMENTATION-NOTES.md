@@ -312,6 +312,7 @@ The character should change as the user levels up. Only Novice is built, so noth
 Noted on 16 Nov 2026 at the developer's request. Nothing is designed or built.
 - **Search and filters:** search the quest log by title, and filter by category or type.
 - **A log that doesn't pile up:** after a while, finished quests leave the main log or fold into a compact summary, such as one row per week or month.
+- **Sentence-case quest titles (decided 16 Nov 2026, after the presentation):** titles are stored in capitals today, by `upper(...)` in the daily quest function and `create_quest` (`quest_functions.sql`) and in `update_quest` (`edit_quest.sql`). To switch: a new migration that redefines those three functions to keep the title as typed (trimmed), a one-time update that turns all-capital titles into sentence case, the database tests that expect capitals (such as `STUDY PHYSICS`), the demo script's `upper(...)`, and the Figma frames. `DailyQuests.swift` already has sentence-case titles, so dailies follow once the server keeps them as sent. Run `scripts/db-tests` before merging, which needs Postgres on this Mac.
 - **Premium UI/UX redesign:** the developer plans a full redesign to make the app feel more premium. Start with brainstorming before changing Figma or the app.
 
 ## Gender (idea)

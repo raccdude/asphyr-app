@@ -62,290 +62,290 @@ enum DailyQuests {
 
     private static let general: Pool = ("Other", [
         .strategist: [
-            ("MAP YOUR NEXT MONTH", "Choose one goal and the steps to reach it."),
-            ("FIND YOUR BOTTLENECK", "Work out what’s slowing your progress most."),
-            ("REVIEW YOUR WEEK", "See what worked and what to change.")
+            ("Map your next month", "Choose one goal and the steps to reach it."),
+            ("Find your bottleneck", "Work out what’s slowing your progress most."),
+            ("Review your week", "See what worked and what to change.")
         ],
         .scholar: [
-            ("LEARN ONE NEW CONCEPT", "Pick something in your field you can’t explain yet."),
-            ("READ AN EXPERT’S ADVICE", "Note the three most useful points."),
-            ("TEACH YOURSELF A BASIC", "Go back to a fundamental you skipped.")
+            ("Learn one new concept", "Pick something in your field you can’t explain yet."),
+            ("Read an expert’s advice", "Note the three most useful points."),
+            ("Teach yourself a basic", "Go back to a fundamental you skipped.")
         ],
         .creator: [
-            ("MAKE A SMALL THING", "Create something related to your goal."),
-            ("SKETCH YOUR IDEA", "Get a rough version out of your head."),
-            ("IMPROVE PAST WORK", "Take something old and make it better.")
+            ("Make a small thing", "Create something related to your goal."),
+            ("Sketch your idea", "Get a rough version out of your head."),
+            ("Improve past work", "Take something old and make it better.")
         ],
         .explorer: [
-            ("TRY A NEW METHOD", "Do a familiar task in an unfamiliar way."),
-            ("ASK SOMEONE AHEAD OF YOU", "Find out what they wish they’d known."),
-            ("SAMPLE A NEW CORNER", "Explore a part of your field you’ve never tried.")
+            ("Try a new method", "Do a familiar task in an unfamiliar way."),
+            ("Ask someone ahead of you", "Find out what they wish they’d known."),
+            ("Sample a new corner", "Explore a part of your field you’ve never tried.")
         ]
     ])
 
     private static let pools: [String: Pool] = [
         "game developer": ("Development", [
             .strategist: [
-                ("PLAN A CORE LOOP", "Map what players do again and again."),
-                ("SCOPE A TINY GAME", "Cut an idea down to one week of work."),
-                ("BALANCE ONE MECHANIC", "Decide the numbers that make it fair.")
+                ("Plan a core loop", "Map what players do again and again."),
+                ("Scope a tiny game", "Cut an idea down to one week of work."),
+                ("Balance one mechanic", "Decide the numbers that make it fair.")
             ],
             .scholar: [
-                ("STUDY A FAVORITE GAME", "Work out why one mechanic feels good."),
-                ("LEARN A GAME PATTERN", "Read about one common code pattern."),
-                ("BREAK DOWN A LEVEL", "Note how a great level teaches its player.")
+                ("Study a favorite game", "Work out why one mechanic feels good."),
+                ("Learn a game pattern", "Read about one common code pattern."),
+                ("Break down a level", "Note how a great level teaches its player.")
             ],
             .creator: [
-                ("BUILD A SMALL MECHANIC", "Turn a simple idea into a working feature."),
-                ("DESIGN ONE CHARACTER", "Give it a look and a way to move."),
-                ("MAKE A ONE-ROOM LEVEL", "Build one small space worth playing.")
+                ("Build a small mechanic", "Turn a simple idea into a working feature."),
+                ("Design one character", "Give it a look and a way to move."),
+                ("Make a one-room level", "Build one small space worth playing.")
             ],
             .explorer: [
-                ("TRY A NEW GENRE", "Play something unlike what you usually make."),
-                ("TEST A STRANGE IDEA", "Prototype a rule no game you know uses."),
-                ("TRY A NEW ENGINE FEATURE", "Use a tool you’ve never opened.")
+                ("Try a new genre", "Play something unlike what you usually make."),
+                ("Test a strange idea", "Prototype a rule no game you know uses."),
+                ("Try a new engine feature", "Use a tool you’ve never opened.")
             ]
         ]),
         "mechanical engineer": ("Development", [
             .strategist: [
-                ("PLAN A SIMPLE ASSEMBLY", "List its parts and the build order."),
-                ("COMPARE TWO MATERIALS", "Choose one for a job and explain why."),
-                ("FIND A WEAK POINT", "Work out where a design would fail first.")
+                ("Plan a simple assembly", "List its parts and the build order."),
+                ("Compare two materials", "Choose one for a job and explain why."),
+                ("Find a weak point", "Work out where a design would fail first.")
             ],
             .scholar: [
-                ("STUDY HOW GEARS WORK", "Learn how ratios change speed and force."),
-                ("REVIEW STRESS AND STRAIN", "Work through one example by hand."),
-                ("LEARN A MECHANISM", "Find out how a common machine moves.")
+                ("Study how gears work", "Learn how ratios change speed and force."),
+                ("Review stress and strain", "Work through one example by hand."),
+                ("Learn a mechanism", "Find out how a common machine moves.")
             ],
             .creator: [
-                ("SKETCH A MECHANISM", "Draw a part that turns motion into work."),
-                ("MODEL A SIMPLE PART", "Draft a bracket or hinge in detail."),
-                ("BUILD A PAPER PROTOTYPE", "Test a moving idea with card and pins.")
+                ("Sketch a mechanism", "Draw a part that turns motion into work."),
+                ("Model a simple part", "Draft a bracket or hinge in detail."),
+                ("Build a paper prototype", "Test a moving idea with card and pins.")
             ],
             .explorer: [
-                ("TAKE SOMETHING APART", "Open an old object and see how it works."),
-                ("SPOT MACHINES AROUND YOU", "Work out how one everyday device moves."),
-                ("TRY A NEW CAD TOOL", "Use a feature you’ve never touched.")
+                ("Take something apart", "Open an old object and see how it works."),
+                ("Spot machines around you", "Work out how one everyday device moves."),
+                ("Try a new CAD tool", "Use a feature you’ve never touched.")
             ]
         ]),
         "psychologist": ("Learning", [
             .strategist: [
-                ("DESIGN A SMALL STUDY", "Choose a question and how you’d test it."),
-                ("MAP A THOUGHT PATTERN", "Trace how one belief shapes a behavior."),
-                ("PLAN A HABIT CHANGE", "Use a known technique on one habit.")
+                ("Design a small study", "Choose a question and how you’d test it."),
+                ("Map a thought pattern", "Trace how one belief shapes a behavior."),
+                ("Plan a habit change", "Use a known technique on one habit.")
             ],
             .scholar: [
-                ("READ ABOUT A BIAS", "Learn one cognitive bias and an example."),
-                ("SUMMARIZE A CLASSIC STUDY", "Note what it found and its limits."),
-                ("COMPARE TWO THEORIES", "See where they agree and disagree.")
+                ("Read about a bias", "Learn one cognitive bias and an example."),
+                ("Summarize a classic study", "Note what it found and its limits."),
+                ("Compare two theories", "See where they agree and disagree.")
             ],
             .creator: [
-                ("WRITE A CASE VIGNETTE", "Describe a fictional person and their struggle."),
-                ("EXPLAIN A CONCEPT SIMPLY", "Make one idea clear for a friend."),
-                ("KEEP A MOOD JOURNAL", "Record what shifted your mood today.")
+                ("Write a case vignette", "Describe a fictional person and their struggle."),
+                ("Explain a concept simply", "Make one idea clear for a friend."),
+                ("Keep a mood journal", "Record what shifted your mood today.")
             ],
             .explorer: [
-                ("WATCH BEHAVIOR IN PUBLIC", "Notice one pattern in how people act."),
-                ("PRACTICE ACTIVE LISTENING", "Try it in one real conversation."),
-                ("TRY A MINDFULNESS EXERCISE", "Note what you notice in yourself.")
+                ("Watch behavior in public", "Notice one pattern in how people act."),
+                ("Practice active listening", "Try it in one real conversation."),
+                ("Try a mindfulness exercise", "Note what you notice in yourself.")
             ]
         ]),
         "doctor": ("Learning", [
             .strategist: [
-                ("PLAN YOUR STUDY WEEK", "Divide one topic into daily sessions."),
-                ("WORK THROUGH A CASE", "Reason from symptoms to a likely cause."),
-                ("BUILD A DIAGNOSIS CHART", "Compare conditions with similar symptoms.")
+                ("Plan your study week", "Divide one topic into daily sessions."),
+                ("Work through a case", "Reason from symptoms to a likely cause."),
+                ("Build a diagnosis chart", "Compare conditions with similar symptoms.")
             ],
             .scholar: [
-                ("STUDY ONE BODY SYSTEM", "Learn how its main parts work together."),
-                ("LEARN TEN TERMS", "Master ten medical terms from one topic."),
-                ("REVIEW ONE CONDITION", "Learn its causes, signs and treatment.")
+                ("Study one body system", "Learn how its main parts work together."),
+                ("Learn ten terms", "Master ten medical terms from one topic."),
+                ("Review one condition", "Learn its causes, signs and treatment.")
             ],
             .creator: [
-                ("DRAW AN ANATOMY DIAGRAM", "Sketch and label one system from memory."),
-                ("MAKE FLASHCARDS", "Create a set for a topic you find hard."),
-                ("WRITE A PATIENT EXPLANATION", "Explain a condition in plain language.")
+                ("Draw an anatomy diagram", "Sketch and label one system from memory."),
+                ("Make flashcards", "Create a set for a topic you find hard."),
+                ("Write a patient explanation", "Explain a condition in plain language.")
             ],
             .explorer: [
-                ("READ ABOUT A SPECIALTY", "Learn what a day in it looks like."),
-                ("LEARN A FIRST AID SKILL", "Pick one you don’t already know."),
-                ("TALK WITH A HEALTH WORKER", "Ask what surprised them about the job.")
+                ("Read about a specialty", "Learn what a day in it looks like."),
+                ("Learn a first aid skill", "Pick one you don’t already know."),
+                ("Talk with a health worker", "Ask what surprised them about the job.")
             ]
         ]),
         "writer": ("Creative", [
             .strategist: [
-                ("OUTLINE A SHORT STORY", "Plan its beginning, middle and end."),
-                ("MAP A CHARACTER ARC", "Decide how someone changes and why."),
-                ("PLAN A REVISION", "List what one draft needs most.")
+                ("Outline a short story", "Plan its beginning, middle and end."),
+                ("Map a character arc", "Decide how someone changes and why."),
+                ("Plan a revision", "List what one draft needs most.")
             ],
             .scholar: [
-                ("STUDY A GREAT OPENING", "Work out why one first page hooks you."),
-                ("LEARN A STRUCTURE", "Read about one way stories are built."),
-                ("ANALYZE A SCENE", "Note how a writer builds its tension.")
+                ("Study a great opening", "Work out why one first page hooks you."),
+                ("Learn a structure", "Read about one way stories are built."),
+                ("Analyze a scene", "Note how a writer builds its tension.")
             ],
             .creator: [
-                ("WRITE ONE SCENE", "Put two characters in a tense moment."),
-                ("WRITE 300 WORDS", "Draft without stopping to edit."),
-                ("REWRITE A PARAGRAPH", "Make one of your own passages sharper.")
+                ("Write one scene", "Put two characters in a tense moment."),
+                ("Write 300 words", "Draft without stopping to edit."),
+                ("Rewrite a paragraph", "Make one of your own passages sharper.")
             ],
             .explorer: [
-                ("WRITE IN A NEW GENRE", "Draft a short piece outside your usual style."),
-                ("WRITE FROM A STRANGER’S VIEW", "Imagine someone you noticed today."),
-                ("USE A RANDOM PROMPT", "Start from a word you didn’t choose.")
+                ("Write in a new genre", "Draft a short piece outside your usual style."),
+                ("Write from a stranger’s view", "Imagine someone you noticed today."),
+                ("Use a random prompt", "Start from a word you didn’t choose.")
             ]
         ]),
         "artist": ("Creative", [
             .strategist: [
-                ("PLAN A COMPOSITION", "Make three thumbnails and choose one."),
-                ("BUILD A COLOR PALETTE", "Pick colors for a mood and test them."),
-                ("SET A SERIES THEME", "Plan three pieces that belong together.")
+                ("Plan a composition", "Make three thumbnails and choose one."),
+                ("Build a color palette", "Pick colors for a mood and test them."),
+                ("Set a series theme", "Plan three pieces that belong together.")
             ],
             .scholar: [
-                ("STUDY AN ARTIST YOU LOVE", "Note how they use light and color."),
-                ("LEARN A SHADING TECHNIQUE", "Practice it on one simple object."),
-                ("COPY A MASTER’S DETAIL", "Learn by redrawing one small section.")
+                ("Study an artist you love", "Note how they use light and color."),
+                ("Learn a shading technique", "Practice it on one simple object."),
+                ("Copy a master’s detail", "Learn by redrawing one small section.")
             ],
             .creator: [
-                ("DRAW FROM LIFE", "Sketch one object in front of you."),
-                ("FINISH A SMALL PIECE", "Take one idea from start to done."),
-                ("PAINT A MOOD", "Show one feeling using only color.")
+                ("Draw from life", "Sketch one object in front of you."),
+                ("Finish a small piece", "Take one idea from start to done."),
+                ("Paint a mood", "Show one feeling using only color.")
             ],
             .explorer: [
-                ("TRY A NEW MEDIUM", "Use a material you’ve never worked with."),
-                ("DRAW WITHOUT LOOKING", "See what your hand does on its own."),
-                ("SKETCH OUTDOORS", "Capture something outside your usual space.")
+                ("Try a new medium", "Use a material you’ve never worked with."),
+                ("Draw without looking", "See what your hand does on its own."),
+                ("Sketch outdoors", "Capture something outside your usual space.")
             ]
         ]),
         "entrepreneur": ("Career", [
             .strategist: [
-                ("MAP YOUR COMPETITORS", "Compare three and find what’s missing."),
-                ("WORK OUT YOUR PRICING", "Estimate your costs and a fair price."),
-                ("SET ONE QUARTERLY GOAL", "Choose the number that matters most.")
+                ("Map your competitors", "Compare three and find what’s missing."),
+                ("Work out your pricing", "Estimate your costs and a fair price."),
+                ("Set one quarterly goal", "Choose the number that matters most.")
             ],
             .scholar: [
-                ("STUDY A FOUNDER’S STORY", "Note one decision that changed everything."),
-                ("LEARN ONE BUSINESS MODEL", "See how a company you use makes money."),
-                ("LEARN A FINANCE BASIC", "Understand cash flow or margin.")
+                ("Study a founder’s story", "Note one decision that changed everything."),
+                ("Learn one business model", "See how a company you use makes money."),
+                ("Learn a finance basic", "Understand cash flow or margin.")
             ],
             .creator: [
-                ("WRITE A ONE-LINE PITCH", "Say who it’s for and why it matters."),
-                ("MOCK UP YOUR OFFER", "Make a simple page describing your idea."),
-                ("DRAFT A CUSTOMER EMAIL", "Write to someone who has the problem.")
+                ("Write a one-line pitch", "Say who it’s for and why it matters."),
+                ("Mock up your offer", "Make a simple page describing your idea."),
+                ("Draft a customer email", "Write to someone who has the problem.")
             ],
             .explorer: [
-                ("TALK TO A CUSTOMER", "Ask one person about their problem."),
-                ("FIND A NEW PROBLEM", "List three annoyances you noticed today."),
-                ("TEST AN IDEA CHEAPLY", "Find the smallest way to learn if it works.")
+                ("Talk to a customer", "Ask one person about their problem."),
+                ("Find a new problem", "List three annoyances you noticed today."),
+                ("Test an idea cheaply", "Find the smallest way to learn if it works.")
             ]
         ]),
         "musician": ("Creative", [
             .strategist: [
-                ("PLAN A PRACTICE ROUTINE", "Split your time across three skills."),
-                ("BREAK DOWN A HARD PASSAGE", "Find the exact bars holding you back."),
-                ("MAP A SONG’S STRUCTURE", "Chart its sections and changes.")
+                ("Plan a practice routine", "Split your time across three skills."),
+                ("Break down a hard passage", "Find the exact bars holding you back."),
+                ("Map a song’s structure", "Chart its sections and changes.")
             ],
             .scholar: [
-                ("LEARN A SCALE", "Master one scale slowly and evenly."),
-                ("STUDY A CHORD PROGRESSION", "Find out why it sounds the way it does."),
-                ("LISTEN CLOSELY TO A SONG", "Follow one instrument from start to end.")
+                ("Learn a scale", "Master one scale slowly and evenly."),
+                ("Study a chord progression", "Find out why it sounds the way it does."),
+                ("Listen closely to a song", "Follow one instrument from start to end.")
             ],
             .creator: [
-                ("WRITE A SHORT MELODY", "Compose eight bars you can hum."),
-                ("ARRANGE A FAVORITE SONG", "Make it your own with one big change."),
-                ("RECORD A SHORT TAKE", "Play something and keep the recording.")
+                ("Write a short melody", "Compose eight bars you can hum."),
+                ("Arrange a favorite song", "Make it your own with one big change."),
+                ("Record a short take", "Play something and keep the recording.")
             ],
             .explorer: [
-                ("PLAY A NEW GENRE", "Learn a groove from unfamiliar music."),
-                ("IMPROVISE FOR A WHILE", "Play with no plan and no page."),
-                ("TRY A NEW SOUND", "Experiment with a technique you’ve avoided.")
+                ("Play a new genre", "Learn a groove from unfamiliar music."),
+                ("Improvise for a while", "Play with no plan and no page."),
+                ("Try a new sound", "Experiment with a technique you’ve avoided.")
             ]
         ]),
         "athlete": ("Health", [
             .strategist: [
-                ("PLAN YOUR TRAINING WEEK", "Balance hard days, easy days and rest."),
-                ("SET A MEASURABLE GOAL", "Choose a target and test it today."),
-                ("REVIEW YOUR RECOVERY", "Check your sleep, food and rest.")
+                ("Plan your training week", "Balance hard days, easy days and rest."),
+                ("Set a measurable goal", "Choose a target and test it today."),
+                ("Review your recovery", "Check your sleep, food and rest.")
             ],
             .scholar: [
-                ("STUDY YOUR TECHNIQUE", "Watch an expert and note one difference."),
-                ("LEARN ONE MUSCLE GROUP", "Find out how it works and trains."),
-                ("READ ABOUT RECOVERY", "Learn one thing that speeds it up.")
+                ("Study your technique", "Watch an expert and note one difference."),
+                ("Learn one muscle group", "Find out how it works and trains."),
+                ("Read about recovery", "Learn one thing that speeds it up.")
             ],
             .creator: [
-                ("DESIGN A WORKOUT", "Build your own 30-minute session."),
-                ("FILM YOUR FORM", "Record a movement and review it."),
-                ("MAKE A WARM-UP ROUTINE", "Create one you’ll want to repeat.")
+                ("Design a workout", "Build your own 30-minute session."),
+                ("Film your form", "Record a movement and review it."),
+                ("Make a warm-up routine", "Create one you’ll want to repeat.")
             ],
             .explorer: [
-                ("TRY A NEW EXERCISE", "Add one movement you’ve never done."),
-                ("TRAIN SOMEWHERE NEW", "Take your session to a different place."),
-                ("TRY ANOTHER SPORT’S DRILL", "See what it teaches you about yours.")
+                ("Try a new exercise", "Add one movement you’ve never done."),
+                ("Train somewhere new", "Take your session to a different place."),
+                ("Try another sport’s drill", "See what it teaches you about yours.")
             ]
         ]),
         "teacher": ("Career", [
             .strategist: [
-                ("PLAN A LESSON", "Set one goal and a way to check it."),
-                ("MAP A UNIT", "Order five lessons so each builds on the last."),
-                ("DESIGN A SHORT QUIZ", "Write questions that reveal understanding.")
+                ("Plan a lesson", "Set one goal and a way to check it."),
+                ("Map a unit", "Order five lessons so each builds on the last."),
+                ("Design a short quiz", "Write questions that reveal understanding.")
             ],
             .scholar: [
-                ("STUDY A TEACHING METHOD", "Learn one way to help ideas stick."),
-                ("DEEPEN YOUR SUBJECT", "Learn something beyond what you’d teach."),
-                ("READ HOW PEOPLE LEARN", "Note one idea you can use.")
+                ("Study a teaching method", "Learn one way to help ideas stick."),
+                ("Deepen your subject", "Learn something beyond what you’d teach."),
+                ("Read how people learn", "Note one idea you can use.")
             ],
             .creator: [
-                ("MAKE A CLASS ACTIVITY", "Turn one idea into something hands-on."),
-                ("DRAW A TEACHING DIAGRAM", "Explain a hard idea with a picture."),
-                ("WRITE A GOOD ANALOGY", "Connect a hard concept to everyday life.")
+                ("Make a class activity", "Turn one idea into something hands-on."),
+                ("Draw a teaching diagram", "Explain a hard idea with a picture."),
+                ("Write a good analogy", "Connect a hard concept to everyday life.")
             ],
             .explorer: [
-                ("EXPLAIN SOMETHING TO A FRIEND", "See where they get confused."),
-                ("WATCH ANOTHER TEACHER", "Note one thing they do differently."),
-                ("TRY A NEW FORMAT", "Teach an idea through a game or story.")
+                ("Explain something to a friend", "See where they get confused."),
+                ("Watch another teacher", "Note one thing they do differently."),
+                ("Try a new format", "Teach an idea through a game or story.")
             ]
         ]),
         "designer": ("Creative", [
             .strategist: [
-                ("MAP A USER FLOW", "Plan every step of one simple task."),
-                ("AUDIT A SCREEN", "List what makes it hard to use."),
-                ("SET A TYPE SCALE", "Choose sizes that work together.")
+                ("Map a user flow", "Plan every step of one simple task."),
+                ("Audit a screen", "List what makes it hard to use."),
+                ("Set a type scale", "Choose sizes that work together.")
             ],
             .scholar: [
-                ("STUDY A DESIGN YOU LOVE", "Work out why its layout feels right."),
-                ("LEARN A TYPE PRINCIPLE", "Practice one rule on a real example."),
-                ("READ ABOUT COLOR CONTRAST", "Check one design against what you learn.")
+                ("Study a design you love", "Work out why its layout feels right."),
+                ("Learn a type principle", "Practice one rule on a real example."),
+                ("Read about color contrast", "Check one design against what you learn.")
             ],
             .creator: [
-                ("REDESIGN A SMALL SCREEN", "Improve one app screen you use daily."),
-                ("MAKE A BUTTON SET", "Design every state of one button."),
-                ("DESIGN A POSTER", "Say one thing with type alone.")
+                ("Redesign a small screen", "Improve one app screen you use daily."),
+                ("Make a button set", "Design every state of one button."),
+                ("Design a poster", "Say one thing with type alone.")
             ],
             .explorer: [
-                ("TRY AN UNFAMILIAR STYLE", "Design in a look you’d never choose."),
-                ("WATCH SOMEONE USE AN APP", "Note where they hesitate."),
-                ("TRY A NEW DESIGN TOOL", "Use a feature you’ve never opened.")
+                ("Try an unfamiliar style", "Design in a look you’d never choose."),
+                ("Watch someone use an app", "Note where they hesitate."),
+                ("Try a new design tool", "Use a feature you’ve never opened.")
             ]
         ]),
         "engineer": ("Development", [
             .strategist: [
-                ("BREAK DOWN A PROBLEM", "Split one big task into small parts."),
-                ("WEIGH TWO SOLUTIONS", "List the tradeoffs and choose one."),
-                ("PLAN A SMALL SYSTEM", "Draw its parts and how they connect.")
+                ("Break down a problem", "Split one big task into small parts."),
+                ("Weigh two solutions", "List the tradeoffs and choose one."),
+                ("Plan a small system", "Draw its parts and how they connect.")
             ],
             .scholar: [
-                ("LEARN ONE CORE CONCEPT", "Pick a fundamental you’ve been avoiding."),
-                ("STUDY HOW SOMETHING WORKS", "Trace one everyday system end to end."),
-                ("WORK A PRACTICE PROBLEM", "Solve one by hand before checking.")
+                ("Learn one core concept", "Pick a fundamental you’ve been avoiding."),
+                ("Study how something works", "Trace one everyday system end to end."),
+                ("Work a practice problem", "Solve one by hand before checking.")
             ],
             .creator: [
-                ("BUILD A SMALL TOOL", "Make something that saves you a step."),
-                ("IMPROVE AN OLD PROJECT", "Fix one thing you’ve been meaning to."),
-                ("MAKE A WORKING MODEL", "Test an idea with something real.")
+                ("Build a small tool", "Make something that saves you a step."),
+                ("Improve an old project", "Fix one thing you’ve been meaning to."),
+                ("Make a working model", "Test an idea with something real.")
             ],
             .explorer: [
-                ("TRY A NEW TOOL", "Use something unfamiliar for a small job."),
-                ("INVESTIGATE A FAILURE", "Find out why something broke."),
-                ("EXPLORE ANOTHER FIELD", "See how a different kind of engineer works.")
+                ("Try a new tool", "Use something unfamiliar for a small job."),
+                ("Investigate a failure", "Find out why something broke."),
+                ("Explore another field", "See how a different kind of engineer works.")
             ]
         ])
     ]

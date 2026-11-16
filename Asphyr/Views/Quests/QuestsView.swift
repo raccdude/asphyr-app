@@ -60,14 +60,28 @@ struct QuestsView: View {
     @State private var questToEdit: Quest?
     @State private var selectedQuestID: UUID?
     @State private var errorMessage: String?
+    @State private var searchText = ""
+    @State private var isSearching = false
+    @FocusState private var isSearchFocused: Bool
     @Namespace private var filterNamespace
+
+    private var searchQuery: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     private var filteredQuests: [Quest] {
         // ALL is everything still open, so finished quests don't pile up there
-        guard let status = selectedFilter.status else {
-            return questStore.quests.filter { $0.status != .completed }
+        let inFilter = selectedFilter.status.map { status in
+            questStore.quests.filter { $0.status == status }
+        } ?? questStore.quests.filter { $0.status != .completed }
+
+        // Search stays inside the chosen filter, so old quests are found under COMPLETED
+        guard !searchQuery.isEmpty else { return inFilter }
+        return inFilter.filter { quest in
+            [quest.title, quest.description, quest.category]
+                .compactMap { $0 }
+                .contains { $0.localizedCaseInsensitiveContains(searchQuery) }
         }
-        return questStore.quests.filter { $0.status == status }
     }
 
     var body: some View {
@@ -80,6 +94,7 @@ struct QuestsView: View {
                     emptyState
                 }
                 .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.immediately)
             } else {
                 questSections
             }
@@ -149,15 +164,41 @@ struct QuestsView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("QUEST LOG")
-                .font(AppTypography.captionMedium)
-                .foregroundStyle(Color.asphyrTextSecondary)
+            // The search button swaps the title for the search field
+            Group {
+                if isSearching {
+                    HStack(spacing: 12) {
+                        searchField
 
-            Text("QUESTS")
-                .font(AppTypography.screenTitle)
-                .foregroundStyle(Color.asphyrTextPrimary)
-                .accessibilityAddTraits(.isHeader)
-                .padding(.top, 4)
+                        Button("Cancel") {
+                            endSearch()
+                        }
+                        .font(AppTypography.body)
+                        .foregroundStyle(Color.asphyrAccentPrimary)
+                        .frame(minHeight: 44)
+                    }
+                    .transition(.opacity)
+                } else {
+                    HStack(alignment: .center, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("QUEST LOG")
+                                .font(AppTypography.captionMedium)
+                                .foregroundStyle(Color.asphyrTextSecondary)
+
+                            Text("QUESTS")
+                                .font(AppTypography.screenTitle)
+                                .foregroundStyle(Color.asphyrTextPrimary)
+                                .accessibilityAddTraits(.isHeader)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        searchButton
+                    }
+                    .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: isSearching)
 
             filterBar
                 .padding(.top, 18)
@@ -169,6 +210,80 @@ struct QuestsView: View {
         .padding(.bottom, 6)
         // Solid, so content scrolling up doesn't show behind the title
         .background(Color.asphyrBackground.ignoresSafeArea(edges: .top))
+    }
+
+    /// Round, like the Settings button on Home.
+    private var searchButton: some View {
+        Button {
+            isSearching = true
+            // The field appears first, then takes the keyboard
+            Task { isSearchFocused = true }
+        } label: {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Color.asphyrTextPrimary)
+                .frame(width: 44, height: 44)
+                .contentShape(Circle())
+        }
+        .glassEffect(.regular.interactive(), in: Circle())
+        .accessibilityLabel("Search quests")
+    }
+
+    private func endSearch() {
+        searchText = ""
+        isSearchFocused = false
+        isSearching = false
+    }
+
+    /// Matches the filter bar below it: same height, corners, fill and border.
+    private var searchField: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(isSearchFocused ? Color.asphyrAccentPrimary : Color.asphyrTextSecondary)
+                .accessibilityHidden(true)
+
+            TextField(
+                "",
+                text: $searchText,
+                prompt: Text("Search quests").foregroundStyle(Color.asphyrTextSecondary)
+            )
+            .font(AppTypography.body)
+            .foregroundStyle(Color.asphyrTextPrimary)
+            .tint(Color.asphyrAccentPrimary)
+            .focused($isSearchFocused)
+            .submitLabel(.search)
+            .autocorrectionDisabled()
+            .accessibilityLabel("Search quests")
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, searchText.isEmpty ? 14 : 0)
+        .frame(minHeight: 44)
+        .background {
+            RoundedRectangle(cornerRadius: 13)
+                .fill(Color.asphyrSurface)
+                .onTapGesture { isSearchFocused = true }
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 13)
+                .strokeBorder(isSearchFocused ? Color.asphyrAccentPrimary : Color.asphyrBorder, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+        .animation(.easeInOut(duration: 0.15), value: isSearchFocused)
     }
 
     private var filterBar: some View {
@@ -283,6 +398,7 @@ struct QuestsView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.immediately)
         .environment(\.defaultMinListRowHeight, 0)
         // Lets the last card scroll clear of the create button
         .contentMargins(.bottom, 79, for: .scrollContent)
@@ -290,22 +406,31 @@ struct QuestsView: View {
 
     private var emptyState: some View {
         VStack(spacing: 0) {
-            Image(selectedFilter.emptyIconName)
-                .foregroundStyle(Color.asphyrAccentPrimary)
-                .frame(width: 78, height: 78)
-                .background(Color.asphyrAccentPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: 24))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(Color.asphyrAccentPrimary.opacity(0.35), lineWidth: 1)
+            Group {
+                if searchQuery.isEmpty {
+                    Image(selectedFilter.emptyIconName)
+                } else {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 30, weight: .medium))
                 }
-                .accessibilityHidden(true)
+            }
+            .foregroundStyle(Color.asphyrAccentPrimary)
+            .frame(width: 78, height: 78)
+            .background(Color.asphyrAccentPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: 24))
+            .overlay {
+                RoundedRectangle(cornerRadius: 24)
+                    .strokeBorder(Color.asphyrAccentPrimary.opacity(0.35), lineWidth: 1)
+            }
+            .accessibilityHidden(true)
 
-            Text(selectedFilter.emptyTitle)
+            Text(searchQuery.isEmpty ? selectedFilter.emptyTitle : "No quests match “\(searchQuery)”.")
                 .font(AppTypography.sectionTitle)
                 .foregroundStyle(Color.asphyrTextPrimary)
                 .padding(.top, 18)
 
-            Text(selectedFilter.emptyMessage)
+            Text(searchQuery.isEmpty
+                ? selectedFilter.emptyMessage
+                : "Try another word, or search under another filter.")
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(Color.asphyrTextSecondary)
                 .frame(maxWidth: 250)
