@@ -662,7 +662,8 @@ struct CreateQuestView: View {
         } label: {
             Text(option)
                 .font(AppTypography.bodySecondary)
-                .foregroundStyle(isSelected ? Color.asphyrAccentPrimary : Color.asphyrTextPrimary)
+                // White like the other selected controls; the border and tint show the choice
+                .foregroundStyle(Color.asphyrTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)
                 .padding(.horizontal, 6)

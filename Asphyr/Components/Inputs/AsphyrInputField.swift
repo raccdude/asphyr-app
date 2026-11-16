@@ -20,6 +20,17 @@ struct AsphyrInputField<Field: Hashable>: View {
 
     @State private var isRevealed = false
 
+    private enum PasswordSide: Hashable {
+        case hidden, shown
+    }
+
+    /// Which of the two password fields has the keyboard.
+    @FocusState private var focusedSide: PasswordSide?
+
+    /// iOS clears a password field on the first key after it takes the keyboard back,
+    /// so the text from before hiding is kept to restore it.
+    @State private var textBeforeHiding: String?
+
     private var isFocused: Bool { focus.wrappedValue == field }
 
     private var accentColor: Color {
@@ -40,21 +51,16 @@ struct AsphyrInputField<Field: Hashable>: View {
                 .allowsHitTesting(false)
 
             Group {
-                if isSecure && !isRevealed {
-                    SecureField("", text: $text, prompt: promptText)
-                } else if isSecure {
-                    // A shown password is still a password: no suggestions or capitals
-                    TextField("", text: $text, prompt: promptText)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
+                if isSecure {
+                    passwordFields
                 } else {
                     TextField("", text: $text, prompt: promptText)
+                        .focused(focus, equals: field)
                 }
             }
             .font(AppTypography.body)
             .foregroundStyle(Color.asphyrTextPrimary)
             .tint(Color.asphyrAccentPrimary)
-            .focused(focus, equals: field)
 
             if isSecure {
                 revealButton
@@ -84,14 +90,68 @@ struct AsphyrInputField<Field: Hashable>: View {
         Text(placeholder).foregroundStyle(Color.asphyrTextSecondary)
     }
 
+    /// Both fields stay on screen, one hidden, and the eye moves typing straight from
+    /// one to the other. Removing the focused field would close the keyboard.
+    private var passwordFields: some View {
+        ZStack {
+            SecureField("", text: $text, prompt: promptText)
+                .focused($focusedSide, equals: .hidden)
+                .opacity(isRevealed ? 0 : 1)
+                .allowsHitTesting(!isRevealed)
+                .accessibilityHidden(isRevealed)
+
+            // A shown password is still a password: no suggestions or capitals
+            TextField("", text: $text, prompt: promptText)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .focused($focusedSide, equals: .shown)
+                .opacity(isRevealed ? 1 : 0)
+                .allowsHitTesting(isRevealed)
+                .accessibilityHidden(!isRevealed)
+        }
+        // Lets the form see and set focus here, for the border and Return-to-next-field
+        .focused(focus, equals: field)
+        // Keeps the form's focus and this field's own focus in step
+        .onChange(of: focus.wrappedValue) { _, newValue in
+            if newValue == field {
+                if focusedSide != visibleSide { focusedSide = visibleSide }
+            } else if focusedSide != nil {
+                focusedSide = nil
+            }
+        }
+        .onChange(of: focusedSide) { _, newValue in
+            if newValue != nil {
+                if focus.wrappedValue != field { focus.wrappedValue = field }
+            } else if focus.wrappedValue == field {
+                focus.wrappedValue = nil
+            }
+        }
+        .onAppear {
+            if focus.wrappedValue == field { focusedSide = visibleSide }
+        }
+        // Undoes the clear: keeps what was typed and applies the new key to it
+        .onChange(of: text) { oldValue, newValue in
+            guard let before = textBeforeHiding else { return }
+            textBeforeHiding = nil
+            if newValue.isEmpty, oldValue == before {
+                text = String(before.dropLast())
+            } else if !newValue.hasPrefix(before), oldValue == before {
+                text = before + newValue
+            }
+        }
+    }
+
+    private var visibleSide: PasswordSide {
+        isRevealed ? .shown : .hidden
+    }
+
     private var revealButton: some View {
         Button {
-            let wasFocused = isFocused
             isRevealed.toggle()
-            // Swapping the field type drops focus, so hand it back
-            if wasFocused {
-                Task { focus.wrappedValue = field }
+            if focusedSide != nil {
+                focusedSide = visibleSide
             }
+            textBeforeHiding = (!isRevealed && focusedSide != nil && !text.isEmpty) ? text : nil
         } label: {
             Group {
                 if isRevealed {
