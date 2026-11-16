@@ -17,20 +17,35 @@ struct AccountLoadingView: View {
             Color.asphyrBackground
                 .ignoresSafeArea()
 
-            Image("asphyrPrismMark")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 77, height: 98)
-                .offset(y: -95)
-                .ignoresSafeArea()
+            // The words sit under the flame, which stays where Splash draws it
+            VStack(spacing: 28) {
+                Image("asphyrPrismMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 77, height: 98)
+                    .accessibilityHidden(true)
+
+                VStack(spacing: 8) {
+                    // Reassures first: a dropped connection never loses progress
+                    Text("Every step you’ve taken is safe.")
+                        .font(AppTypography.sectionTitle)
+                        .foregroundStyle(Color.asphyrTextPrimary)
+
+                    Text(errorMessage)
+                        .font(AppTypography.bodySecondary)
+                        .foregroundStyle(Color.asphyrTextSecondary)
+                }
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 32)
+            }
+            // Centers on the flame rather than the whole stack
+            .alignmentGuide(VerticalAlignment.center) { $0[.top] + 49 }
+            .offset(y: -95)
+            .ignoresSafeArea()
 
             VStack(spacing: 16) {
                 Spacer()
-
-                Text(errorMessage)
-                    .font(AppTypography.bodySecondary)
-                    .foregroundStyle(Color.asphyrTextSecondary)
-                    .multilineTextAlignment(.center)
 
                 PrimaryButton(title: "TRY AGAIN", action: onRetry)
 
