@@ -102,9 +102,11 @@ struct RecoverAccountView: View {
                     .padding(.top, 8)
             }
 
-            Spacer(minLength: 24)
-
+            // Sits under the field, like Login and Create Account
             PrimaryButton(title: "SEND RESET LINK", isBusy: isBusy, action: submit)
+                .padding(.top, 24)
+
+            Spacer(minLength: 24)
         }
         .padding(.horizontal, 20)
         // Tapping empty space dismisses the keyboard
