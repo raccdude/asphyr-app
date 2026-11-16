@@ -16,7 +16,7 @@ ASPHYR turns real-world self-improvement into a game-inspired journey. You creat
 [![Tests](https://img.shields.io/badge/Backend%20checks-168%20%2B%208-00FF41?style=flat-square)](#testing)
 [![Project](https://img.shields.io/badge/BSCS-Finals%202026-1A2E22?style=flat-square)](#author)
 
-[Features](#features) · [Smart difficulty](#smart-difficulty-detection) · [Architecture](#architecture) · [Run the app](#run-the-app) · [Figma design](https://www.figma.com/design/27W7B4MhKAFJ8LwiWJgcmD/ASPHYR)
+[Screenshots](#screenshots) · [Features](#features) · [Smart difficulty](#smart-difficulty-detection) · [Architecture](#architecture) · [Run the app](#run-the-app) · [Figma design](https://www.figma.com/design/27W7B4MhKAFJ8LwiWJgcmD/ASPHYR)
 
 </div>
 
@@ -30,21 +30,22 @@ ASPHYR turns real-world self-improvement into a game-inspired journey. You creat
 <summary><b>Table of contents</b></summary>
 
 1. [Overview](#overview)
-2. [The Problem](#the-problem)
-3. [The Solution](#the-solution)
-4. [Features](#features)
-5. [Smart Difficulty Detection](#smart-difficulty-detection)
-6. [Who It Serves](#who-it-serves)
-7. [Privacy and Fair Play](#privacy-and-fair-play)
-8. [How It's Different](#how-its-different)
-9. [Limitations and Next Steps](#limitations-and-next-steps)
-10. [Architecture](#architecture)
-11. [Repository Contents](#repository-contents)
-12. [Run the App](#run-the-app)
-13. [Testing](#testing)
-14. [Documentation](#documentation)
-15. [Author](#author)
-16. [License](#license)
+2. [Screenshots](#screenshots)
+3. [The Problem](#the-problem)
+4. [The Solution](#the-solution)
+5. [Features](#features)
+6. [Smart Difficulty Detection](#smart-difficulty-detection)
+7. [Who It Serves](#who-it-serves)
+8. [Privacy and Fair Play](#privacy-and-fair-play)
+9. [How It's Different](#how-its-different)
+10. [Limitations and Next Steps](#limitations-and-next-steps)
+11. [Architecture](#architecture)
+12. [Repository Contents](#repository-contents)
+13. [Run the App](#run-the-app)
+14. [Testing](#testing)
+15. [Documentation](#documentation)
+16. [Author](#author)
+17. [License](#license)
 
 </details>
 
@@ -60,6 +61,40 @@ ASPHYR is a native iPhone app built with Swift and SwiftUI, with Supabase as its
 | Finish a real quest | XP, attributes and Embers, shown on an animated Reward screen |
 | Keep showing up | Levels, a streak flame, achievements and cloaks |
 | Keep going | A Journey of five constellations that lights up star by star |
+
+---
+
+## Screenshots
+
+<div align="center">
+
+<img src="docs/assets/screenshots/home.png" alt="Home" width="19%" />
+<img src="docs/assets/screenshots/quest-log.png" alt="Quest log" width="19%" />
+<img src="docs/assets/screenshots/reward.png" alt="Reward" width="19%" />
+<img src="docs/assets/screenshots/journey.png" alt="Journey" width="19%" />
+<img src="docs/assets/screenshots/store.png" alt="Store" width="19%" />
+
+<sub><b>Home</b> · <b>Quest log</b> · <b>Reward</b> · <b>Journey</b> · <b>Store</b></sub>
+
+</div>
+
+<details>
+<summary><b>More screens</b></summary>
+<br/>
+
+<div align="center">
+
+<img src="docs/assets/screenshots/splash.png" alt="Splash" width="19%" />
+<img src="docs/assets/screenshots/archetype.png" alt="Choosing an archetype" width="19%" />
+<img src="docs/assets/screenshots/create-quest-personal.png" alt="Create Quest" width="19%" />
+<img src="docs/assets/screenshots/quest-details.png" alt="Quest Details" width="19%" />
+<img src="docs/assets/screenshots/settings.png" alt="Settings" width="19%" />
+
+<sub><b>Splash</b> · <b>Archetype</b> · <b>Create Quest</b> · <b>Quest Details</b> · <b>Settings</b></sub>
+
+</div>
+
+</details>
 
 ---
 
