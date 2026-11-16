@@ -348,6 +348,8 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 
 **Cleanup (16 Nov 2026, later):** `15.3` deleted (its locked-cloak toast lives in `22.3`); Apple buttons removed from Create Account and Login, with Google full width; the email section removed from Notifications `19` and `19.1`; the Journey toast in `14.8` moved to the top like every other toast; `21.1` to `21.7` rebuilt from the current Dark frames in the Light mode, with round glass buttons given a surface fill and border so they show on light backgrounds. Setting a variable mode also drops opacity, so restore it after the mode switch. `1.1` and the app's `AccountLoadingView` now say "Every step you’ve taken is safe." under the flame.
 
+**Audit fixes (16 Nov 2026):** after a frame-by-frame comparison with the app: "Continue with Google" on Create Account and Login (the only social option, and Google's own wording); full stops on `10.6` and `15.1`; `17.3` uses the app's dark-first text; `17.5` and the app say progress is saved to the account; "+1 Ember" in `13.3` and the app; Home `9.2` and `9.3` attributes include the quests' gains; the Ember chip on `16.4`; `11.7` rebuilt so only Personal is at its limit; new `1.2` Splash (returning user), `11.8` and `11.9` Edit Quest, `22.4` to `22.6` Store states, `18.7` photo updated; Store toasts use the Ember icon; quest card layers renamed `Card / Quest / <title>`.
+
 **Frame numbers on `06`:** organized in app-flow order, one row per section, with each section's notes at the end of its row.
 
 | Section | Frames |
@@ -369,7 +371,7 @@ Revisions are made on the page `06 — Hi-Fi v3 (App revisions)`, a copy of `05 
 | 15 Notifications | `19` to `19.2` |
 | 16 Character art | `20.1` to `20.8` |
 | 17 Light mode | `21.1` to `21.8`: only the essential screens, copied from the current Dark frames and set to the Light color mode |
-| 18 Store & Inventory | `22` Store, `22.1` buy confirmation, `22.2` Inventory, `22.3` Inventory (locked cloak) |
+| 18 Store & Inventory | `22` Store, `22.1` buy confirmation, `22.2` Inventory, `22.3` Inventory (locked cloak), `22.4` not enough Embers, `22.5` cloak bought, `22.6` closed |
 
 **Done on `06`:** every revision group above the list below: auth, onboarding, Home, Quests, Create Quest, Quest Details, Reward, Journey, Character, Streaks, Settings and character art, with the app's toast style, side margins on sheets, 76pt back buttons and swatch outlines. `20.6` to `20.8` are built from the app's own SVG layers. The developer preferred the sheet's angry flames to the old `flame.fill` symbol, so the app now draws the sheet's shape, with an inner outline added to both. Behaviour that a still frame can't show is written beside each group as `Notes / ...`, and motion is in `Notes / Motion`. None of it is wired up as a Figma prototype yet.
 

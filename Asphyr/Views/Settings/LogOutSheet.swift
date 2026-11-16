@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Nothing is saved to an account yet, so logging out loses everything.
+/// Progress is saved to the account, so logging out only signs out this iPhone.
 struct LogOutSheet: View {
     let onLogOut: () -> Void
 
@@ -30,7 +30,7 @@ struct LogOutSheet: View {
                 .foregroundStyle(Color.asphyrTextPrimary)
                 .padding(.top, 16)
 
-            Text("Progress isn’t saved to an account yet, so logging out will erase it.")
+            Text("Your progress is saved to your account. Log back in anytime to pick up where you left off.")
                 .font(AppTypography.bodySecondary)
                 .foregroundStyle(Color.asphyrTextSecondary)
                 .multilineTextAlignment(.center)

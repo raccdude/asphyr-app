@@ -340,7 +340,7 @@ struct RewardView: View {
     private var embersEarned: some View {
         HStack(spacing: 6) {
             Image("iconEmber")
-            Text("+\(completion.embersEarned) Embers")
+            Text("+\(completion.embersEarned) \(completion.embersEarned == 1 ? "Ember" : "Embers")")
                 .font(AppTypography.bodySemiBold)
         }
         .foregroundStyle(Color.asphyrWarning)

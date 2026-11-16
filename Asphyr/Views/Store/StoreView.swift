@@ -153,7 +153,7 @@ struct StoreView: View {
     private func tapBuy(_ item: StoreItemRecord) {
         let shortfall = item.price - questStore.embers
         if shortfall > 0 {
-            toast = "You need \(shortfall) more Embers. Complete quests to earn them."
+            toast = "You need \(shortfall) more \(shortfall == 1 ? "Ember" : "Embers"). Complete quests to earn them."
         } else {
             pendingPurchase = item
         }
@@ -198,7 +198,7 @@ struct EmberBalance: View {
                 .strokeBorder(Color.asphyrWarning.opacity(0.4), lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(embers) Embers")
+        .accessibilityLabel("\(embers) \(embers == 1 ? "Ember" : "Embers")")
     }
 }
 
